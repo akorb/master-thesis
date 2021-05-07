@@ -6,9 +6,9 @@ command -v pdfcrop >/dev/null 2>&1 || {
   exit 1
 }
 
-LOGOS=(tum faculty)
+LOGOS="tum faculty"
 
-for logo in ${LOGOS[@]}
+for logo in ${LOGOS}
 do
   pdfcrop "logos/${logo}.pdf" "logos/${logo}.pdf"
 done
