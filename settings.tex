@@ -34,6 +34,18 @@
 }
 \usepackage{ifthen}
 
+\addto\extrasamerican{
+	\def\lstnumberautorefname{Line}
+	\def\chapterautorefname{Chapter}
+	\def\sectionautorefname{Section}
+	\def\subsectionautorefname{Subsection}
+	\def\subsubsectionautorefname{Subsubsection}
+}
+
+\addto\extrasngerman{
+	\def\lstnumberautorefname{Zeile}
+}
+
 % Themes
 \ifthenelse{\equal{\detokenize{dark}}{\jobname}}{%
   % Dark theme
