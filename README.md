@@ -2,7 +2,7 @@
 
 **⚠️⚠️ On the 01. October 2022 all faculties will be dissolved in favor of the new Schools which will be founded on 01. October 2022. This means, in case you hand in your thesis after the 01. October 2022, you have to replace `Department of XYZ` with `School of XYZ`. This change is already reflected in the latest version of this template. ⚠️⚠️**
 
-This is a LaTeX template created according to the guidelines for TUM informatics theses in SS 2013. **Always check the [current formatting guidelines][thesis-guidelines] before you hand in.** See [`build/main.pdf`][sample-pdf] for an example PDF created with this template.
+This is a LaTeX template created according to the guidelines for TUM informatics theses in SS 2022. **Always check the [current formatting guidelines][thesis-guidelines] before you hand in.** See [`build/main.pdf`][sample-pdf] for an example PDF created with this template.
 
 Note: Because of copyright considerations, TUM logos are not included in this template. Unfortunately, the logos are also not available on the MyTUM website anymore.
 Your supervisor should be able to hand them to you.
