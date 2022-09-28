@@ -11,13 +11,13 @@ Comments & contributions are welcome!
 
 ## Quickstart
 
- * [Download][template-download] and extract the template, or upload it to an online editor such as [Overleaf][overleaf] or [ShareLaTeX][sharelatex]. If you prefer to use Git, just clone/fork the repository.
+ * [Download][template-download] and extract the template, or upload it to an online editor such as [Overleaf][overleaf] or [TUM ShareLaTeX][tum-sharelatex]. If you prefer to use Git, just clone/fork the repository.
  * If your editor provides support for compiling LaTeX, set it up to use `pdflatex` and `biber`. Set the master document to `main.tex`. Alternatively, you can use the provided Makefile to generate a PDF in the `build` directory (requires `latexmk`).
  * Look for `TODO` comments in the provided files. Start at `main.tex`.
 
-If you are new to LaTeX, the [ShareLaTeX knowledge base][sharelatex-kb] or the [LaTeX Wikibook][latex-wikibook] might help.
+If you are new to LaTeX, the [Overleaf Documentation][overleaf-learn] or the [LaTeX Wikibook][latex-wikibook] might help.
 
-For additional hints, have a look at [the wiki][wiki]. If you still have problems with the template, feel free to [create an issue][issue]. For general LaTeX questions, use [TeX StackExchange][tex-se].
+If you still have problems with the template, feel free to [create an issue][issue]. For general LaTeX questions, use [TeX StackExchange][tex-se].
 
 ## License
 
@@ -38,11 +38,11 @@ The license **applies only to the template**; there are no restrictions on the r
 [license]: https://creativecommons.org/licenses/by-sa/4.0/
 [overleaf]: https://www.overleaf.com/
 [sample-pdf]: https://raw.github.com/TUM-Dev/tum-thesis-latex/master/build/main.pdf
-[sharelatex-kb]: https://www.sharelatex.com/learn
-[sharelatex]: https://www.sharelatex.com/
+[overleaf-learn]: https://www.overleaf.com/learn
+[tum-sharelatex]: https://latex.tum.de/ldap/login
 [template-authors]: https://github.com/TUM-Dev/tum-thesis-latex/graphs/contributors
 [template-download]: https://github.com/TUM-Dev/tum-thesis-latex/archive/master.zip
 [template-url]: https://github.com/TUM-Dev/tum-thesis-latex
 [tex-se]: https://tex.stackexchange.com/
-[thesis-guidelines]: http://www.in.tum.de/en/current-students/administrative-matters/thesis-guidelines-and-topics.html
+[thesis-guidelines]: https://www.in.tum.de/en/in/current-students/administrative-matters/thesis-guidelines-and-topics/
 [wiki]: https://github.com/TUM-Dev/tum-thesis-latex/wiki/
