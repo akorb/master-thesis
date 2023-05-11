@@ -1,6 +1,12 @@
 \chapter{Background}\label{chapter:background}
 
+This chapter discusses the relevant background knowledge required to understand the remainder of this work.
+
 \section{Trusted execution environment}
+A \ac{TEE} is a trusted execution environment on a processor isolated by hardware.
+It allows code to be executed and data to be stored on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity. One such environment is ARM's TrustZone~\cite{ARM09}. It partitions all software and hardware resources of the containing system into the Normal world~(NW) and the Secure world~(SW). While the SW can access the resources of the SW and the NW, the NW is restricted to its own resources.
+Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\% \cite{eclipse}, many of the approaches in this field of research rely on ARM technology such as TrustZone. Our approach also leverages TrustZone to run a trusted application in the SW that monitors the control-flow of the OS kernel in the NW.
+
 
 
 \section{Trusted Platform Module}
@@ -11,3 +17,7 @@
 \section{Attestation}
 \subsection{Local attestation}
 \subsection{Remote attestation}
+
+Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
+
+A trusted anchor is required on the device to be attested because at least one trusted component is necessary to extract the data from the remote device to be verified. In many cases, TEE's act as a trust anchor because they are hardware-protected, making it an excellent candidate for a trust anchor.
