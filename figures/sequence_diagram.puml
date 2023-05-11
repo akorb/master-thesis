@@ -1,0 +1,49 @@
+@startuml sequence diagram
+
+
+
+actor "3rd party\nattester"
+
+== Initialization during boot-time ==
+
+'activate "fTPM Attestation\nTA"
+'?-> "fTPM Attestation\nTA": Triggered\nby OP-TEE
+"fTPM Attestation\nTA" -[hidden]-> "fTPM Attestation\nTA" ++
+
+"fTPM Attestation\nTA" -> "RA PTA" ++: Attest fTPM TA
+
+"RA PTA" -> "fTPM TA": Read memory
+"RA PTA" -> "RA PTA": Hash fTPM memory
+
+"fTPM Attestation\nTA" <-- "RA PTA" --: Signed fTPM hash
+
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Create and store EKCert\ncontaining fTPM hash
+"fTPM Attestation\nTA" -> "fTPM TA": Inject EKCert
+
+
+
+
+== Attestation process ==
+
+"3rd party\nattester" -> "User space\napplication" ++: Attestation request\nwith Nonce
+"User space\napplication" -> "Kernel module" ++: Forward
+
+
+"Kernel module" -> "fTPM Attestation\nTA": Forward
+"Kernel module" <-- "fTPM Attestation\nTA": Evidence = Quote\n+ EKCert\n+ Certificate chain\n+ Nonce
+"User space\napplication" <-- "Kernel module" --: Evidence
+"3rd party\nattester" <-- "User space\napplication" --: Evidence
+
+
+box "Normal World (Linux)" #Salmon
+participant "User space\napplication"
+participant "Kernel module"
+end box
+
+box "Secure World (OP-TEE)" #LightBlue
+participant "fTPM Attestation\nTA"
+participant "RA PTA"
+participant "fTPM TA"
+end box
+
+@enduml
