@@ -20,23 +20,45 @@ Our approach also leverages TrustZone to enable the execution and the remote att
 
 Other common \ac{TEE} technologies are Intel Software Guard Extensions (SGX), Intel Trusted Domain Extensions (TDX) and AMD Secure Encrypted Virtualization (SEV). Since we focus on the implementation of our concept with ARM TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to ARM processors and can also be applied to others, they are mentioned for the sake of completeness.
 
+\section{Attestation}
+\subsection{Local attestation}
+\subsection{Remote attestation}
+
+Remote attestation is a challenge-
+response protocol that sends PCR values in the form of a
+digitally signed quote to a remote attestor.
+
+Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
+
+A trusted anchor is required on the device to be attested because at least one trusted component is necessary to extract the data from the remote device to be verified. In many cases, TEE's act as a trust anchor because they are hardware-protected, making it an excellent candidate for a trust anchor.
+
 \section{Trusted Platform Module}
 
 TPMs support three main use-cases: secure key generation, remote system attestation, and secure storage. 
 
 There are various types of TPMs. They all offer the same functionality, but with different security guarantees and are also deployed differently.
 
+% From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
+% Rephrase
+Allows remote attestation with PCR values in the form of a digitally signed quote to a remote attestor.
+
+% PCR usage table (similar to https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf)
+
+$PCR(i)_{t+1} = hash(PCR(i)_t\ |\ new\ measurement),\ PCR(i)_0 = 0$
+
+% Maybe add graphs for dTPM and vTPM:
+% CPU <-LPC-> dTPM
+% [CPU|TEE[fTPM]]
+
 \subsection{Discrete TPM}
+
+Connected to CPU via LPC bus.
+% Reference https://www.intel.de/content/dam/www/program/design/us/en/documents/low-pin-count-interface-specification.pdf
+
 \subsection{Virtual TPM}
 \subsection{Firmware TPM}
 
-\section{Attestation}
-\subsection{Local attestation}
-\subsection{Remote attestation}
 
-Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
-
-A trusted anchor is required on the device to be attested because at least one trusted component is necessary to extract the data from the remote device to be verified. In many cases, TEE's act as a trust anchor because they are hardware-protected, making it an excellent candidate for a trust anchor.
 
 \section{Secure Boot and Measured Boot}
 
