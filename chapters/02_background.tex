@@ -24,9 +24,11 @@ Other common \ac{TEE} technologies are Intel Software Guard Extensions (SGX), In
 \subsection{Local attestation}
 \subsection{Remote attestation}
 
-Remote attestation is a challenge-
-response protocol that sends PCR values in the form of a
-digitally signed quote to a remote attestor.
+Remote attestation is a challenge-response protocol initiated by a remote attestor.
+The challenge contains a nonce, enforcing a fresh response.
+The response must be a proof of the challenged system that it is trustworthy.
+
+TPMs send PCR values in the form of a digitally signed quote to a remote attestor.
 
 Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
 
@@ -50,13 +52,44 @@ $PCR(i)_{t+1} = hash(PCR(i)_t\ |\ new\ measurement),\ PCR(i)_0 = 0$
 % CPU <-LPC-> dTPM
 % [CPU|TEE[fTPM]]
 
+\begin{figure}
+    \begin{subfigure}{0.49\textwidth}
+      \includegraphics[width=\linewidth]{figures/dTPM.pdf}
+      \caption{Discrete TPM} \label{fig:dtpm}
+    \end{subfigure}%
+    \hspace*{\fill}   % maximize separation between the subfigures
+    \begin{subfigure}{0.49\textwidth}
+      \includegraphics[width=\linewidth]{figures/fTPM.pdf}
+      \caption{Firmware TPM} \label{fig:ftpm}
+    \end{subfigure}%
+  
+  \caption{Schematic illustration of the different TPM types.} \label{fig:tpm_types}
+  \end{figure}
+
 \subsection{Discrete TPM}
 
-Connected to CPU via LPC bus.
+This is the classical form of a TPM. It is a dedicated piece of hardware, connected to the CPU via a bus. It is designed and manufactured to be highly temper-resistant against hardware attacks.
 % Reference https://www.intel.de/content/dam/www/program/design/us/en/documents/low-pin-count-interface-specification.pdf
 
-\subsection{Virtual TPM}
+The well known TPM Reset Attack was independently described in \cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the data signal of the LPC bus to ground. This results in a reset signal for the TPM, yielding predictable values for the PCR registers, i.e., 0. This allows an attacker to replay arbitrary register extends.
+
+Winter and Dietrich \cite{Winter2013} show attacks against the bus between a TPM and the CPU. They built-up onto the previously described TPM Reset Attack. It focuses on resetting the PCR values by active hardware attacks, while the running platform does not change. For that, a valid boot procedure is required to retrieve the valid PCR values. However, it also introduces the opposite, where the PC is reset, and an evil operating system/firmware booted, but the TPM is not aware of this, keeping the valid PCR values of the previous boot procedure.
+
+\cite{Kursawe2005AnalyzingTP} also attacks LPC bus against TPM 1.1. They observed that the data of some operations like unsealing are transmitted via the bus in plain text.
+
+Invasive hardware attacks on dTPMs have already been shown in 2010 by Tarnovsky \cite{tarnovsky}. However, this requires a lot of time, knowledge, and resources, i.e., hardware and money.
+
+Also, I2C common for bus system. Hardware interface even standardized by TCG.
+
+% LPC most common for PC clients
+% I2C most common for embedded clients (SPI too?)
+% LPC, I2C and SPI defined in https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/
+
 \subsection{Firmware TPM}
+
+As seen in the previous section, the bus between the CPU and a TPM is the biggest attack vector. An fTPM circumvents this by being directly executed within the CPU, revealing no easily accessible bus.
+
+\subsection{Virtual TPM}
 
 
 
