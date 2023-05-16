@@ -48,9 +48,29 @@ Allows remote attestation with PCR values in the form of a digitally signed quot
 
 $PCR(i)_{t+1} = hash(PCR(i)_t\ |\ new\ measurement),\ PCR(i)_0 = 0$
 
-% Maybe add graphs for dTPM and vTPM:
-% CPU <-LPC-> dTPM
-% [CPU|TEE[fTPM]]
+
+\begin{table}[htpb]
+    \caption[PCR table]{The PCR register usages as defined by the TPM PC Client specification \cite{tcgPcClient}.}\label{tab:sample}
+    \centering
+    \begin{tblr}{Q[c,m] Q[l,m]}
+      \toprule
+        PCR Index & Usage \\
+      \midrule
+        0    & {SRTM, BIOS, host platform extensions,\\ embedded Option
+        ROMs and PI Drivers} \\
+        1    & Host platform configuration \\
+        2    & UEFI driver and application code \\
+        3    & UEFI driver and application configuration and data \\
+        4    & UEFI Boot Manager code (usually the MBR) and boot attempts \\
+        5    & {Boot Manager Code configuration/data and GPT/partition table} \\
+        6    & Host platform manufacturer specific \\
+        7    & Secure boot policy \\
+        8-15 & Defined for use by the static OS \\
+        16   & Debug \\
+        23   & Application support \\
+      \bottomrule
+    \end{tblr}
+\end{table}
 
 \begin{figure}
     \begin{subfigure}{0.49\textwidth}
