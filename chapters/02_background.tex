@@ -45,10 +45,12 @@ There are various types of TPMs. They all offer the same functionality, but with
 Allows remote attestation with PCR values in the form of a digitally signed quote to a remote attestor.
 
 
+% Sealing (local attestation)
 % EKCert
 % PCRs
+While TPM 1.2 is limited to SHA-1 hashes, TPM 2.0 also allows the SHA-256 (and other) algorithms.
 
-$PCR(i)_{t+1} = hash(PCR(i)_t\ |\ new\ measurement),\ PCR(i)_0 = 0$
+$PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0$
 
 \begin{table}[htpb]
     \caption[PCR table]{The PCR register usages as defined by the TPM PC Client specification \cite{tcgPcClient}.}\label{tab:sample}
@@ -92,11 +94,14 @@ $PCR(i)_{t+1} = hash(PCR(i)_t\ |\ new\ measurement),\ PCR(i)_0 = 0$
 This is the classical form of a TPM. It is a dedicated piece of hardware, connected to the CPU via a bus. It is designed and manufactured to be highly temper-resistant against hardware attacks.
 The TPM specifications \cite{tpm, tcgPcClient} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI.
 
-The well-known 'TPM Reset Attack' was independently described in \cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus \cite{lpc} to ground. This results in a reset signal for the TPM, yielding predictable values for the PCR registers, i.e., 0. This allows an attacker to replay arbitrary register extends.
+The well-known 'TPM Reset Attack' was independently described in \cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus \cite{lpc} to ground. This results in a reset signal for the TPM, yielding predictable values for the PCR registers, i.e., 0. This allows an attacker to replay the measurement log of a benign boot process to achieve valid PCR values, even though a modified chain has been booted.
+Since TPM 1.2, TCG provides a mitigation specification for this reset attack \cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
+% TODO: That's claimed by Winter2013 but that the mitigation works because the attacker cannot gain a valid measurement log is from me. But is measurement log really sensitive? Otherwise I'm not sure how the mitigation prevents the attack, since the spec only changes the behavior of the platform on reset, not the TPM on reset. And with the upper described attack, only the TPM is reset.
+However, this mitigation is still vulnerable to cold boot attacks \cite{Halderman2009, Winter2013}.
 
-Winter and Dietrich \cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus and the I\textsuperscript{2}C bus. They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as in \cite{kauerBernhard,sparks2007}, they reset the platform, i.e., the users' device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid PCR values of the previous boot procedure. Now, the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs.
-
-% Winter and Dietrich \cite{Winter2013} continue the 'TPM Reset Attack' by circumventing counter-measurements taken since the reveal of the attack. Therefore, it also focuses on resetting the PCR values by active hardware attacks, while the running platform does not change. For that, a valid boot procedure is required to retrieve the valid PCR values. However, it also introduces the opposite, where the PC is reset, and a malicious operating system/firmware booted. The attacker prevents the TPM from receiving the reset signal, keeping the valid PCR values of the previous boot procedure. While its conceptually easier since the attacker does not need to know the valid PCR values since they are already in-place, it requires active manipulation of the data transmitted via the LPC bus to shield the TPM from the reset signal.
+Winter and Dietrich \cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
+Their approach, labeled 'Active LPC frame hijacking', allows them to "lift" commands to a higher locality than the one they were originally sent with. This allows them to evolve the 'TPM Reset attack' from being only usable for S-RTM, to also D-RTM systems.
+They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as previously described \cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the users' device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid PCR values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs. While its conceptually easier since the attacker does not need to know the measurement log since the valid PCR values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
 
 A passive sniffing attack is shown in \cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plain text. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted \cite{Winter2013}.
 
