@@ -21,16 +21,16 @@ actor "3rd party\nattester"
 "fTPM Attestation\nTA" -> "fTPM TA": Inject EKCert
 
 
-
-
 == Attestation process ==
 
-"3rd party\nattester" -> "User space\napplication" ++: Attestation request\nwith Nonce
+"3rd party\nattester" -> "User space\napplication" ++: Attestation request\nwith PCR list
 "User space\napplication" -> "Kernel module" ++: Forward
 
-
-"Kernel module" -> "fTPM Attestation\nTA": Forward
-"Kernel module" <-- "fTPM Attestation\nTA": Evidence = Quote\n+ EKCert\n+ Certificate chain\n+ Nonce
+"Kernel module" -> "fTPM TA": Forward
+"Kernel module" <-- "fTPM TA": Quote
+"Kernel module" -> "fTPM Attestation\nTA": Get auxiliary
+"Kernel module" <-- "fTPM Attestation\nTA": EKCert,\nCertificate chain
+"Kernel module" -> "Kernel module": Evidence = Quote\n+ EKCert\n+ Certificate chain
 "User space\napplication" <-- "Kernel module" --: Evidence
 "3rd party\nattester" <-- "User space\napplication" --: Evidence
 
