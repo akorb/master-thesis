@@ -7,9 +7,14 @@ This chapter discusses the relevant background knowledge required to understand 
 
 \section{Trusted execution environment}
 
-One of the core security concepts of operating systems are the privilege levels of processes. Thereby, processes are protected against other processes with the same privilege level. However, they are not protected against more privileged processes. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices. Hence, protection against more privileged processes is desired.
+One of the core security concepts of operating systems are the privilege levels of processes. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices. Hence, protection against more privileged processes is desired.
 
-A \ac{TEE} is an integrated hardware extension to processors. Effectively, the execution environment is separated into the \ac{REE} and the \ac{TEE}. The \ac{REE} runs the common software, e.g., a Linux-based operating system and the applications. The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity. Therefore, it aims to protect data-in-use, instead of data-in-transit or data-at-rest. Since it is integrated into the processor, there is no separate chip required. However, it is common to give the \ac{TEE} a dedicated volatile memory chip, namely the secure RAM~(sRAM), which is ensured to be exclusively accessible to the \ac{TEE} by hardware.
+% Global Platform = industry standard
+
+A \ac{TEE} is an integrated hardware extension to processors. Effectively, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware. The \ac{REE} runs the common software, e.g., a Linux-based operating system and the applications. The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
+% TODO: Which previous technologies?
+Previous technologies ensure protection of data-in-transit, and data-at-rest, while \ac{TEE} additionally protects data-in-use.
+Since it is integrated into the processor, there is no separate chip required. However, it is common to give the \ac{TEE} a dedicated volatile memory chip, namely the secure RAM~(sRAM), which is ensured to be exclusively accessible to the \ac{TEE} by hardware.
 
 Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as \ac{REE} operating systems. The kernel space is running a trusted OS kernel, and the user space is running the trusted applications.
 
@@ -18,7 +23,13 @@ While the SW can access the resources of the SW and the NW, the NW is restricted
 Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\% \cite{eclipse}, many of the approaches in this field of research rely on ARM technology such as TrustZone.
 Our approach also leverages TrustZone to enable the execution and the remote attestation of an fTPM.
 
-Other common \ac{TEE} technologies are Intel Software Guard Extensions (SGX), Intel Trusted Domain Extensions (TDX) and AMD Secure Encrypted Virtualization (SEV). Since we focus on the implementation of our concept with ARM TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to ARM processors and can also be applied to others, they are mentioned for the sake of completeness.
+Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and ARM Confidential Computing Architecture~(CCA). Since we focus on the implementation of our concept with ARM TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to ARM processors and can also be applied to others, they are mentioned for the sake of completeness.
+
+% TrustZone, Trusted applications are not isolated -> they need to trust each other
+
+% static: ARM TZ
+% dynamic: Intel SGX, TDX, AMD SEV
+
 
 \section{Attestation}
 \subsection{Local attestation}
@@ -36,6 +47,9 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
+A TPM is a specific HSM (Hardware Security Module)
+Vertrauen in zugrundeliegende Plattform steigern.
+
 TPMs support three main use-cases: secure key generation, remote system attestation, and secure storage. 
 
 There are various types of TPMs. They all offer the same functionality, but with different security guarantees and are also deployed differently.
@@ -46,9 +60,14 @@ Allows remote attestation with PCR values in the form of a digitally signed quot
 
 
 % Sealing (local attestation)
-% EKCert
+% EKCert, EK = Unique ID, key in TPM, used for validation
+% Binding to TPM (EK)
+% Core Root of Trust of Measurement: BIOS-Erweiterung, trusted hashing
 % PCRs
-While TPM 1.2 is limited to SHA-1 hashes, TPM 2.0 also allows the SHA-256 (and other) algorithms.
+% Attestation: TPM confirms measured state
+While TPM 1.2 is limited to SHA-1 hashes, TPM 2.0 also allows the SHA-256 (and other) algorithms (crypto agility).
+
+% TPM 2.0: Crypto agility, more flexible, always on
 
 $PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0$
 
@@ -114,6 +133,7 @@ As seen in the previous section, the bus between the CPU and a TPM is the bigges
 
 \subsection{Virtual TPM}
 
+% Provided by hypervisor (not necessarily, I read a paper which does not need to trust hypervisor. Don't remember what provides it.)
 
 
 \section{Secure Boot and Measured Boot}
