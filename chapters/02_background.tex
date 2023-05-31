@@ -47,27 +47,25 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
-A TPM is a specific HSM (Hardware Security Module)
-Vertrauen in zugrundeliegende Plattform steigern.
-
-TPMs support three main use-cases: secure key generation, remote system attestation, and secure storage. 
-
-There are various types of TPMs. They all offer the same functionality, but with different security guarantees and are also deployed differently.
-
+A TPM is a specific Hardware Security Module (HSM) that increases trust in the underlying platform.
+They support three main use-cases: secure key generation, remote system attestation, and secure storage. 
 % From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
 % Rephrase
 Allows remote attestation with PCR values in the form of a digitally signed quote to a remote attestor.
+
+% Explain these, and name use-cases (maybe from book)
+% secure key generation
+% remote system attestation
+% secure storage
 
 
 % Sealing (local attestation)
 % EKCert, EK = Unique ID, key in TPM, used for validation
 % Binding to TPM (EK)
-% Core Root of Trust of Measurement: BIOS-Erweiterung, trusted hashing
+% Core Root of Trust of Measurement: BIOS extension, trusted hashing
 % PCRs
 % Attestation: TPM confirms measured state
-While TPM 1.2 is limited to SHA-1 hashes, TPM 2.0 also allows the SHA-256 (and other) algorithms (crypto agility).
-
-% TPM 2.0: Crypto agility, more flexible, always on
+While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Stevens2017}, TPM~2.0 offers crypto agility and therefore, also allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually.
 
 $PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0$
 
@@ -113,6 +111,8 @@ $PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \colo
   
   \caption{Schematic illustration of the different TPM types. Blue: Hardware, Orange: Software.} \label{fig:tpm_types}
   \end{figure}
+
+There are three types of TPMs. They all offer the same functionality, but with different security guarantees and performance characteristics.
 
 \subsection{Discrete TPM}
 
