@@ -39,7 +39,7 @@ Remote attestation is a challenge-response protocol initiated by a remote attest
 The challenge contains a nonce, enforcing a fresh response.
 The response must be a proof of the challenged system that it is trustworthy.
 
-TPMs send PCR values in the form of a digitally signed quote to a remote attestor.
+TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
 
 Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
 
@@ -47,7 +47,7 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
-A TPM is a specific Hardware Security Module (HSM) that increases trust in the underlying platform.
+A TPM is a specific \ac{HSM} that increases trust in the underlying platform.
 They support three main use-cases: secure key generation, remote system attestation, and secure storage. 
 % From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
 % Rephrase
