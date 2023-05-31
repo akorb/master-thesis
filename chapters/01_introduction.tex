@@ -6,5 +6,25 @@
 \section{Motivation}
 \section{Goal}
 \section{Threat Model}
+
+The main threat is the modification of the binary of the fTPM before or during boot. For example, by exchanging the SD card storing the binary.
+However, we assume that the fTPM cannot be modified by malicious parties after the boot process (regardless of whether the fTPM is benign or compromised) because we trust the OP-TEE environment.
+Out-of-scope are hardware attacks, side-channel attacks, control-flow attacks, and Denial of Service attacks.
+
+% - In-scope
+%     - Modification of fTPM (at boot, not runtime) (Q: Only at boot-time because the OP-TEE is trusted and therefore, no (malicious) runtime modifications are expected, correct?)
+%     - Exchange of SD card
+% - Out-of-scope
+%     - HW attacks
+%     - Side-channel attacks
+%     - Control-flow attacks
+%     - DoS attacks
+
+
 \section{Environment}
+
+This work was created at the 'Fraunhofer-Institut für Angewandte und Integrierte Sicherheit AISEC' in Garching.
+It is part of the 'Fraunhofer Society for the Promotion of Applied Research e.~V.', which is an organization distributed over Europe with main focus on applied research.
+In the roughly 35 years of its existence, it rose to become the largest research institute in Europe with around 30,000 employees.
+
 \section{Outline}
