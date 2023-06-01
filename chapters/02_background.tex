@@ -67,6 +67,9 @@ Allows remote attestation with \ac{PCR} values in the form of a digitally signed
 % Attestation: TPM confirms measured state
 While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Stevens2017}, TPM~2.0 offers crypto agility and therefore, also allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually.
 
+% SRTM (from the beginning, what we use)
+% DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
+
 $PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0$
 
 \begin{table}[htpb]
@@ -127,6 +130,8 @@ However, this mitigation is still vulnerable to cold boot attacks \cite{Halderma
 Winter and Dietrich \cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
 Their approach, labeled 'Active LPC frame hijacking', allows them to "lift" commands to a higher locality than the one they were originally sent with. This allows them to evolve the 'TPM Reset attack' from being only usable for S-RTM, to also D-RTM systems.
 They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as previously described \cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the users' device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs. While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
+
+Seunghun Han et al. \cite{aBadDream} show two attacks on discrete TPMs to reset the PCR registers. The first targets a gray area in the power management section of the TPM 2.0 specification. The TPM shall store its state into the (its?) non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up. However, the specification is missing a concrete description how to handle a lack of a stored state when waking up. Therefore, some implementations simply reset the state. Their second attack targets a DRTM, namely an implementation flaw in tboot \cite{tboot}, the most widely used measured boot environment used with Intel's Trusted Execution Technology. However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
 
 A passive sniffing attack is shown in \cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plain text. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted \cite{Winter2013}.
 
