@@ -39,8 +39,6 @@ Remote attestation is a challenge-response protocol initiated by a remote attest
 The challenge contains a nonce, enforcing a fresh response.
 The response must be a proof of the challenged system that it is trustworthy.
 
-TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
-
 Remote attestation is the process initiated by a remote trusted party (called ``verifier'') to verify that an end-device (called ``prover'') has not been tampered with. For detecting that, remote attestation generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, (ii) its execution has not been redirected in unintended ways at runtime, and (iii) its data has not been maliciously modified at runtime.
 
 A trusted anchor is required on the device to be attested because at least one trusted component is necessary to extract the data from the remote device to be verified. In many cases, TEE's act as a trust anchor because they are hardware-protected, making it an excellent candidate for a trust anchor.
@@ -56,6 +54,7 @@ Allows remote attestation with \ac{PCR} values in the form of a digitally signed
 % Explain these, and name use-cases (maybe from book)
 % secure key generation
 % remote system attestation
+TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
 % secure storage
 
 
