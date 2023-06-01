@@ -47,7 +47,7 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
-A TPM is a specific \ac{HSM} that increases trust in the underlying platform.
+The \ac{TCG} proposed the TPM specification. It describes a \ac{HSM} that increases trust in the underlying platform.
 They support three main use-cases: secure key generation, remote system attestation, and secure storage. 
 % From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
 % Rephrase
@@ -112,10 +112,10 @@ $PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \colo
       \caption{Virtual TPM} \label{fig:vtpm}
     \end{subfigure}%
   
-  \caption{Schematic illustration of the different TPM types. Blue: Hardware, Orange: Software.} \label{fig:tpm_types}
+  \caption{Schematic illustration of the different TPM types in their pure form. Blue: Hardware, Orange: Software.} \label{fig:tpm_types}
   \end{figure}
 
-There are three types of TPMs. They all offer the same functionality, but with different security guarantees and performance characteristics.
+There are three types of TPMs. They all offer the same functionality, but with different security guarantees and performance characteristics. Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between fTPMs and dTPMs. They found that fTPMs are faster overall, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 
 \subsection{Discrete TPM}
 
