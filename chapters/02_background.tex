@@ -84,7 +84,7 @@ While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Steve
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
 
-$PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0$
+\[ PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0 \]
 
 \begin{table}[htpb]
     \caption[PCR table]{The PCR register usages as defined by the TPM PC Client specification \cite{tcgPcClient}.}\label{tab:sample}
@@ -160,6 +160,8 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 
 As seen in the previous section, the bus between the CPU and a TPM is the biggest attack vector. An fTPM circumvents this by being directly executed within the CPU, revealing no easily accessible bus.
 The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}.
+
+The previously described side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
 
 \subsection{Virtual TPM}
 
