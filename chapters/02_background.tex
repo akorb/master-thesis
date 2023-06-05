@@ -65,6 +65,7 @@ The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889
 % First v2.0 version was much earlier
 It describes a cryptographic coprocessor that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
 For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
+It is also a passive device, meaning it only does something when prompted.
 
 TPMs support three main use-cases: (i) secure key generation, (ii) remote system attestation, and (iii) secure storage.
 
@@ -74,17 +75,19 @@ TPMs support three main use-cases: (i) secure key generation, (ii) remote system
 \subsubsection{Secure key generation}
 \subsubsection{Remote system attestation}
 
-The fundament for this functionality are the \ac{PCR} registers. They are ``one-way'' registers, which actual values can never be written to an exact value, but only be extended.
+The fundament for this functionality are the \ac{PCR} values. They are 'one-way' registers, which values can never be written to an exact value, but only be extended.
+This is known as 'hash extend'.
+The extend properties prohibit the removal of extensions, and the arbitrary writing of values, whether by a benign or malicious actor.
+The fixed length of the \ac{PCR} values is important for memory-constrained TPMs.
 
-\[ PCR(i)_0 \coloneqq 0,\ PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement)\]
+The PCR value at index $i$ can only be modified (i.e., extended) in the following way:
+\[ PCR(i)_0 \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ value)\]
 
-TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
+A PCR value holds a hash representing the platform state.
+Thereby, a remote attestor can request a so-called 'quote' from the TPM on the host in question.
+A quote contains the PCR values and is digitally signed.
 
-% From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
-% Rephrase
-Allows remote attestation with \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
-
-% Quotes
+Most commonly, a TPM contains 24 PCR values, which form a bank. \autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}.
 
 \input{elements/table_pcr_registers}
 
@@ -150,6 +153,6 @@ The previously described side-channel attack \cite{Moghimi2019} against dTPMs, c
 
 Secure boot is a concept of UEFI doing local attestation of components directly at boot-time. Based on signatures of next-to-boot components. It cancels the boot process as soon as deviations are detected. Binaries of components are first signed and then, deployed universally. Hence, binaries are not bound to the platform and can be considered portable in this context.
 
-Measured Boot is a concept that is often implemented in interplay with a TPM. Measured Boot allows remote attestation to a later time. Uses sealing functionality of TPMs, therefore, bound to the exact platform.
+Measured Boot is a concept that is often implemented in interplay with a TPM. Measured Boot allows remote attestation to a later time. Uses sealing functionality of TPMs, therefore, bound to the exact platform. Its goal is to detect manipulated system configurations.
 
 Both technologies are often used in conjunction.
