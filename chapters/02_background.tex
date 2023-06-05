@@ -60,74 +60,45 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
-The \ac{TCG} proposed the TPM specification. It describes a \ac{HSM} that increases trust in the underlying platform.
-They support three main use-cases: secure key generation, remote system attestation, and secure storage. 
+The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}. It describes a \ac{HSM} that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
+For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
+
+TPMs support three main use-cases: (i) secure key generation, (ii) remote system attestation, and (iii) secure storage.
+
+% Explain these subsections, and name use-cases (maybe from book)
+\subsubsection{Secure key generation}
+\subsubsection{Remote system attestation}
+
+The fundament for this functionality are the \ac{PCR} registers. They are ``one-way'' registers, which actual values can never be written to an exact value, but only be extended.
+
+\[ PCR(i)_0 \coloneqq 0,\ PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement)\]
+
+TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
+
 % From https://www.usenix.org/system/files/conference/usenixsecurity18/sec18-han.pdf
 % Rephrase
 Allows remote attestation with \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
 
-% Explain these, and name use-cases (maybe from book)
-% secure key generation
-% remote system attestation
-TPMs send \ac{PCR} values in the form of a digitally signed quote to a remote attestor.
-% secure storage
+% Quotes
 
+\input{elements/table_pcr_registers}
+
+\subsubsection{Secure storage}
 
 % Sealing (local attestation)
 % EKCert, EK = Unique ID, key in TPM, used for validation
 % Binding to TPM (EK)
 % Core Root of Trust of Measurement: BIOS extension, trusted hashing
-% PCRs
 % Attestation: TPM confirms measured state
-While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Stevens2017}, TPM~2.0 offers crypto agility and therefore, also allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually.
+
+While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Stevens2017, sha1tpm12}, TPM~2.0 offers crypto agility and therefore, also allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
+
+TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages \cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR banks \cite{win11req}.
 
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
 
-\[ PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ measurement),\ PCR(i)_0 \coloneqq 0 \]
-
-\begin{table}[htpb]
-    \caption[PCR table]{The PCR register usages as defined by the TPM PC Client specification \cite{tcgPcClient}.}\label{tab:sample}
-    \centering
-    \begin{tblr}{Q[c,m] Q[l,m]}
-      \toprule
-        PCR Index & Usage \\
-      \midrule
-        0    & {SRTM, BIOS, host platform extensions,\\ embedded Option
-        ROMs and PI Drivers} \\
-        1    & Host platform configuration \\
-        2    & UEFI driver and application code \\
-        3    & UEFI driver and application configuration and data \\
-        4    & UEFI Boot Manager code (usually the MBR) and boot attempts \\
-        5    & {Boot Manager Code configuration/data and GPT/partition table} \\
-        6    & Host platform manufacturer specific \\
-        7    & Secure boot policy \\
-        8-15 & Defined for use by the static OS \\
-        16   & Debug \\
-        23   & Application support \\
-      \bottomrule
-    \end{tblr}
-\end{table}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{0.49\textwidth}
-      \includegraphics[width=\linewidth]{figures/dTPM.pdf}
-      \caption{Discrete TPM} \label{fig:dtpm}
-    \end{subfigure}%
-    \hspace*{\fill}   % maximize separation between the subfigures
-    \begin{subfigure}{0.49\textwidth}
-      \includegraphics[width=\linewidth]{figures/fTPM.pdf}
-      \caption{Firmware TPM} \label{fig:ftpm}
-    \end{subfigure}%
-
-    \begin{subfigure}{0.49\textwidth}
-      \includegraphics[width=\linewidth]{figures/vTPM.pdf}
-      \caption{Virtual TPM} \label{fig:vtpm}
-    \end{subfigure}%
-  
-  \caption{Schematic illustration of the different TPM types in their pure form. Blue: Hardware, Orange: Software.} \label{fig:tpm_types}
-  \end{figure}
+\input{elements/figure_pcr_types}
 
 There are three types of TPMs. They all offer the same functionality, but with different security guarantees and performance characteristics. Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between fTPMs and dTPMs. They found that fTPMs are faster overall, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 
