@@ -14,7 +14,8 @@ One of the core security concepts of operating systems are the privilege levels 
 A \ac{TEE} is an integrated hardware extension to processors. Effectively, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware. The \ac{REE} runs the common software, e.g., a Linux-based operating system and the applications. The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
 % TODO: Which previous technologies?
 Previous technologies ensure protection of data-in-transit, and data-at-rest, while \ac{TEE} additionally protects data-in-use.
-Since it is integrated into the processor, there is no separate chip required. However, it is common to give the \ac{TEE} a dedicated volatile memory chip, namely the secure RAM~(sRAM), which is ensured to be exclusively accessible to the \ac{TEE} by hardware.
+For example, smart cards are commonly used to store keys to identify users and keys to encrypt data-at-rest \cite{Arthur2015}.
+Since a \ac{TEE} is integrated into the processor, there is no separate chip required. However, it is common to give the \ac{TEE} a dedicated volatile memory chip, namely the secure RAM~(sRAM), which is ensured to be exclusively accessible to the \ac{TEE} by hardware.
 
 Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as \ac{REE} operating systems. The kernel space is running a trusted OS kernel, and the user space is running the trusted applications.
 
@@ -60,10 +61,14 @@ A trusted anchor is required on the device to be attested because at least one t
 
 \section{Trusted Platform Module}
 
-The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}. It describes a \ac{HSM} that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
+The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}.
+% First v2.0 version was much earlier
+It describes a cryptographic coprocessor that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
 For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
 
 TPMs support three main use-cases: (i) secure key generation, (ii) remote system attestation, and (iii) secure storage.
+
+% Microsoft BitLocker as use-case
 
 % Explain these subsections, and name use-cases (maybe from book)
 \subsubsection{Secure key generation}
@@ -91,7 +96,7 @@ Allows remote attestation with \ac{PCR} values in the form of a digitally signed
 % Core Root of Trust of Measurement: BIOS extension, trusted hashing
 % Attestation: TPM confirms measured state
 
-While TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{Stevens2017, sha1tpm12}, TPM~2.0 offers crypto agility and therefore, also allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
+TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{cryptoeprint:2005/010, Wang2005, Stevens2017}. Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected \cite{sha1tpm12}, cryptographic algorithms only become weaker over time \cite{Arthur2015}. In reaction, TPM~2.0 offers crypto agility and allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
 
 TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages \cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR banks \cite{win11req}.
 
