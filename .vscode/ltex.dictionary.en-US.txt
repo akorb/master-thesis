@@ -2,3 +2,14 @@ Garching
 attester
 prover
 TPMs
+TrustZone
+fTPM
+dTPMs
+fTPMs
+dTPM
+Tarnovsky
+ECSchnorr
+NVRAM
+Seunghun
+tboot
+sRAM
