@@ -100,7 +100,7 @@ TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over
 
 \input{elements/figure_pcr_types}
 
-There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}. They all offer the same functionality, but with different security guarantees and performance characteristics. Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between discrete TPMs (dTPM) and firmware TPMs (fTPM). They found that fTPMs are faster overall, but especially in key loading, sealing, unsealing, signature verification, and encryption.
+There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}. They all offer the same functionality, but with different security guarantees and performance characteristics.
 
 \subsection{Discrete TPM}
 
@@ -127,13 +127,30 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 
 \subsection{Firmware TPM}
 
-% higher performance, on-chip security, and incident response agility
-% No perfect RNG
-
-As seen in the previous section, the bus between the CPU and a TPM is the biggest attack vector. An fTPM circumvents this by being directly executed within the CPU, revealing no easily accessible bus.
+As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM can be considered as their biggest attack vector. An fTPM \cite{Raj2015, 197213} circumvents this by being directly executed within the CPU within a \ac{TEE}, revealing no easily accessible bus.
 The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}.
 
-The previously described side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
+Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between dTPMs and fTPMs. They found that fTPMs are faster overall. %, but especially in key loading, sealing, unsealing, signature verification, and encryption.
+In addition, as is the nature of software, fTPMs are easier to update than dTPMs.
+
+However, there are also disadvantages. First, they cannot provide true RNG, since hardware is required for that. Second, they are started later in the boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the preceding boot components cannot be sent to the fTPM.
+
+Of course, there are also attacks against fTPMs.
+The previously mentioned side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
+
+% \begin{table}[htpb]
+%   \caption[ftpmdownsides]{Advantages and disadvantages of fTPMs.}\label{tab:tpm_comparison}
+%   \centering
+%   \begin{tblr}{Q[l,h] Q[l,m]}
+%     \toprule
+%     Advantages      &  Disadvantages \\
+%     \midrule
+%     Faster          &  No perfect RNG \\
+%     Easier update   &  {Launched later in boot chain.\\ Cannot measure hashes of preceding boot components.} \\
+%     \bottomrule
+%   \end{tblr}
+% \end{table}
+
 
 \subsection{Virtual TPM}
 
