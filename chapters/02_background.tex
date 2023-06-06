@@ -80,9 +80,11 @@ A PCR value holds a hash representing the platform state.
 Thereby, a remote attestor can request a so-called 'quote' from the TPM on the host in question.
 A quote contains the PCR values and is digitally signed.
 
-Typically, a TPM contains 24 PCR values that form a bank, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}. \autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}. The fixed length of the \ac{PCR} values is important for memory-constrained TPMs \cite{Arthur2015}.
+Typically, a TPM contains 24 PCR values that form a bank, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}.
+%\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}.
+The fixed length of the \ac{PCR} values is important for memory-constrained TPMs \cite{Arthur2015}.
 
-\input{elements/table_pcr_registers}
+%\input{elements/table_pcr_registers}
 
 % Sealing (local attestation)
 % EKCert, EK = Unique ID, key in TPM, used for validation
