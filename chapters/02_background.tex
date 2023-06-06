@@ -74,7 +74,7 @@ It is also a passive device, meaning it only does something when prompted.
 
 The \ac{PCR} values are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
 This is known as 'hash extend'.
-The extend properties prohibit the removal of extensions, and the arbitrary writing of values, whether by a benign or malicious actor.
+Its properties prohibit the removal of extensions, and the arbitrary writing of values, whether by a benign or malicious actor.
 The PCR value at index $i$ can only be modified (i.e., extended) in the following way:
 \[ PCR(i)_0 \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ value)\]
 

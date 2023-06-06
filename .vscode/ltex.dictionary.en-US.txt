@@ -13,3 +13,6 @@ NVRAM
 Seunghun
 tboot
 sRAM
+REE
+PCRs
+
