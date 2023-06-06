@@ -66,20 +66,13 @@ The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889
 It describes a cryptographic coprocessor that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
 For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
 It is also a passive device, meaning it only does something when prompted.
+\autoref{tab:tpm_use_cases} summarizes the main features of TPMs.
 
-TPMs support three main use-cases: (i) secure key generation, (ii) remote system attestation, and (iii) secure storage.
+\input{elements/table_tpm_use_cases.tex}
 
-% Microsoft BitLocker as use-case
-
-% Explain these subsections, and name use-cases (maybe from book)
-\subsubsection{Secure key generation}
-\subsubsection{Remote system attestation}
-
-The fundament for this functionality are the \ac{PCR} values. They are 'one-way' registers, which values can never be written to an exact value, but only be extended.
+The \ac{PCR} values are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
 This is known as 'hash extend'.
 The extend properties prohibit the removal of extensions, and the arbitrary writing of values, whether by a benign or malicious actor.
-The fixed length of the \ac{PCR} values is important for memory-constrained TPMs.
-
 The PCR value at index $i$ can only be modified (i.e., extended) in the following way:
 \[ PCR(i)_0 \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ value)\]
 
@@ -87,11 +80,9 @@ A PCR value holds a hash representing the platform state.
 Thereby, a remote attestor can request a so-called 'quote' from the TPM on the host in question.
 A quote contains the PCR values and is digitally signed.
 
-Most commonly, a TPM contains 24 PCR values, which form a bank. \autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}.
+Typically, a TPM contains 24 PCR values that form a bank, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}. \autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}. The fixed length of the \ac{PCR} values is important for memory-constrained TPMs \cite{Arthur2015}.
 
 \input{elements/table_pcr_registers}
-
-\subsubsection{Secure storage}
 
 % Sealing (local attestation)
 % EKCert, EK = Unique ID, key in TPM, used for validation
@@ -99,8 +90,7 @@ Most commonly, a TPM contains 24 PCR values, which form a bank. \autoref{tab:pcr
 % Core Root of Trust of Measurement: BIOS extension, trusted hashing
 % Attestation: TPM confirms measured state
 
-TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{cryptoeprint:2005/010, Wang2005, Stevens2017}. Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected \cite{sha1tpm12}, cryptographic algorithms only become weaker over time \cite{Arthur2015}. In reaction, TPM~2.0 offers crypto agility and allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while TPM~1.2 components needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
-
+TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{cryptoeprint:2005/010, Wang2005, Stevens2017}. Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected \cite{sha1tpm12}, cryptographic algorithms only become weaker over time \cite{Arthur2015}. In reaction, TPM~2.0 offers crypto-agility and allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while a TPM~1.2 needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
 TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages \cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR banks \cite{win11req}.
 
 % SRTM (from the beginning, what we use)
@@ -108,7 +98,7 @@ TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over
 
 \input{elements/figure_pcr_types}
 
-There are three types of TPMs. They all offer the same functionality, but with different security guarantees and performance characteristics. Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between fTPMs and dTPMs. They found that fTPMs are faster overall, but especially in key loading, sealing, unsealing, signature verification, and encryption.
+There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}. They all offer the same functionality, but with different security guarantees and performance characteristics. Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between discrete TPMs (dTPM) and firmware TPMs (fTPM). They found that fTPMs are faster overall, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 
 \subsection{Discrete TPM}
 
@@ -136,6 +126,7 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 \subsection{Firmware TPM}
 
 % higher performance, on-chip security, and incident response agility
+% No perfect RNG
 
 As seen in the previous section, the bus between the CPU and a TPM is the biggest attack vector. An fTPM circumvents this by being directly executed within the CPU, revealing no easily accessible bus.
 The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}.
