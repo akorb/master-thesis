@@ -15,5 +15,4 @@ tboot
 sRAM
 REE
 PCRs
-
 Cfir

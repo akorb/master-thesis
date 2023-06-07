@@ -138,7 +138,7 @@ The trend is moving towards fTPMs, which can also been seen by the increasing ef
 Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between dTPMs and fTPMs. They found that fTPMs are faster overall. %, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 In addition, as is the nature of software, fTPMs are easier to update than dTPMs.
 
-However, there are also disadvantages. First, they cannot provide true RNG, since hardware is required for that. Second, they are started later in the boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the preceding boot components cannot be sent to the fTPM. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the \ac{TEE}, and the boot chain.
+However, there are also disadvantages. First, they cannot provide true RNG, since hardware is required for that. Second, they are started later in the hosts' boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the components booted before the fTPM cannot be sent to the fTPM. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the \ac{TEE}, and the boot chain.
 
 Of course, there are also attacks against fTPMs.
 The previously mentioned side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
