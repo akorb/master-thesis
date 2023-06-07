@@ -129,16 +129,21 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 
 \subsection{Firmware TPM}
 
+% Generally more secure? According to https://arxiv.org/pdf/2304.14717.pdf, yes
+% But TEEs are also tamper-resistant, aren't they? Maybe not as much as dTPMs.
+
 As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM can be considered as their biggest attack vector. An fTPM \cite{Raj2015, 197213} circumvents this by being directly executed within the CPU within a \ac{TEE}, revealing no easily accessible bus.
-The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}.
+The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}. Also, since they require less hardware, they are cheaper for manufacturers.
 
 Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between dTPMs and fTPMs. They found that fTPMs are faster overall. %, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 In addition, as is the nature of software, fTPMs are easier to update than dTPMs.
 
-However, there are also disadvantages. First, they cannot provide true RNG, since hardware is required for that. Second, they are started later in the boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the preceding boot components cannot be sent to the fTPM.
+However, there are also disadvantages. First, they cannot provide true RNG, since hardware is required for that. Second, they are started later in the boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the preceding boot components cannot be sent to the fTPM. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the \ac{TEE}, and the boot chain.
 
 Of course, there are also attacks against fTPMs.
 The previously mentioned side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
+
+Jacob et al. \cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP). Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms. To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data. They achieve this by using a voltage fault injection that bypasses the authenticity check in the boot process and allows them to boot their own firmware component that leaks the required information.
 
 % \begin{table}[htpb]
 %   \caption[ftpmdownsides]{Advantages and disadvantages of fTPMs.}\label{tab:tpm_comparison}
