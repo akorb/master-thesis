@@ -18,7 +18,7 @@ Since a \ac{TEE} is integrated into the processor, there is no separate chip req
 % TODO: Which previous technologies?
 Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as \ac{REE} operating systems. The kernel space is running a trusted OS kernel, and the user space is running the trusted applications.
 
-Previous technologies ensure protection of data-in-transit, and data-at-rest, while \ac{TEE} additionally protects data-in-use.
+Previous, mostly software-based technologies ensure confidentiality and integrity protection of data-in-transit, and data-at-rest \cite{Pecholt2022}, while a \ac{TEE} additionally protects data-in-use \cite{Lee:EECS-2022-96}.
 For example, smart cards are commonly used to store keys to identify users and keys to encrypt data-at-rest \cite{Arthur2015}.
 
 One such \ac{TEE} is ARM's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}.
@@ -163,9 +163,17 @@ Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMS, w
 
 \subsection{Virtual TPM}
 
-% Confidential Computing approaches (Fraunhofer paper), our solution could be a use-case for that
+A vTPM is a software-based TPM provided by a hypervisor for one of its managed virtual machines \cite{268868}. The vTPMs can be realized fully in software \cite{268868}, or backed by dTPMs \cite{Liu2010}. The hypervisor can provide a (theoretically) unlimited number of vTPMs. For the virtual machines it seems that they have access exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor. A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine. vTPMs support this as well. Note the different security properties between vTPMs and dTPMs.
 
-% Provided by hypervisor (not necessarily, I read a paper which does not need to trust hypervisor. Don't remember what provides it.)
+Because of the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused. The initially proposed design \cite{268868} has a large trusted base, e.g., the operating system and the hypervisor need to be trusted.
+
+Wang et al. \cite{Wang2019} bring the vTPM into the \ac{TEE}, namely Intel SGX, essentially creating an fTPM and vTPM hybrid. They launch each vTPM in a private hardware-protected enclave. This reduces the trusted computing base to the individual enclaves and SGX itself, enabling the host operating system and hypervisor to be untrusted.
+
+Pecholt and Wessel \cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the hosts' operating system do not need to be trusted as well. This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
+
+Stateless ephemeral vTPMs \cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
+Ephemeral vTPMs support the remote attestation of virtual machines.
+However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
 
 
 \section{Secure Boot and Measured Boot}

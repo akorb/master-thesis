@@ -16,3 +16,6 @@ sRAM
 REE
 PCRs
 Cfir
+vTPM
+vTPMs
+exfiltration

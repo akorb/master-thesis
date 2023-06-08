@@ -392,4 +392,76 @@ month = aug,
   url    = {https://seclists.org/fulldisclosure/2018/Jan/12},
 }
 
+@inproceedings {268868,
+author = {Stefan Berger and Ramon Caceres and Kenneth A. Goldman and Ronald Perez and Reiner Sailer and Leendert van Doorn},
+title = {{vTPM}: Virtualizing the Trusted Platform Module},
+booktitle = {15th USENIX Security Symposium (USENIX Security 06)},
+year = {2006},
+address = {Vancouver, B.C. Canada},
+url = {https://www.usenix.org/conference/15th-usenix-security-symposium/vtpm-virtualizing-trusted-platform-module},
+publisher = {USENIX Association},
+month = jul,
+}
+
+@InProceedings{Pecholt2022,
+  author    = {Joana Pecholt and Sascha Wessel},
+  booktitle = {Proceedings of the 38th Annual Computer Security Applications Conference},
+  title     = {{CoCoTPM}: Trusted Platform Modules for Virtual Machines in Confidential Computing Environments},
+  year      = {2022},
+  month     = dec,
+  publisher = {{ACM}},
+  doi       = {10.1145/3564625.3564648},
+}
+
+@InProceedings{Liu2010,
+  author    = {Dongxi Liu and Jack Lee and Julian Jang and Surya Nepal and John Zic},
+  booktitle = {2010 {IEEE}/{IFIP} International Conference on Embedded and Ubiquitous Computing},
+  title     = {A Cloud Architecture of Virtual Trusted Platform Modules},
+  year      = {2010},
+  month     = dec,
+  publisher = {{IEEE}},
+  doi       = {10.1109/euc.2010.125},
+}
+
+@Article{Wang2023,
+  author    = {Juan Wang and Jie Wang and Chengyang Fan and Fei Yan and Yueqiang Cheng and Yinqian Zhang and Wenhui Zhang and Mengda Yang and Hongxin Hu},
+  journal   = {{IEEE} Transactions on Cloud Computing},
+  title     = {{SvTPM}: {SGX}-based Virtual Trusted Platform Modules for Cloud Computing},
+  year      = {2023},
+  pages     = {1--18},
+  doi       = {10.1109/tcc.2023.3243891},
+  publisher = {Institute of Electrical and Electronics Engineers ({IEEE})},
+}
+
+@Misc{Wang2019,
+  author    = {Wang, Juan and Fan, Chengyang and Wang, Jie and Cheng, Yueqiang and Zhang, Yinqian and Zhang, Wenhui and Liu, Peng and Hu, Hongxin},
+  title     = {SvTPM: A Secure and Efficient vTPM in the Cloud},
+  year      = {2019},
+  copyright = {arXiv.org perpetual, non-exclusive license},
+  doi       = {10.48550/ARXIV.1905.08493},
+  keywords  = {Cryptography and Security (cs.CR), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  publisher = {arXiv},
+}
+
+@Misc{Narayanan2023,
+  author    = {Narayanan, Vikram and Carvalho, Claudio and Ruocco, Angelo and Almási, Gheorghe and Bottomley, James and Ye, Mengmei and Feldman-Fitzthum, Tobin and Buono, Daniele and Franke, Hubertus and Burtsev, Anton},
+  title     = {Remote attestation of SEV-SNP confidential VMs using e-vTPMs},
+  year      = {2023},
+  copyright = {Creative Commons Attribution 4.0 International},
+  doi       = {10.48550/ARXIV.2303.16463},
+  keywords  = {Cryptography and Security (cs.CR), Operating Systems (cs.OS), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  publisher = {arXiv},
+}
+
+@phdthesis{Lee:EECS-2022-96,
+    Author = {Lee, Dayeol},
+    Title = {Building Trusted Execution Environments},
+    School = {EECS Department, University of California, Berkeley},
+    Year = {2022},
+    Month = may,
+    URL = {http://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-96.html},
+    Number = {UCB/EECS-2022-96},
+    Abstract = {Trusted Execution Environments (TEEs) offer hardware-based isolation, which protects the integrity and confidentiality of the in-use data of programs against various threats. Many hardware vendors have produced various TEE-enabled chips. However, there has been only a little public research on building TEEs. Building a TEE with different threat models and functionalities relies on design-space exploration. For example, a TEE must quickly adapt to various evolving threat models. In addition, a TEE can have different functionality requirements, which should not impact security guarantees. This thesis discusses research challenges in exploring the TEE design space. First, this thesis motivates why a TEE should not have a fixed threat model by demonstrating a novel off-chip side-channel attack on a TEE. Next, this thesis proposes Keystone, a software framework that enables building TEEs based on various needs, such as threat models and functionality requirements. Furthermore, this thesis discusses how to extend TEE functionality without breaking security guarantees using incremental verification.}
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
