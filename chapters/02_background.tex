@@ -62,6 +62,7 @@ The attesting environment acts as a trust anchor for the verifier.
 A trusted anchor is required on the device to be attested because at least one trusted component is necessary to extract the data from the remote device to be verified. In many cases, TEE's act as a trust anchor because they are hardware-protected, making it an excellent candidate for a trust anchor.
 
 \section{Trusted Platform Module}
+\label{sec:tpm}
 
 The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}.
 % First v2.0 version was much earlier
@@ -178,8 +179,13 @@ However, they intentionally do not support persistent storage to preclude exfilt
 
 \section{Secure Boot and Measured Boot}
 
-Secure boot is a concept of UEFI doing local attestation of components directly at boot-time. Based on signatures of next-to-boot components. It cancels the boot process as soon as deviations are detected. Binaries of components are first signed and then, deployed universally. Hence, binaries are not bound to the platform and can be considered portable in this context.
+When the system is started, the root component, e.g., from ROM, is executed. This subsequently launches the next component, and so forth. This boot structure is called the boot chain. Typically, the first component turns on the memory, the second stage initializes the platform, and finally, the last stage boots the operating system \cite{Yao2020}.
 
-Measured Boot is a concept that is often implemented in interplay with a TPM. Measured Boot allows remote attestation to a later time. Uses sealing functionality of TPMs, therefore, bound to the exact platform. Its goal is to detect manipulated system configurations.
+Secure Boot is a concept of UEFI \cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
+% For this purpose, boot chain binaries are first signed and then, deployed universally. Hence, the binaries are not bound to the platform and can be considered portable in this context.
 
-Both technologies are often used in conjunction.
+Measured Boot \cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM. It allows remote attestation to a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally attesting the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote attestor to verify the state of the software on the system. The goal is to detect manipulated system configurations.
+
+%Uses sealing functionality of TPMs, therefore, bound to the exact platform.
+
+Secure Boot and Measured Boot are often used in conjunction.

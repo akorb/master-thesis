@@ -464,4 +464,40 @@ month = jul,
     Abstract = {Trusted Execution Environments (TEEs) offer hardware-based isolation, which protects the integrity and confidentiality of the in-use data of programs against various threats. Many hardware vendors have produced various TEE-enabled chips. However, there has been only a little public research on building TEEs. Building a TEE with different threat models and functionalities relies on design-space exploration. For example, a TEE must quickly adapt to various evolving threat models. In addition, a TEE can have different functionality requirements, which should not impact security guarantees. This thesis discusses research challenges in exploring the TEE design space. First, this thesis motivates why a TEE should not have a fixed threat model by demonstrating a novel off-chip side-channel attack on a TEE. Next, this thesis proposes Keystone, a software framework that enables building TEEs based on various needs, such as threat models and functionality requirements. Furthermore, this thesis discusses how to extend TEE functionality without breaking security guarantees using incremental verification.}
 }
 
+@Misc{UEFI,
+  author = {{UEFI Forum, Inc.}},
+  title  = {Unified Extensible Firmware Interface (UEFI) Specification Version 2.10},
+  year   = {2022},
+  Month  = aug,
+}
+
+@Misc{tcgMeasuredBoot,
+  author = {{Trusted Computing Group}},
+  month  = jan,
+  note   = {Version 1.22 Revision 15},
+  title  = {{TCG EFI Platform Specification}},
+  year   = {2014},
+}
+
+@Book{Yao2020,
+  author    = {Jiewen Yao and Vincent Zimmer},
+  publisher = {Apress},
+  title     = {Building Secure Firmware},
+  year      = {2020},
+  doi       = {10.1007/978-1-4842-6106-4},
+}
+
+@Article{Frazelle2020,
+  author    = {Jessie Frazelle},
+  journal   = {Communications of the {ACM}},
+  title     = {Securing the boot process},
+  year      = {2020},
+  month     = {feb},
+  number    = {3},
+  pages     = {38--42},
+  volume    = {63},
+  doi       = {10.1145/3379512},
+  publisher = {Association for Computing Machinery ({ACM})},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
