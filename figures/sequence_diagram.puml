@@ -14,11 +14,18 @@ actor "3rd party\nattester"
 
 "RA PTA" -> "fTPM TA": Read memory
 "RA PTA" -> "RA PTA": Hash fTPM memory
-
 "fTPM Attestation\nTA" <-- "RA PTA" --: Signed fTPM hash
 
-"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Create and store EKCert\ncontaining fTPM hash
-"fTPM Attestation\nTA" -> "fTPM TA": Inject EKCert
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Read boot chain ID
+
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": eseed = fTPM hash + boot chain ID
+"fTPM Attestation\nTA" -> "fTPM TA": Inject eseed (vendor-specific)
+
+"fTPM Attestation\nTA" -> "fTPM TA" ++: TPM2_CreatePrimary
+"fTPM Attestation\nTA" <-- "fTPM TA" --: Public key (= EKPub)
+
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Create EKCert with EKPub\nsigned by OP-TEE private key
+
 
 
 == Attestation process ==
@@ -26,8 +33,8 @@ actor "3rd party\nattester"
 "3rd party\nattester" -> "User space\napplication" ++: Attestation request\nwith PCR list
 "User space\napplication" -> "Kernel module" ++: Forward
 
-"Kernel module" -> "fTPM TA": Forward
-"Kernel module" <-- "fTPM TA": Quote
+"Kernel module" -> "fTPM TA" ++: Forward
+"Kernel module" <-- "fTPM TA" --: Quote
 "Kernel module" -> "fTPM Attestation\nTA": Get auxiliary
 "Kernel module" <-- "fTPM Attestation\nTA": EKCert,\nCertificate chain
 "Kernel module" -> "Kernel module": Evidence = Quote\n+ EKCert\n+ Certificate chain
