@@ -16,10 +16,12 @@ actor "3rd party\nattester"
 "RA PTA" -> "RA PTA": Hash fTPM memory
 "fTPM Attestation\nTA" <-- "RA PTA" --: Signed fTPM hash
 
-"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Read boot chain ID
+' From https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Arch-Implicit-Identity-Based-Device-Attestation-v1-rev93.pdf
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": Read boot chain ID\n(from TCG-DICE-fwid in OP-TEE cert)
 
-"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": eseed = fTPM hash + boot chain ID
-"fTPM Attestation\nTA" -> "fTPM TA": Inject eseed (vendor-specific)
+' Formula from https://www.trustedcomputinggroup.org/wp-content/uploads/Device-Identifier-Composition-Engine-Rev69_Public-Review.pdf
+"fTPM Attestation\nTA" -> "fTPM Attestation\nTA": EPS =\nHMAC(OP-TEE private key,\nH(fTPM hash || boot chain ID)
+"fTPM Attestation\nTA" -> "fTPM TA": Inject EPS (vendor-specific)
 
 "fTPM Attestation\nTA" -> "fTPM TA" ++: TPM2_CreatePrimary
 "fTPM Attestation\nTA" <-- "fTPM TA" --: Public key (= EKPub)
