@@ -13,14 +13,13 @@ In such models, trustworthiness can only be assumed after the platform configura
 In the meantime, TPMs rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs \cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021 \cite{win11req}.
 
 A dedicated trusted hardware TPM, which would allow for independent attestation of system states, increases cost and complexity - especially for embedded platforms.
-Integrated solutions for resource-constrained devices such as \ac{DICE} are unsuitable for large dynamic systems, for example Linux based devices.
+The exclusive use of integrated solutions for resource-constrained devices such as \ac{DICE} is unsuitable for large dynamic systems, for example Linux based devices.
 These mechanisms shift trust from the firmware provider to the hardware provider by allowing firmware attestation through a hardware root of trust.
 Through trusted execution environments (TEEs), such as Arm TrustZone, a firmware-TPM (fTPM) can be used to provide similar security guarantees as a hardware TPM chip.
 This approach is currently very limited, as no comprehensive mechanisms exists to integrate a fTPM into DICE-like attestation mechanisms.
 Without such mechanisms, independent verifiers have to blindly trust the firmware manufacturer, which drastically limits trust relationships.
 
-An independently verifiable fTPM, rooted in a hardware trust anchor, can be leveraged in a
-zero trust environment without requiring additional hardware or compromising on security.
+An independently verifiable fTPM, rooted in a hardware trust anchor, can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
 
 \subsection{Concept}
 The conceptual basis for this feature is to attest the software stack of the TPM itself, and thus providing a way to independently assess the properties of the fTPM.
