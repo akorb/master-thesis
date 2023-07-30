@@ -48,11 +48,7 @@ Local attestation enables assertions between two environments on the same system
 
 \subsection{Remote attestation}
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[trim={0 5cm 0 0}, width=0.5\linewidth]{figures/remote_attestation.pdf}
-  \caption{Data flow of remote attestation \cite{rfc9334}. Initially, only the blue areas are trusted by the verifier. After the attestation, the verifier also trusts the target environment.} \label{fig:ra}
-\end{figure}
+\input{elements/figure_remote_attestation.tex}
 
 Remote attestation is a challenge-response protocol initiated by a remote attestor. \autoref{fig:ra} depicts a simplified overview of the data flow of a remote attestation.
 The process is initiated by a remote trusted party (called ``verifier'') to verify that a target environment on the end-device (called ``prover'') has not been tampered with \cite{Menetrey2022, Coker2011}. This challenge contains a nonce, enforcing a fresh response.
