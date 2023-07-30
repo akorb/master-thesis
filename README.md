@@ -1,22 +1,31 @@
-# LaTeX template for TUM theses
+### Cool commands
 
-This is a LaTeX template created according to the guidelines for TUM informatics theses in WS 2022. **Always check the [current formatting guidelines][thesis-guidelines] before you hand in.** See [`build/main.pdf`][sample-pdf] for an example PDF created with this template.
+Trims all images to its content but pads it with one pixel line on the top and bottom. The padding is needed, because sometimes the `\includegraphics` command is trimming a pixel line.
 
-Note: Because of copyright considerations, TUM logos are not included in this template. Unfortunately, the logos are also not available on the MyTUM website anymore.
-Your supervisor should be able to hand them to you.
+`mogrify -trim -gravity north -splice 0x1 -gravity south -splice 0x1 *.png`
 
-Comments & contributions are welcome!
 
-## Quickstart
+Convert *.puml file (PlantUML) to a PDF file containing vectorized data.
 
- * [Download][template-download] and extract the template, or upload it to an online editor such as [Overleaf][overleaf] or [TUM ShareLaTeX][tum-sharelatex]. If you prefer to use Git, just clone/fork the repository.
-If your editor supports compiling LaTeX, set it up to use `pdflatex` and `biber`. Set the master document to `main.tex`. Alternatively, you can use the provided Makefile to generate a PDF in the `build` directory (requires `latexmk`).
- * To use Visual Studio Code install the [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop) extension. Then as soon as you click on "Save" it automatically compiles your thesis for you without having to configure anything.
- * Look for `TODO` comments in the provided files. Start at `main.tex`.
+`cat myfile.puml | plantuml -tsvg -p | inkscape --export-type="pdf" -p > myfile.pdf`
 
-If you are new to LaTeX, the [Overleaf Documentation][overleaf-learn] or the [LaTeX Wikibook][latex-wikibook] might help.
 
-If you still have problems with the template, feel free to [create an issue][issue]. For general LaTeX questions, use [TeX StackExchange][tex-se].
+Convert *.puml file (PlantUML) to a PDF file containing vectorized data rotated by 90 degrees clockwise.
+
+`cat overview.puml | plantuml -tsvg -p | inkscape --export-type="pdf" -p | pdfjam --angle 90 --outfile overview.pdf`
+
+## LibreOffice slide to PDF
+
+1. Select all objects of figure
+2. Export
+4. Choose PDF as file type
+3. Tick 'Selection'
+5. Export
+6. Finally, execute this command to crop the PDF to content:
+```shell
+inkscape figure.pdf --export-area-drawing -o figure.pdf
+```
+
 
 ## License
 
