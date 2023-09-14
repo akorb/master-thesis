@@ -10,8 +10,9 @@ stages:
 pdf:
   stage: build
   script:
-  - make pdf 
+    - make pdf
   artifacts:
     paths:
-    - build/main.pdf
+      - build/main.pdf
+      - build/fachschaft_print.pdf
     expire_in: 1 week
