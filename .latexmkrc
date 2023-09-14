@@ -7,3 +7,5 @@ sub makeglossaries {
   popd;
   return $return;
 }
+
+$success_cmd = 'make _fachschaft-print'
