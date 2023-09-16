@@ -8,16 +8,15 @@ jobs:
     container: texlive/texlive:latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Build pdf
       run: make pdf
 
     - name: Upload pdf
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: thesis
-        path: |
-          - build/main.pdf
-          - build/fachschaft_print.pdf
+        path: build/*.pdf
+        if-no-files-found: error
         retention-days: 14
