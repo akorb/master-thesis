@@ -1,13 +1,13 @@
 @startuml sequence diagram
+!pragma teoz true
 
-
+skinparam NoteTextAlignment center
 
 actor "3rd party\nattester"
 
-"User space\napplication" -> "Kernel module" ++: First TPM command
-"Kernel module" -> "fTPM TA" ++: Forward
-
 == Initialization ==
+
+note over "fTPM TA": Triggered only once\nat any first interaction\nwith fTPM
 
 "fTPM TA" -> "RA PTA" ++: Hash me
 
@@ -16,41 +16,33 @@ actor "3rd party\nattester"
 "fTPM TA" <-- "RA PTA" --: fTPM hash
 
 ' Formula (2) from https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf
-"fTPM TA" -> "fTPM TA": EPS =\nHMAC(OP-TEE private key,\nfTPM hash)
+"fTPM TA" -> "fTPM TA": EPS = HMAC(CDI, "EPS")
 "fTPM TA" -> "fTPM TA": Inject EPS
 
-"fTPM TA" -> "fTPM TA": Generate and get EKPub\nwith TPM2_CreatePrimary
-"fTPM TA" -> "fTPM TA": Create EKCert with EKPub\nsigned by OP-TEE private key
-
-"fTPM TA" -> "fTPM TA": Execute TPM command
-
-
-"Kernel module" <-- "fTPM TA" --: Return result
-"User space\napplication" <-- "Kernel module" --: Return result
+"fTPM TA" -> "fTPM TA": Generate EK with\nTPM2_CreatePrimary
+"fTPM TA" -> "fTPM TA": Create EKCert with EKPub as subject\nsigned by OP-TEE private key\ncontaining the hash of the fTPM TA
 
 
 == Attestation process ==
 
-"3rd party\nattester" -> "User space\napplication" ++: Attestation request\nwith PCR list
-"User space\napplication" -> "Kernel module" ++: Forward
+"3rd party\nattester" -> "User space\napplication" ++: PCR list + Nonce
 
-"Kernel module" -> "fTPM TA" ++: Forward
-"Kernel module" <-- "fTPM TA" --: Quote
-"Kernel module" -> "fTPM TA": Get auxiliary
-"Kernel module" <-- "fTPM TA": Certificate chain
-"Kernel module" -> "Kernel module": Evidence = Quote\n+ Certificate chain
-"User space\napplication" <-- "Kernel module" --: Evidence
+"User space\napplication" -> "fTPM TA" ++: Forward
+"User space\napplication" <-- "fTPM TA" --: Evidence =\nQuote signed by EKpriv,\n[event log],\nDice Cert chain incl. EKCert
 "3rd party\nattester" <-- "User space\napplication" --: Evidence
 
+"3rd party\nattester" -> "3rd party\nattester": Make security decision\nregarding own policy\nbased on provided evidence
 
-box "Normal World (Linux)" #Salmon
-participant "User space\napplication"
-participant "Kernel module"
-end box
+box "Attestee"
+    box "Normal World\n        (Linux)" #Salmon
+    participant "User space\napplication"
+    participant "User space\napplication"
+    end box
 
-box "Secure World (OP-TEE)" #LightBlue
-participant "fTPM TA"
-participant "RA PTA"
+    box "Secure World (OP-TEE)" #LightBlue
+    participant "fTPM TA"
+    participant "RA PTA"
+    end box
 end box
 
 @enduml
