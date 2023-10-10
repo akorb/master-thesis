@@ -33,7 +33,7 @@ note over "fTPM TA": Triggered only once\nat any first interaction\nwith fTPM
 
 "3rd party\nattester" -> "3rd party\nattester": Make security decision\nregarding own policy\nbased on provided evidence
 
-box "Attestee"
+box "Prover"
     box "Normal World\n        (Linux)" #Salmon
     participant "User space\napplication"
     participant "User space\napplication"

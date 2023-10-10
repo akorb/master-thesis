@@ -3,4 +3,39 @@
 
 \chapter{Discussion}\label{chapter:discussion}
 
-\section{Evaluating security goals}
+\section{Assessment of the fulfillment of requirements}
+
+\subsection{Security requirements}
+
+\subsection{Attestation process requirements}
+
+% Definitions
+
+\ac{TCG} defines as part of their Trusted Attestation Protocol \cite{tap} the requirements for an attestation process to provide assurance to a verifier that it is (i) accurate, (ii) interpretable, and (iii) attributable.
+
+(i) Accurate attestation data represents the actual state of the device.
+This includes freshness, i.e., the data is not replayed and does not represent an old, outdated state of the device.
+
+(ii) Intuitively, the data must be interpretable by the verifier.
+In other words, the verifier must be able to derive a decision about the trustworthiness of the prover based on the attestation data.
+
+(iii) It must be possible to assign the attestation data to a specific device, i.e., it must be verifiable that the attestation data originates from the prover.
+
+% Why they are reached
+
+\section{Higher level protocols' compatibility}
+
+\section{Missing privacy implications}
+
+% An attacker could use the TCIs to find the exact version of the running software and match this to known vulnerabilities of this version.
+% See: https://www.rfc-editor.org/rfc/rfc9334.html#section-11
+
+\section{Hardware requirements DICE + fTPM vs TPM}
+
+% Does it even make sense? (Price wise, maybe energy wise)
+
+\section{Personal opinion about developed system}
+
+% Maybe too complex?
+% Bad feeling about this?
+% Benefit bigger than effort?
