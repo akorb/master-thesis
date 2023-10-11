@@ -9,10 +9,18 @@
 
 \section{Chaining DICE and TPM certificate infrastructure}
 
+\section{Provisioning process}
+
+% To summarize, attestation key provisioning must ensure that only valid attestation key material is established in Attesters [RFC 9334]
+
 \section{Attestation process}
+
+% Check also for revocation of manufacturer cert
 
 \section{Updating the fTPM}
 
-% Updated TCI is integrated, or: Current state of fTPM always represented. Can only trust updated versions
+% fTPM update only possible while system is shut down. This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM.
 
 \section{Privacy}
+
+% Maybe: The certificates would need to be encrypted as well, as they contain the TCI values, potentially identifying the device
