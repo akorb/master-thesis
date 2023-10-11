@@ -25,10 +25,22 @@ In other words, the verifier must be able to derive a decision about the trustwo
 
 \section{Higher level protocols' compatibility}
 
-\section{Missing privacy implications}
+\section{Implications of missing privacy}
 
 % An attacker could use the TCIs to find the exact version of the running software and match this to known vulnerabilities of this version.
 % See: https://www.rfc-editor.org/rfc/rfc9334.html#section-11
+
+\section{Hardware knowledge dependency}
+% Or hardware-agnostic?
+
+% Comparison to RATS architecture
+% For RATS: Our system would be integrated by the verifier to establish trust into the fTPM, the relying party wouldn't need to know about it
+% For us: verifier = relying party: full burden, needs to know everything
+% but required for a (mostly) independent attestation.
+% Otherwise trust relationship between verifier and relying party required
+% See also Introduction of https://dl.acm.org/doi/10.1145/3600160.3600171
+
+% See abstract of https://www.ietf.org/archive/id/draft-birkholz-rats-corim-01.html
 
 \section{Hardware requirements DICE + fTPM vs TPM}
 

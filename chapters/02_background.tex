@@ -48,7 +48,14 @@ In the following, the two types are discussed.
 
 Local attestation enables assertions between two environments on the same system \cite{Anati2013InnovativeTF}. The claim of an environment can be verified by another environment, usually with the help of message authentication codes (MAC) \cite{Menetrey2022}. For example, Intel SGX uses this mechanism to establish assertions between two enclaves \cite{Anati2013InnovativeTF}.
 
+% Example is the sealing functionality of the TPM. It only releases information if the state of the system is as expected.
+
 \subsection{Remote attestation}
+
+% Doctor analogy
+% A company conducts a remote attestation if a worker provides a sickness attest to a company.
+% In this scenario, the worker is the attester/prover, the doctor is the verifier, and the company is the relying party.
+% Trust in the doctor is established via his medical license, rooted most commonly in a government agency who only certifies doctors which are declared trustworthy since they fulfilled a list of requirements, like succeeding a medical education. 
 
 \input{elements/figure_remote_attestation.tex}
 

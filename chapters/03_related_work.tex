@@ -17,3 +17,10 @@ There exist efforts to improve the security of TPM by introducing the concept of
 Vice versa, Gross et al. \cite{Gross2021} propose the reverse approach of backing an fTPM with hardware. While their implementation has similar properties to hTPM, it inherits some downsides of fTPMs. For example, their fTPM is still started later in the boot chain than a dTPM, which is not the case for hTPM. However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
 % Attacks which we would avoid (e.g., exchange/spoof EKCert)
+
+
+% https://dl.acm.org/doi/pdf/10.1145/3600160.3600171
+% This requires trusting the measurement root of trust (there TPM, AMD SEV-SNP or Arm PSA Attestation Token), but also need to trust the operator to provide benign reference values.
+% Or not if the operator of the trust anchor is the same as the operator of the device. Or the trust anchor and the reference values root in the operator. Operator needs to sign (and beforehand verify) not only the trust anchor, but also reference values (high burden).
+% The paper also only mentions hardware trust anchors, no fTPMs. Could be used in conjunction. I believe our cert chain up to the fTPM would need to be provided within the Attestation Report, but system independent, i.e., would need to be independent of the concrete technology (here DICE). Not sure if that's possible.
+

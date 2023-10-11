@@ -24,11 +24,15 @@ Without such mechanisms, independent verifiers have to blindly trust the firmwar
 
 An independently verifiable fTPM, rooted in a hardware trust anchor, can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
 
+% So far, the fTPM is strictly bound to the processor manufacturer, like Intel® NUC-Kit NUC7PJYH (Intel® Platform Trust Technology), such that you can trust the underlying software as well which is provisioned by the manufacturer, e.g., Intel, too.
+
 \subsection{Concept}
 The conceptual basis for this feature is to attest the software stack of the TPM itself, and thus providing a way to independently assess the properties of the fTPM.
 As the fTPM typically runs atop different software components itself, they too have to be included in the attestation of the fTPM.
 Current fTPM implementations require additional security measures to not leak state between reboots and different software versions.
 The final concept should provide a comprehensive guideline to implement an fTPM, which accounts for such an environment and reflect any relevant information through remote attestation.
+
+% Prover and verifier can take both roles for mutual attestation
 
 \section{Goal}
 \section{Threat Model}
