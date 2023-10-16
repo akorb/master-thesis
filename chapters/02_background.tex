@@ -141,6 +141,8 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM can be considered as their biggest attack vector. An fTPM \cite{Raj2015, 197213} circumvents this by being directly executed within the CPU within a \ac{TEE}, revealing no easily accessible bus.
 The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}. Also, since they require less hardware, they are cheaper for manufacturers.
 
+As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT) \cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an ARM-based coprocessor on the die which enables ARM's TrustZone \cite{Khalid2020}.
+
 Cheng et al. \cite{Cheng2020} conducted a detailed performance comparison between dTPMs and fTPMs. They found that fTPMs are faster overall. %, but especially in key loading, sealing, unsealing, signature verification, and encryption.
 In addition, as is the nature of software, fTPMs are easier to update than dTPMs.
 

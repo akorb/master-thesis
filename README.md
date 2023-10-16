@@ -18,12 +18,13 @@ Convert *.puml file (PlantUML) to a PDF file containing vectorized data rotated 
 
 1. Select all objects of figure
 2. Export
-4. Choose PDF as file type
+4. Choose SVG as file type
 3. Tick 'Selection'
 5. Export
-6. Finally, execute this command to crop the PDF to content:
+6. Again, tick 'Selection'
+7. Finally, execute this command to crop the PDF to content:
 ```shell
-inkscape figure.pdf --export-area-drawing -o figure.pdf
+inkscape figure.svg --export-area-drawing -o figure.pdf
 ```
 
 

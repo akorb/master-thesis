@@ -9,32 +9,78 @@ This chapter includes an explanation of the exact problem we are addressing, and
 
 \section{Motivation}
 
+% Which area this thesis is talking about (Zero Trust)
+
 Modern trust relationships, such as Zero Trust \cite{isaca2021}, require trustworthy platforms, which can reliably report their system state.
 In such models, trustworthiness can only be assumed after the platform configuration has been proved by all parties of the communication.
 
-In the meantime, TPMs rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs \cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021 \cite{win11req}.
-Their applications are also expanding, for example, they are used in anti-cheat software for games \cite{valorant}.
+% Explain remote attestation
 
-A dedicated trusted hardware TPM, which would allow for independent attestation of system states, increases cost and complexity - especially for embedded platforms.
-The exclusive use of integrated solutions for resource-constrained devices such as \ac{DICE} is unsuitable for large dynamic systems, for example Linux based devices.
-These mechanisms shift trust from the firmware provider to the hardware provider by allowing firmware attestation through a hardware root of trust.
-Through trusted execution environments (TEEs), such as Arm TrustZone, a firmware-TPM (fTPM) can be used to provide similar security guarantees as a hardware TPM chip.
-This approach is currently very limited, as no comprehensive mechanisms exists to integrate a fTPM into DICE-like attestation mechanisms.
-Without such mechanisms, independent verifiers have to blindly trust the firmware manufacturer, which drastically limits trust relationships.
+This is solved by remote attestation. In the simplest case, there is a prover and a verifier, as depicted in \autoref{fig:ra_simple}.
 
-An independently verifiable fTPM, rooted in a hardware trust anchor, can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
+\input{elements/figure_remote_attestation_process.tex}
 
-% So far, the fTPM is strictly bound to the processor manufacturer, like Intel® NUC-Kit NUC7PJYH (Intel® Platform Trust Technology), such that you can trust the underlying software as well which is provisioned by the manufacturer, e.g., Intel, too.
+% TPMs become more important
 
-\subsection{Concept}
-The conceptual basis for this feature is to attest the software stack of the TPM itself, and thus providing a way to independently assess the properties of the fTPM.
-As the fTPM typically runs atop different software components itself, they too have to be included in the attestation of the fTPM.
+In the meantime, \acp{TPM} rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs \cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021 \cite{win11req}.
+While they provide remote attestation mechanisms of system states, their applications are also expanding. For example, they are used in anti-cheat software for games \cite{valorant}.
+
+% Short intro why fTPMs were introduced (for weak devices, exactly our target platform)
+
+A dedicated hardware \ac{TPM} (dTPM) increases cost and hardware complexity - especially for embedded platforms.
+Through \acp{TEE}, such as Arm TrustZone, a \ac{fTPM} can be used to provide similar security guarantees as a dTPM chip.
+
+% Why establishing trust in an fTPM is harder than in a dTPM
+
+Unlike a dTPM, which consists of an independent, fully vendor-built hardware unit that is simply activated by power, an \ac{fTPM} is firmware-based and is typically started later in the boot chain, making it dependent on the underlying firmware stack.
+As a result, the fTPM can only be trusted if the entire underlying firmware stack is also trusted.
+However, while a TPM-compliant component provides an infrastructure with which trust in it can be established remotely, i.e., an endorsement key, the underlying firmware stack is not represented by this.
+Though, the underlying firmware could modify, i.e., compromise, the fTPM component which is then not detected.
+Currently, this is solved by the vendor providing not only the fTPM, but also the entire underlying firmware stack.
+Consequently, by establishing trust to the fTPM vendor, one can implicitly trust the underlying firmware as well.
+This is possible since in the most general sense, one can derive from an endorsement key who the endorser is, and if the attester trusts the endorser and the guarantees he provides, trust is established.
+
+% Summary
+
+In summary, with the current approach, the endorser, usually a CPU vendor, also provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this vendor provided without knowing the firmware.
+
+% Current limitations
+
+This approach is limited, as with this mechanism, independent verifiers have to blindly trust the firmware manufacturer, which drastically limits trust relationships.
+In contrast, an independently verifiable fTPM stack, rooted in a hardware trust anchor, can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
+
+\section{Goal}
+
+For \acp{dTPM}, identifying the vendor of the TPM and understanding the guarantees he provides are sufficient. For a fTPM, however, as the fTPM typically runs atop different firmware components itself, this is not enough. The firmware components have to be included in the attestation of the fTPM, too.
+
+The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same vendor, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the firmware vendor.
+
+% Short introduction to DICE
+
+One mechanism enabling firmware attestation is the \ac{DICE}, focusing on resource-constrained devices. Although this mechanism shifts trust from the firmware provider to the hardware provider by allowing firmware attestation through a hardware root of trust, the exclusive use of this integrated solution is unsuitable for large dynamic systems, for example Linux based devices.
+Nevertheless, the advantage is that the state of each component of the firmware boot chain is represented.
+
+% How we try to overcome these limitations
+
+We propose a hybrid solution, combining the advantages of \acp{fTPM} and \ac{DICE}, yielding an independently verifiable certificate chain representing the boot chain up to and including the \ac{fTPM}.
+This enables a verifier to only verify trust into an \ac{fTPM} if the underlying firmware is benign as well and thus, providing a way to independently assess the properties of the fTPM.
+% The conceptual basis for this is to attest the software stack of the TPM itself, and thus providing a way to independently assess the properties of the fTPM.
+
 Current fTPM implementations require additional security measures to not leak state between reboots and different software versions.
 The final concept should provide a comprehensive guideline to implement an fTPM, which accounts for such an environment and reflect any relevant information through remote attestation.
 
+The research questions are:
+\begin{itemize}
+  \item How to combine the DICE and TPM infrastructure? %(e.g., AliasCert $\cup$ EKcert)
+  \item How to manage an fTPM's persistent data securely? %(e.g., flush data on update)
+  \item What constitutes the identity of an fTPM? %(e.g., hash, configuration, boot chain)
+  \item How to enable privacy for the attestation mechanism?
+\end{itemize}
+
 % Prover and verifier can take both roles for mutual attestation
 
-\section{Goal}
+% Chaining the underlying firmware identities with the endorsement identity
+
 \section{Threat Model}
 
 The main threat is the modification of the binary of the fTPM before or during boot. For example, by exchanging the SD card storing the binary.
