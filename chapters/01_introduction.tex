@@ -32,20 +32,29 @@ Through \acp{TEE}, such as Arm TrustZone, a \ac{fTPM} can be used to provide sim
 
 % Why establishing trust in an fTPM is harder than in a dTPM
 
-Unlike a dTPM, which consists of an independent hardware unit manufactured by a single manufacturer that is simply activated by power, an \ac{fTPM} is firmware-based and is typically started later in the boot chain, making it dependent on the underlying firmware stack.
+For a \ac{dTPM}, which consists of an independent hardware unit manufactured by a single manufacturer and is directly activated by power, it is sufficient to identify its manufacturer and understand his provided guarantees.
+In contrast, an \ac{fTPM} runs atop other firmware components and is started later in the boot chain, making its security dependent on the underlying firmware stack.
 As a result, the fTPM can only be trusted if the entire underlying firmware stack is also trusted.
-However, while a TPM-compliant component provides an infrastructure with which trust in it can be established remotely, i.e., an endorsement key, the underlying firmware stack is not represented by this.
+
+% What's the difficulty of establishing trust to an fTPM?
+
+However, while a TPM-compliant component provides an infrastructure with which trust in it can be established remotely, i.e., an endorsement certificate, the underlying firmware stack is not represented by this.
 Though, the underlying firmware could modify, i.e., compromise, the fTPM component which is then not detected.
+
+% How it currently works for fTPMs
+
 Currently, this is solved by the manufacturer providing not only the fTPM, but also the entire underlying firmware stack.
 Consequently, by establishing trust to the fTPM manufacturer, one can implicitly trust the underlying firmware as well.
-This is possible since in the most general sense, one can derive from an endorsement key who the endorser is, and if the attester trusts the endorser and the guarantees he provides, trust is established.
+This is possible since in the most general sense, one can derive from an endorsement certificate the endorser, i.e., manufacturer, and if the attester trusts the endorser and the guarantees he provides, trust is established to his provided components.
 
-This process is illustrated in figure \autoref{fig:current_state}. The verifier trusts the \ac{fTPM} when he trusts the manufacturer of the fTPM including the underlying firmware stack. Note how the verifier has to assume that the manufacturer of the firmware is the same as of the fTPM, without being able to verify that they were actually manufactured by A, and only 
 \input{elements/figure_current_state.tex}
+
+This process is illustrated in figure \autoref{fig:current_state}. The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain. The verifier trusts the entire chain when he trusts the manufacturer of each individual boot component. Note that the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM.
+
 
 % Summary
 
-In summary, with the current approach, the endorser, usually a CPU manufacturer, also provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this manufacturer provided without knowing the firmware.
+In summary, with the current approach, the endorser, usually a CPU manufacturer, provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this manufacturer provided without knowing the firmware.
 
 % Current limitations
 
@@ -54,9 +63,7 @@ In contrast, an independently verifiable fTPM stack, rooted in a hardware trust 
 
 \section{Goal}
 
-For \acp{dTPM}, identifying the manufacturer of the TPM and understanding the guarantees he provides are sufficient. For a fTPM, however, as the fTPM typically runs atop different firmware components itself, this is not enough. The firmware components have to be included in the attestation of the fTPM, too.
-
-The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the firmware manufacturer.
+The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the manufacturer.
 
 % Short introduction to DICE
 
