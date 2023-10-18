@@ -14,18 +14,24 @@ Convert *.puml file (PlantUML) to a PDF file containing vectorized data rotated 
 
 `cat overview.puml | plantuml -tsvg -p | inkscape --export-type="pdf" -p | pdfjam --angle 90 --outfile overview.pdf`
 
-## LibreOffice slide to PDF
+## LibreOffice Impress slide to PDF
 
 1. Select all objects of figure
-2. Export
-4. Choose SVG as file type
-3. Tick 'Selection'
-5. Export
-6. Again, tick 'Selection'
-7. Finally, execute this command to crop the PDF to content:
+2. Right click → Export
+3. Choose PDF as file type → Save
+4. Tick 'Selection'
+5. Unselect all options under 'General'
+6. Export
+7. Crop PDF to content:
 ```shell
-inkscape figure.svg --export-area-drawing -o figure.pdf
+pdfcrop figure.pdf figure.pdf
 ```
+
+<!-- 5. LibreOffice Impress exports the SVG's way too huge. We need to scale it.
+Do the scaling and the conversion at once:
+```shell
+LC_NUMERIC='C' inkscape figure.svg --actions 'select-all:all;transform-scale:0.05;fit-canvas-to-selection' -o figure.pdf
+``` -->
 
 
 ## License

@@ -14,16 +14,16 @@ This chapter includes an explanation of the exact problem we are addressing, and
 Modern trust relationships, such as Zero Trust \cite{isaca2021}, require trustworthy platforms, which can reliably report their system state.
 In such models, trustworthiness can only be assumed after the platform configuration has been proved by all parties of the communication.
 
-% Explain remote attestation
+% Primer on remote attestation
 
-This is solved by remote attestation. In the simplest case, there is a prover and a verifier, as depicted in \autoref{fig:ra_simple}.
+This is solved by remote attestation. In the simplest case, there is a prover and a verifier, as depicted in \autoref{fig:ra_simple}. This requires the verifier to establish trust with software or hardware on the prover's machine that attests the remaining software running on the prover.
 
 \input{elements/figure_remote_attestation_process.tex}
 
 % TPMs become more important
 
 In the meantime, \acp{TPM} rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs \cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021 \cite{win11req}.
-While they provide remote attestation mechanisms of system states, their applications are also expanding. For example, they are used in anti-cheat software for games \cite{valorant}.
+While they provide remote attestation mechanisms of system states, their applications are also expanding beyond their traditional use-cases. For example, they are used in anti-cheat software for games \cite{valorant}.
 
 % Short intro why fTPMs were introduced (for weak devices, exactly our target platform)
 
@@ -32,17 +32,20 @@ Through \acp{TEE}, such as Arm TrustZone, a \ac{fTPM} can be used to provide sim
 
 % Why establishing trust in an fTPM is harder than in a dTPM
 
-Unlike a dTPM, which consists of an independent, fully vendor-built hardware unit that is simply activated by power, an \ac{fTPM} is firmware-based and is typically started later in the boot chain, making it dependent on the underlying firmware stack.
+Unlike a dTPM, which consists of an independent hardware unit manufactured by a single manufacturer that is simply activated by power, an \ac{fTPM} is firmware-based and is typically started later in the boot chain, making it dependent on the underlying firmware stack.
 As a result, the fTPM can only be trusted if the entire underlying firmware stack is also trusted.
 However, while a TPM-compliant component provides an infrastructure with which trust in it can be established remotely, i.e., an endorsement key, the underlying firmware stack is not represented by this.
 Though, the underlying firmware could modify, i.e., compromise, the fTPM component which is then not detected.
-Currently, this is solved by the vendor providing not only the fTPM, but also the entire underlying firmware stack.
-Consequently, by establishing trust to the fTPM vendor, one can implicitly trust the underlying firmware as well.
+Currently, this is solved by the manufacturer providing not only the fTPM, but also the entire underlying firmware stack.
+Consequently, by establishing trust to the fTPM manufacturer, one can implicitly trust the underlying firmware as well.
 This is possible since in the most general sense, one can derive from an endorsement key who the endorser is, and if the attester trusts the endorser and the guarantees he provides, trust is established.
+
+This process is illustrated in figure \autoref{fig:current_state}. The verifier trusts the \ac{fTPM} when he trusts the manufacturer of the fTPM including the underlying firmware stack. Note how the verifier has to assume that the manufacturer of the firmware is the same as of the fTPM, without being able to verify that they were actually manufactured by A, and only 
+\input{elements/figure_current_state.tex}
 
 % Summary
 
-In summary, with the current approach, the endorser, usually a CPU vendor, also provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this vendor provided without knowing the firmware.
+In summary, with the current approach, the endorser, usually a CPU manufacturer, also provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this manufacturer provided without knowing the firmware.
 
 % Current limitations
 
@@ -51,9 +54,9 @@ In contrast, an independently verifiable fTPM stack, rooted in a hardware trust 
 
 \section{Goal}
 
-For \acp{dTPM}, identifying the vendor of the TPM and understanding the guarantees he provides are sufficient. For a fTPM, however, as the fTPM typically runs atop different firmware components itself, this is not enough. The firmware components have to be included in the attestation of the fTPM, too.
+For \acp{dTPM}, identifying the manufacturer of the TPM and understanding the guarantees he provides are sufficient. For a fTPM, however, as the fTPM typically runs atop different firmware components itself, this is not enough. The firmware components have to be included in the attestation of the fTPM, too.
 
-The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same vendor, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the firmware vendor.
+The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the firmware manufacturer.
 
 % Short introduction to DICE
 
