@@ -28,6 +28,10 @@
 
 % Check also for revocation of manufacturer cert
 
+\begin{equation}
+trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
+\end{equation}
+
 \section{Updating the fTPM}
 
 We consider it as critical that the \ac{fTPM} is updatable. This is due to the history of \acp{fTPM} showing vulnerabilities which have been patched consequently. % cite... all from background probably
@@ -59,3 +63,5 @@ So, our protection additionally protects data-at-rest, while the data-at-use is 
 \section{Privacy}
 
 % Maybe: The certificates would need to be encrypted as well, as they contain the TCI values, potentially identifying the device
+
+% Use Attestation key not in endorsement (or platform?) hierarchy
