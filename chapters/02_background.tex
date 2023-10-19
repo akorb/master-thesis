@@ -82,13 +82,13 @@ It is also a passive device, meaning it only does something when prompted.
 
 \input{elements/table_tpm_use_cases.tex}
 
-The \ac{PCR} values are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
+The \acp{PCR} are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
 This operation is known as 'hash extend' \cite{Arthur2015}.
 Its design prohibits the removal of extensions, which would cause the TPM to forget a measurement, and the arbitrary writing of values, which would overwrite any previously conducted measurements.
 A PCR value holds a hash representing the platform state.
 Thereby, a remote verifier can request a so-called 'quote' from the TPM on the host in question.
 A quote contains the hash of all requested PCR values and is digitally signed.
-Typically, a TPM contains 24 PCR registers, as defined as the minimum by \cite{tcgPcClient}, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}.
+Typically, a TPM contains 24 PCR registers\footnote{Note that we are aware that 'PCR register' is a Redundant Acronym Syndrome, but we have chosen to leave it as such for clarity, as 'PC register' can be associated with other meanings.}, as defined as the minimum by \cite{tcgPcClient}, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}.
 %\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}.
 The fixed length of the \ac{PCR} values is important for the memory-constrained nature of TPMs \cite{Arthur2015}.
 
@@ -111,8 +111,6 @@ TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over
 
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
-
-Note that we are aware that 'PCR register' is a RAS\footnote{Redundant Acronym Syndrome}, but we have chosen to leave it as such for clarity, as 'PC register' can be associated with other meanings.
 
 \input{elements/figure_pcr_types}
 
