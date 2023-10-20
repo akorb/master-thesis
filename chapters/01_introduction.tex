@@ -94,6 +94,10 @@ The research questions are:
 
 % https://trustedfirmware-a.readthedocs.io/en/latest/threat_model/threat_model.html
 
+% We only need to trust the isolation between the TEE and REE
+% And we also need to inherintly trust our root of trust (SRTM) starting the measurements of the subsequent firmware components
+% Just because authenticity including integrity is given for boot components, this doesn't mean they are free of software bugs. We do not assume that the firmware, e.g., Arm trusted firmware-a, is free of bugs. That is up to the verifier to decide.
+
 The main threat is the modification of the binary of the fTPM before or during boot. For example, by exchanging the SD card storing the binary.
 However, we assume that the fTPM cannot be modified by malicious parties after the boot process regardless of whether the fTPM is benign or compromised because we trust the TEE environment.
 Out-of-scope are hardware attacks, side-channel attacks, control-flow attacks, and Denial of Service attacks.

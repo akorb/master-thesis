@@ -7,26 +7,44 @@ This chapter discusses the relevant background knowledge required to understand 
 
 \section{Trusted execution environment}
 
-% https://developer.arm.com/documentation/100935/0100/The-TrustZone-hardware-architecture-
+% Motiviation for TEE's
 
-One of the core security concepts of operating systems are the privilege levels of processes. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices. Hence, protection against more privileged processes is desired.
+One of the core security concepts of operating systems are the privilege levels of processes \cite{Linden1976}. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes \cite{Bratus2009}. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant \cite{Nimgaonkar2012}. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices \cite{Ning2018}. Hence, protection against more privileged processes is desired.
 
-% Global Platform = industry standard
 
-A \ac{TEE} is an integrated hardware extension to processors. Effectively, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware. The \ac{REE} runs the common software, e.g., a Linux-based operating system and the user applications.
-The TEE is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states (e.g., memory) \cite{Sabt2015}.
+% What TEE's are
+
+The \acf{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
+The \ac{REE} runs commodity software, e.g., a Linux-based operating system with user applications.
+The TEE is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory \cite{Sabt2015}.
 Since a \ac{TEE} is integrated into the processor, there is no separate chip required.
 % The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
-% TODO: Which previous technologies?
-Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as \ac{REE} operating systems. The kernel space is running a trusted OS kernel, and the user space is running the trusted applications.
+Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS. The kernel space is running a trusted OS, and the user space is running the trusted applications. 
+It focuses on resisting software-based attacks generated in the \ac{REE}, however, also protects against some hardware attacks \cite{GPSysArch}.
 
-Previous, mostly software-based technologies ensure confidentiality and integrity protection of data-in-transit, and data-at-rest \cite{Pecholt2022}, while a \ac{TEE} additionally protects data-in-use \cite{Lee:EECS-2022-96}.
-For example, smart cards are commonly used to store keys to identify users and keys to encrypt data-at-rest \cite{Arthur2015}.
 
-One such \ac{TEE} is ARM's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}.
-While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own resources.
-Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\% \cite{eclipse}, many of the approaches in this field of research rely on ARM technology such as TrustZone.
+% Differences to previous technologies
+
+Previous, mostly software-based technologies ensure confidentiality and integrity protection of data-in-transit and data-at-rest \cite{Pecholt2022}, while a \ac{TEE} additionally protects data-in-use in hardware \cite{Pecholt2022, Lee:EECS-2022-96}.
+% For example, smart cards are commonly used to store keys to identify users and to encrypt data-at-rest \cite{Arthur2015}.
+
+% Figure explanation
+
+\autoref{fig:tee_motivation} illustrates the motivation. In the traditional architecture, i.e., without a TEE, if an attacker compromises the \ac{REE} the full system is affected. With a \ac{TEE}, the attacker is limited to the \ac{REE}, while the \ac{TEE} continues to protect the secure assets, such as encryption keys. This results from the observation that the attack surface of a rich OS is much larger than that of a trusted OS, e.g., due to its network connectivity and the high dynamics of software installations, while the attack surface of a trusted OS is rather small and has tightly controlled interfaces.
+
+\input{elements/figure_tee_motivation.tex}
+
+\subsection{Arm TrustZone}
+
+One such \ac{TEE} is ARM's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
+While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own assigned resources.
+Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\% \cite{eclipse}, many of the approaches in this field of research use Arm TrustZone \cite{Valadares2021}.
+
+\input{elements/figure_arm_trustzone_arch.tex}
+
 Our approach also leverages TrustZone to enable the execution and the remote attestation of an fTPM.
+
+\subsection{Further TEE technologies}
 
 Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and ARM Confidential Computing Architecture~(CCA). Since we focus on the implementation of our concept with ARM TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to ARM processors and can also be applied to others, they are mentioned for the sake of completeness.
 
@@ -73,7 +91,7 @@ It typically consists of two parts \cite{McCune2008}. (i) The attestation, and (
 \section{Trusted Platform Module}
 \label{sec:tpm}
 
-The \ac{TCG} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}.
+The \ac{TCG}\footnote{\url{https://trustedcomputinggroup.org/}} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}.
 % First v2.0 version was much earlier
 It describes a cryptographic coprocessor that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
 For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
