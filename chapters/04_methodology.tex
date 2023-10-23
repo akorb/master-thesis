@@ -8,6 +8,14 @@
 % FWID vs. TCI
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
+\section{The identity of an fTPM}
+
+% Configurations required
+% Does contain whole firmware stack?
+% Data cannot be considered, since changes during runtime, not represented by DICE which only happens at boot-time
+% What happens if changed? -> Data not accessible, in essence, fTPM fully reset
+% https://trustedfirmware-a.readthedocs.io/en/latest/design_documents/measured_boot.html#critical-data
+
 \section{Architectural overview}
 
 % S-RTM = DICE
@@ -17,6 +25,11 @@
 
 % EK does not represent devices' identity anymore, but DICEs' DeviceCert does.
 % Lifetime of EK is bound to the exact software versions of the fTPM including all underlying firmware
+
+% 5.3.2 from https://dl.acm.org/doi/10.1145/3098954.3103165
+% Use the references there to explain why we used HMAC with SHA256
+% Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
+
 
 \section{Chaining DICE and TPM certificate infrastructure}
 

@@ -51,18 +51,15 @@ This is possible since in the most general sense, one can derive from an endorse
 This process is illustrated in figure \autoref{fig:current_state}. The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain. The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component. Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM.
 
 
-% Summary
+% Summary with limitations
 
 In summary, with the current approach, the endorser, usually a CPU manufacturer, provides the firmware up to the fTPM and guarantees the firmware is not modifiable by untrusted parties. This enables to establish trust the other firmware components this manufacturer provided without knowing the firmware.
-
-% Current limitations
-
 This approach is limited, as with this mechanism, independent verifiers have to blindly trust the firmware manufacturer, which drastically limits trust relationships.
-In contrast, an independently verifiable fTPM stack, rooted in a hardware root of trust, can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
 
 \section{Goal}
 
-The goal is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the manufacturer.
+We establish independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a zero trust environment without requiring additional hardware or compromising on security.
+The goal of this approach is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on the manufacturer.
 
 % Short introduction to DICE
 
