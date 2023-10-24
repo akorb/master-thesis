@@ -48,8 +48,7 @@ This is possible since in the most general sense, one can derive from an endorse
 
 \input{elements/figure_current_state.tex}
 
-This process is illustrated in figure \autoref{fig:current_state}. The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain. The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component. Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM.
-
+This process is illustrated in figure \autoref{fig:current_state}. The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain. The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component. Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM. To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
 
 % Summary with limitations
 

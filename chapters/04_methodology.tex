@@ -6,6 +6,9 @@
 \section{Terminology}
 
 % FWID vs. TCI
+
+Personal correspondence with TCG ...
+
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
 \section{The identity of an fTPM}
@@ -30,6 +33,9 @@
 % Use the references there to explain why we used HMAC with SHA256
 % Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
 
+% We use explicit attestation. See DICE Layering Spec 7.2
+% See 8.1.1.2 for an example about implicit attestation
+% Implicit attestation would require to know all resulting public keys in EKcert, which would require that we booted it up in a controlled manner beforehand and stored the resulting code.
 
 \section{Chaining DICE and TPM certificate infrastructure}
 

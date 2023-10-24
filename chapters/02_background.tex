@@ -233,34 +233,80 @@ Secure Boot and Measured Boot are often used in conjunction.
 
 \section{Device Identifier Composition Engine}
 
-% Its origins
-\ac{DICE} was originally proposed by Microsoft as part of their Robust Internet-of-Things (RIoT) architecture \cite{England2016}. In 2017, the DICE specification was published by \ac{TCG} \cite{tcg-microsoft-tpm}, of which Microsoft is a member.
 % Primer
-Its main purpose is to detect firmware tampering, while its main attribute is its minimal hardware requirements.
-Furthermore, it offers the means to establish trust and identity in a device.
-
-% Hardware requirements
-The standard constitutes three hardware requirements \cite{dice-hardware-reqs}.
-\begin{itemize}
-  \item Store a read-only Unique Device Secret (UDS).
-  \item First executed code (DICE) is immutable.
-  \item UDS exclusively accessible for the first code layer.
-\end{itemize}
-The requirements can be justified intuitively. The UDS must be read-only and unique to the device to enable identification. Moreover, the first code layer is the root of trust since it cannot be measured and therefore, it is required that it is immutable. In other words, its protection mechanisms must be trusted without being verified or measured such that manipulations are not possible. The first code layer must read the UDS, perform its calculations based on it, and then erase the UDS from memory while preventing other entities from retrieving this secret during the power-on time. Otherwise, other entities could trivially forge measurement or identification values.
+\ac{DICE} was originally proposed by Microsoft as part of their Robust Internet-of-Things (RIoT) architecture \cite{England2016}. In 2017, the DICE specification was published by \ac{TCG} \cite{tcg-microsoft-tpm}, of which Microsoft is a member.
+Its purposes are to detect firmware tampering and enable device identification, while its main attribute is its minimal hardware requirements.
 
 % Measurement chain
-% immutable DICE, DICE Core, bootloader, application
 
-Each layer conducts a measurement of the subsequent layer, and merges it with the current CDI to the CDI of the next layer. Therefore, a trust chain is established, since if a single measurement changes, the CDI of each subsequent layer will be affected.
+DICE operates on a boot process layered into components \cite{dice-layering-arch}.
+Later components are typically more feature rich and complex than earlier ones, but this is not necessary.
+Each component is measured prior becoming active by the preceding component.
+Great care must be taken to ensure that the identity of the measured and finally executed component is consistent \cite{Hristozov2022, Carpent2018}.
+The union of all security-relevant components of a device form a Trusted Computing Base (TCB).
+Their identities are called TCB Component Identifier (TCI).
+They are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
+
+% Hardware requirements
+
+The first component is the DICE itself. It consists of software and hardware. The DICE specification \cite{dice-hardware-reqs} states three hardware requirements that the DICE layer 
+\begin{enumerate}
+  \item stores a read-only Unique Device Secret (UDS),
+  \item is immutable,
+  \item and has exclusive access to the UDS.
+\end{enumerate}
+These requirements can be justified intuitively.
+(1) The UDS must be read-only and unique to the device to enable a base for long term identification.
+(2) Moreover, the DICE layer is the root of trust because its misbehavior cannot be detected since it is not preceded by anything that could measure it.
+Therefore, it is required to be immutable.
+From a remote verifiers' perspective, the protection mechanisms of the DICE layer must be trusted to prohibit manipulations, without being verified or measured.
+(3) The DICE layer reads and uses the UDS, and then needs to erase the UDS from memory while preventing other components from retrieving this secret during the power-on time.
+Otherwise, other entities could trivially forge measurement or identification values. This lock mechanism can, for example, be realized with eFuses \cite{dice-hardware-reqs}.
+
+\input{elements/figure_dice_layers.tex}
+
+
+% CDI
+
+While the UDS is exclusive to the DICE layer, each subsequent measurable component retrieves a Compound Device Identifier (CDI) from the previous component. The UDS identifies only the hardware, the CDIs represent the combination of hardware and software. The CDI of each layer depends on two components combined in a one-way function (OWF). (i) The own TCI, binding the CDI to the current layers' identity, i.e., the hash of itself, and (ii) the CDI of the previous layer, making each CDI depending on the identities of all previous component identities. In other words, as soon as any component is modified, this reflects in the permutation of the CDI of all subsequent components. Hence, a trust chain is established. Just as the DICE layer must ensure to have exclusive access to the UDS, each later layer must ensure that it has exclusive access to its CDI. The calculation of the CDI values is illustrated visually in \autoref{fig:dice-layers}, and mathematically in \autoref{eq:dice_cdi}. The layers can derive further secrets from their CDI, e.g., an alias key pair. In other words, the CDI acts as a seed.
+
+\begin{equation}
+  \label{eq:dice_cdi}
+  CDI_n =
+  \begin{cases}
+    OWF(UDS,\ TCI_0), & \text{for } n=0\\
+    OWF(CDI_{n-1},\ TCI_n), & \text{for } n \geq 1
+  \end{cases}
+\end{equation}
+
+% Certificate chain
+
+Each measurable layer is represented by a certificate forming a certificate chain.
+For layers $n \geq 1$ they are called Alias certificates, while for Layer 0 it is called DeviceID certificate.
+The differing names come from their different purposes. An AliasCert merely represents the identity of a layer, i.e., represents an alias of the component.
+A DeviceID certificate is additionally the asset which allows a long term identification of the device.
+The UDS alone cannot be used for this because it is kept strictly secret, whereas the DeviceID certificate is public.
+
+% AliasCert
+
+Recall that a measurement is always conducted from the previous component. Hence, the previous component also has to create the AliasCert, since the just measured component is not trusted to do that.
+Therefore, measured TCIs are persisted in Alias certificates signed with a private key only accessible to the measuring layer. This private key was derived from its CDI value.
+
+% DeviceCert
+
+Another important difference between the AliasCert and DeviceID certificate is, that the DeviceID certificate is generated during provisioning by a private key of the manufacturer.
+This allows linking the DICE implementation to a manufacturer, which is important to retrieve the guarantees the manufacturer conducts for its DICE implementation.
+A DeviceID certificate contains the TCI of Layer 0.
+
+% Add certificate graph chain, rooting from manufacturer, show which TCI is contained. Maybe show with colors what is generated during boot time, and what is externally generated (Manufacturer cert & DeviceID cert)
+
+Trust on CDI based on secrecy of UDS.
+How to establish trust into the UDS? DeviceCert
 
 % From 8.1.3 Layered Architecture
 % The DICE TCB layer that generates an IDevID (typically layer 0 = DeviceID cert) SHOULD be either immutable or mutable under the control of the device manufacturer
 % This is because it is required that any change to the layer 0 TCB MUST result in a different DeviceID key. Which changes identity of device.
 
-\input{elements/figure_dice_layers.tex}
-
-% Certificates
-
 % Security statement
 
-To the best of our knowledge, \ac{DICE} is so far considered a secure concept apart from physical attacks, only implementation problems can bear security problems \cite{Jaeger2020}.
+To the best of our knowledge, \ac{DICE} is so far considered a secure concept apart from physical attacks, only implementation problems can bear security problems \cite{Jaeger2020, Hristozov2022}.
