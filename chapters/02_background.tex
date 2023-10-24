@@ -253,8 +253,11 @@ The requirements can be justified intuitively. The UDS must be read-only and uni
 
 Each layer conducts a measurement of the subsequent layer, and merges it with the current CDI to the CDI of the next layer. Therefore, a trust chain is established, since if a single measurement changes, the CDI of each subsequent layer will be affected.
 
+% From 8.1.3 Layered Architecture
+% The DICE TCB layer that generates an IDevID (typically layer 0 = DeviceID cert) SHOULD be either immutable or mutable under the control of the device manufacturer
+% This is because it is required that any change to the layer 0 TCB MUST result in a different DeviceID key. Which changes identity of device.
 
-% TODO: Add graph
+\input{elements/figure_dice_layers.tex}
 
 % Certificates
 
