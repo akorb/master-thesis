@@ -268,7 +268,7 @@ Otherwise, other entities could trivially forge measurement or identification va
 
 % CDI
 
-While the UDS is exclusive to the DICE layer, each subsequent measurable component retrieves a Compound Device Identifier (CDI) from the previous component. The UDS identifies only the hardware, the CDIs represent the combination of hardware and software. The CDI of each layer depends on two components combined in a one-way function (OWF). (i) The own TCI, binding the CDI to the current layers' identity, i.e., the hash of itself, and (ii) the CDI of the previous layer, making each CDI depending on the identities of all previous component identities. In other words, as soon as any component is modified, this reflects in the permutation of the CDI of all subsequent components. Hence, a trust chain is established. Just as the DICE layer must ensure to have exclusive access to the UDS, each later layer must ensure that it has exclusive access to its CDI. The calculation of the CDI values is illustrated visually in \autoref{fig:dice-layers}, and mathematically in \autoref{eq:dice_cdi}. The layers can derive further secrets from their CDI, e.g., an alias key pair. In other words, the CDI acts as a seed.
+While the UDS is exclusive to the DICE layer, each subsequent measurable component retrieves a Compound Device Identifier (CDI) from the previous component. The UDS identifies only the hardware, the CDIs represent the combination of hardware and software. The CDI of each layer depends on two components combined in a one-way function (OWF). (i) The own TCI, binding the CDI to the current layers' identity, i.e., the hash of itself, and (ii) the CDI of the previous layer, making each CDI depending on the identities of all previous component identities. In other words, as soon as any component is modified, this reflects in the permutation of the CDI of all subsequent components. Hence, a trust chain is established. Just as the DICE layer must ensure to have exclusive access to the UDS, each later layer must ensure that it has exclusive access to its CDI. The calculation of the CDI values is illustrated visually in \autoref{fig:dice-layers}, and mathematically in \autoref{eq:dice_cdi}. The layers can derive further secrets from their CDI, e.g., an encryption key to enforce the confidentiality of the data for the respective layer. In other words, the CDI acts as a seed.
 
 \begin{equation}
   \label{eq:dice_cdi}
@@ -281,27 +281,48 @@ While the UDS is exclusive to the DICE layer, each subsequent measurable compone
 
 % Certificate chain
 
-Each measurable layer is represented by a certificate forming a certificate chain.
-For layers $n \geq 1$ they are called Alias certificates, while for Layer 0 it is called DeviceID certificate.
-The differing names come from their different purposes. An AliasCert merely represents the identity of a layer, i.e., represents an alias of the component.
-A DeviceID certificate is additionally the asset which allows a long term identification of the device.
+The end result of a successful boot process using DICE is a certificate chain.
+Here, each certificate represents a layer by embedding the identity of the layer, i.e., its TCI.
+The certificate chain is built up step by step during the boot-process, with
+the first two certificates (manufacturer certificate and DeviceID certificate) being static and potentially stored on the device, and the remaining certificates (Alias certificates) being generated during boot time. There is at least one Alias certificate, as shown in \autoref{eq:cert_chain}.
+
+\begin{equation}
+  \label{eq:cert_chain}
+  Manufacturer\ Cert \rightarrow DeviceID\ Cert \rightarrow Alias\ Cert\ [\rightarrow Alias\ Cert]^*
+\end{equation}
+
+The chains' root is the certificate of the DICE manufacturer. It is either provided by the device or can be retrieved from the manufacturer itself, e.g., via its website.
+
+% DeviceID certificate
+
+The subsequent certificate is the DeviceID certificate.
+% For layers $n \geq 1$ they are called Alias certificates, while for Layer 0 it is called DeviceID certificate.
+% The differing names come from their different purposes. An AliasCert merely represents the identity of a layer, i.e., represents an alias of the component.
+%A DeviceID certificate is additionally the asset which allows a long term identification of the device, and provides device provenance, i.e., links the DICE to its manufacturer.Another important difference between the AliasCert and DeviceID certificate is, that the DeviceID certificate is generated during device provisioning by the manufacturer.
+It is generated during device provisioning by the manufacturer, and signed by the manufacturers' private key.
+This links the DICE implementation to a manufacturer, which is important to retrieve the guarantees the manufacturer conducts for its DICE implementation to protect its UDS value, which is the hardware root of trust.
+The DeviceID certificate also contains the TCI of layer 0.
+Hence, the manufacturer must ensure to only sign a DeviceID certificate containing a TCI matching the actual TCI of layer 0.
 The UDS alone cannot be used for this because it is kept strictly secret, whereas the DeviceID certificate is public.
+This certificate also represents the long term identity of the device. Therefore, the identity of the device changes if layer 0 is modified.
+Only the public key is pre-provisioned within the DeviceID certificate.
+The private key still has to be generated during boot-time.
+% What happens if Layer 0 changes? DeviceID cert is pre-provisioned, how is it detected?
+This continues the chain of trust, because if layer 0 changes, the DeviceIDs' private key also changes.
+It follows that the signature of the next certificate will be invalid for the public key in the DeviceID certificate.
+
+% While the alias key pair is always generated by the preceding layer, the DeviceID key pair is generated within layer 0 itself, and the deviceID certificate contains its own TCI.
+%The DeviceID certificate is not generated during ordinary boot-times, but in a manufacturer controlled provisioning-process.
+
+% So, the DeviceID certificate contains the TCI of layer 0, however, it is pre-provisioned by the manufacturer.
+
+
+\input{elements/figure_dice_certs.tex}
 
 % AliasCert
 
 Recall that a measurement is always conducted from the previous component. Hence, the previous component also has to create the AliasCert, since the just measured component is not trusted to do that.
 Therefore, measured TCIs are persisted in Alias certificates signed with a private key only accessible to the measuring layer. This private key was derived from its CDI value.
-
-% DeviceCert
-
-Another important difference between the AliasCert and DeviceID certificate is, that the DeviceID certificate is generated during provisioning by a private key of the manufacturer.
-This allows linking the DICE implementation to a manufacturer, which is important to retrieve the guarantees the manufacturer conducts for its DICE implementation.
-A DeviceID certificate contains the TCI of Layer 0.
-
-% Add certificate graph chain, rooting from manufacturer, show which TCI is contained. Maybe show with colors what is generated during boot time, and what is externally generated (Manufacturer cert & DeviceID cert)
-
-Trust on CDI based on secrecy of UDS.
-How to establish trust into the UDS? DeviceCert
 
 % From 8.1.3 Layered Architecture
 % The DICE TCB layer that generates an IDevID (typically layer 0 = DeviceID cert) SHOULD be either immutable or mutable under the control of the device manufacturer
