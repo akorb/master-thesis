@@ -20,3 +20,4 @@ vTPM
 vTPMs
 exfiltration
 GlobalPlatform
+DeviceID
