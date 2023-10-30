@@ -21,3 +21,4 @@ vTPMs
 exfiltration
 GlobalPlatform
 DeviceID
+hardcoded
