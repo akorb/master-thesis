@@ -19,17 +19,9 @@ The old term FWID is retained whenever it is used in something that is alive in 
 Therefore, we will use the term TCI in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term FWID, just as it is common practice at the TCG.
 
 
-% Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
-
-\section{The identity of an fTPM}
-
-% Configurations required
-% Does contain whole firmware stack?
-% Data cannot be considered, since changes during runtime, not represented by DICE which only happens at boot-time
-% What happens if changed? -> Data not accessible, in essence, fTPM fully reset
-% https://trustedfirmware-a.readthedocs.io/en/latest/design_documents/measured_boot.html#critical-data
-
 \section{Architectural overview}
+
+\input{elements/figure_architecture.tex}
 
 We have an S-RTM, which uses the consistent trusted state a device has after powering-on for further measurements. This in contrast to D-RTM, which is capable of doing so at anytime, e.g., Intel SGX.
 % S-RTM = DICE
@@ -44,9 +36,41 @@ We have an S-RTM, which uses the consistent trusted state a device has after pow
 % Use the references there to explain why we used HMAC with SHA256
 % Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
 
-% We use explicit attestation. See DICE Layering Spec 7.2
-% See 8.1.1.2 for an example about implicit attestation
-% Implicit attestation would require to know all resulting public keys in EKcert, which would require that we booted it up in a controlled manner beforehand and stored the resulting code.
+
+% Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
+
+\section{The identities of an fTPM}
+
+Depending on the point of view, there are two identities of an fTPM.
+There is the identity of the fTPM measured by DICE, which consists of the hash of the binary and the component configurations as for all DICE components, as shown in \autoref{fig:ftpm-identity}.
+This identity is referred to as the TCI.
+Compilation flags are not part of these configurations, as they are embedded in the final binary and are therefore automatically measured as part of the measurement of the binary.
+Of more interest are the configurations that are not part of the binary.
+They are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+However, Microsoft's fTPM reference implementation does not contain such configurations, which simplifies the TCI generation of our fTPM by limiting it to the measurement of the fTPM binary data.
+The TPM's storage cannot be part of its identity as it changes during runtime after each data write, e.g., storing an arbitrary key.
+This is a problem because DICE only runs during the boot time in which the identity of the fTPM is measured.
+The identity of the fTPM must not change afterwards, otherwise the consistency of the identity transmitted by DICE and the actual identity of the fTPM would differ.
+In the interest of completeness, we also do not want to restrict the permissible values of the working data of an fTPM.
+
+Then, there is also the identity of the fTPM in the TPM context, which is represented by its EK.
+This identity is not only bound to the binary and the configuration of the fTPM, but also the entire underlying firmware stack.
+We derive the EK from the TPMs CDI, which is derived of the measurements of all preceding firmware components and the TPMs' TCI, see \autoref{eq:dice_cdi}.
+A TPMs storage must never be accessible to another TPM.
+Therefore, if the TPMs identity changes, e.g., due to a TPM modification or an update of a preceding firmware component, the old storage data is inaccessible, which is equivalent to a full manufacturer reset.
+
+
+\input{elements/figure_ftpm_identity.tex}
+
+% In the context of DICE, the identity of a firmware component generally consists of the binary and its configuration, as depicted in \autoref{fig:ftpm-identity}.
+
+
+% Configurations required
+% Does contain whole firmware stack?
+% Data cannot be considered, since changes during runtime, not represented by DICE which only happens at boot-time
+% What happens if identity changed? -> Data not accessible, in essence, fTPM fully reset
+% https://trustedfirmware-a.readthedocs.io/en/latest/design_documents/measured_boot.html#critical-data
+
 
 \section{Chaining DICE and TPM certificate infrastructure}
 
@@ -61,6 +85,14 @@ We have an S-RTM, which uses the consistent trusted state a device has after pow
 \begin{equation}
 trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
 \end{equation}
+
+% We use explicit attestation. See DICE Layering Spec 7.2
+% See 8.1.1.2 for an example about implicit attestation
+% Implicit attestation would require to know all resulting public keys in EKcert, which would require that we booted it up in a controlled manner beforehand and stored the resulting code.
+We use an explicit attestation procedure.
+This makes it sufficient for the verifier to know the trusted TCI, whereas implicit attestation would require a database of known public keys corresponding to a trusted TCI.
+And since each public key for a device is unique, as it is ultimately derived from the device's unique UDS, the verifier would need to know the mapping between public keys and the corresponding TCI for each device, which we consider unrealistic.
+Also, this is a hindrance as the verifier should be able to trust an unknown device by trusting the DICE manufacturer.
 
 \section{Updating the fTPM}
 
