@@ -4,10 +4,19 @@
 \chapter{Methodology}\label{chapter:methodology}
 
 \section{Terminology}
+\label{sec:terminology}
 
-% FWID vs. TCI
+Before we dive into technical explanations, we want to clear some potential terminology confusion.
 
-Personal correspondence with TCG ...
+In the original DICE release from Microsoft \cite{England2016}, the identifier of a component is called the Firmware ID (FWID).
+The TCG consortium later renamed it TCB Component Identifier (TCI).
+We believe this is to emphasize that the TCI does not necessarily have to be the hash of a firmware binary, but could also be, for example, the embedded ID of a hardware component.
+However, TCG has not fully implemented this terminology renaming.
+In their DICE Attestation Architecture \cite{TCGAttestation2020}, they define an X.509 extension that contains the TCIs.
+In fact, however, they still refer to them as FWIDs in its formal definition, while everywhere else they are referred to as TCIs.
+In personal correspondence with TCG, we have learned that this is due to backwards compatibility.
+The old term FWID is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term TCI in assets that can be updated more quickly, such as the specification text.
+
 
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
@@ -21,6 +30,7 @@ Personal correspondence with TCG ...
 
 \section{Architectural overview}
 
+We have an S-RTM, which uses the consistent trusted state a device has after powering-on for further measurements. This in contrast to D-RTM, which is capable of doing so at anytime, e.g., Intel SGX.
 % S-RTM = DICE
 
 % EK = AK: Takes on both roles. Endorsement key always represents identity, therefore, we lose privacy. Later an approach with privacy is presented.
