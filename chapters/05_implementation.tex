@@ -9,6 +9,41 @@ As explained in \autoref{sec:terminology}, from now on the term Firmware ID (FWI
 % Use the attributes for the NVindex of the EKcert as defined by TPM PC Client Spec 4.5.2.1
 % The attributes set such that the NV index can only be written or deleted if the policy is fulfilled. However, it has an empty policy, which can never be fulfilled. This yields an undeletable EK certificate.
 
+% \section{Providing a custom EK template}
+\section{Adaption of the Endorsement Key}
+
+The EK is a primary key, so it is derived from the Endorsement Primary Seed (EPS).
+There is also a default template defined by TCG \cite{tcg-ek}, dictating the endorsement key to be a restricted encryption key, since it is privacy-sensitive.
+The default template is required to be able to reproduce the EK contained in the EK certificate so that the TPM can prove that this EK certificate corresponds to it by being able to generate the corresponding private key.
+The default template is not stored on the TPM, but it is part of the command triggering the key generation (\texttt{TPM2\_CreatePrimary}).
+Therefore, the TPM itself does not need to know what the default template is, since it is always provided by TPM-capable software.
+
+However, we want to use the EK as a signing key.
+The TPM specification provides a mechanism for this, where we need to store our custom EK template in a specific NV index within the TPM \cite{tcg-ek}.
+We use the values of the default EK template and only deviate from it when necessary in three aspects.
+We declare the EK as a (i) restricted signing key.
+This also requires to specify a (ii) signature scheme, and (iii) no inner symmetric key as required for signing keys since they are not allowed to have any children keys.
+
+This template will be generated within the TPM after each manufacturer reset, so it will be preserved even after an identity change and a reset of the firmware TPM.
+However, the EK itself will change as the CDI changes, then the EPS and finally the EK.
+The attributes of the NV index are declared such that the template cannot be deleted \cite{tcgPcClient}.
+This is possible by allowing to delete the NV index only when an unfulfillable policy is met.
+
+The creation of the template is done in code of the fTPM.
+This is a convenient feature, as the template is thus also part of the TCI of the fTPM.
+And since a verifier is free to decide whether to trust a particular TCI, he will most likely only trust a TCI if it contains that the TPM generates a restricted EK.
+However, this is also possible with a generic TPM with a little more effort with the \texttt{TPM2\_Certify} command.
+
+% \autoref{eq:ek}.
+% \begin{equation}
+%     \label{eq:ek}
+%     EK = KDF(EPS,\ EK_{template})
+% \end{equation}
+
+% 5.3.2 from https://dl.acm.org/doi/10.1145/3098954.3103165
+% Use the references there to explain why we used HMAC with SHA256
+% Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
+
 \section{Prover}
 \subsection{Normal World}
 
@@ -19,3 +54,7 @@ As explained in \autoref{sec:terminology}, from now on the term Firmware ID (FWI
 \section{Attester}
 
 \section{Technical obstacles}
+
+We would have liked to use RSASSA-PSS which is formally proven to be secure over RSASSA-PKCS1-v1\_5.
+RFC 8017 even requires RSASSA-PSS for new applications  \cite{Moriarty2016}.
+However, it is not fully supported by the tpm2-tools, yet\footnote{\url{https://github.com/tpm2-software/tpm2-tools/issues/3283}}.

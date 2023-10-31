@@ -20,39 +20,6 @@ Therefore, we will use the term TCI in this theoretical chapter, and in the impl
 
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
-%\section{The identities of an fTPM}
-
-% chain identity
-% component identity
-
-\input{elements/figure_identities.tex}
-
-% TODO: Update this
-
-Depending on the point of view, there are two identities of an fTPM, as shown in \autoref{fig:identities}.
-There is the identity of the fTPM measured by DICE, which consists of the hash of the binary and the component configurations as for all DICE components, as shown in \autoref{fig:ftpm-identity}.
-This identity is referred to as the TCI.
-Compilation flags are not part of these configurations, as they are embedded in the final binary and are therefore automatically measured as part of the measurement of the binary.
-Of more interest are the configurations that are not part of the binary.
-They are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
-However, Microsoft's fTPM reference implementation does not contain such configurations, which simplifies the TCI generation of our fTPM by limiting it to the measurement of the fTPM binary data.
-The TPM's storage cannot be part of its identity as it changes during runtime after each data write, e.g., storing an arbitrary key.
-This is a problem because DICE only runs during the boot time in which the identity of the fTPM is measured.
-The identity of the fTPM must not change afterwards, otherwise the consistency of the identity transmitted by DICE and the actual identity of the fTPM would differ.
-In the interest of completeness, we also do not want to restrict the permissible values of the working data of an fTPM.
-In summary, the CDI keeps being updated from layer to layer, the TCI is calculated for each layer individually.
-Then, there is also the identity of the fTPM in the TPM context, which is represented by its EK.
-This identity is not only bound to the binary and the configuration of the fTPM, but also the entire underlying firmware stack.
-We derive the EK from the TPMs CDI, which is derived of the measurements of all preceding firmware components and the TPMs' TCI, see \autoref{eq:dice_cdi}.
-
-\input{elements/figure_ftpm_identity.tex}
-
-% Configurations required
-% Does contain whole firmware stack?
-% Data cannot be considered, since changes during runtime, not represented by DICE which only happens at boot-time
-% What happens if identity changed? -> Data not accessible, in essence, fTPM fully reset
-% https://trustedfirmware-a.readthedocs.io/en/latest/design_documents/measured_boot.html#critical-data
-
 
 \section{Architectural overview}
 
@@ -68,16 +35,16 @@ This is in contrast to a dynamic RTM (D-RTM), which is able to do this at any ti
 The boot process continues from here in the usual DICE manner until the firmware TPM is reached.
 The component that measures the fTPM is usually the trusted operating system running in EL1 in the secure world, as seen in \autoref{fig:arm_trustzone_arch}.
 Like any other DICE component, the fTPM receives its secret Compound Device Identifier (CDI) from its predecessor layer.
-Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack.
+Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the UDS.
 Two values are derived from the CDI.
 
 % Storage Key generation
 
 First, the storage key is generated.
 This is a symmetric encryption key that is used to encrypt the fTPM storage space in RAM before it is written to a persistent storage space such as a hard disk drive (HDD).
-At no time does the HDD see plain text data.
-Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g. due to a TPM modification or an update of a previous firmware component, which is equivalent to a full manufacturer reset.
-This enables the property that an fTPM memory must never be accessible to another TPM.
+At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
+Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which is equivalent to a full manufacturer reset.
+This enables the property that an fTPM storage must never be accessible to another TPM.
 
 \input{elements/figure_storage_encryption.tex}
 
@@ -91,28 +58,72 @@ And we want our system to require as few modifications to TPM code as possible.
 
 % Device identification
 
-With a dedicated TPM, the EK can be used to represent the long-term identity of the device as long as the TPM is not soldered away.
-Our EK does not do this because a firmware TPM software-based and changes every time the fTPM or the underlying firmware is modified.
+The EK of a dedicated TPM represents the long-term identity of the device as long as the TPM is not soldered away.
+Our EK does not do this because a firmware TPM is software-based and changes every time the fTPM or the underlying firmware is modified, without the host device changing.
 Instead, we use the DICE for this, which is hardware-based.
 Its DeviceID key, as the name suggests, represents the device identity.
 Note that the DeviceID contains the identity of layer 0 of the boot chain, i.e., the first mutable code.
 This can also be seen in \autoref{eq:dice_deviceID}.
 For this reason, the DICE specification suggests keeping the first mutable code as small as possible so that it remains constant throughout the life of the device \cite{dice-layering-arch}.
 
-% EK = AK
+% EK is a signing key
 
-Our EK takes on the role of an attestation key.
-In general, attestation keys represent device identities and are therefore privacy-sensitive.
-Although our EK does not represent device identities, it does represent the identity of short-lived fTPMs, which is also privacy-sensitive.
-Our approach has the advantage that we do not need a trusted third party, but trust the producer of our trust anchor directly (DICE).
-In \autoref{sec:privacy}, an extension of our system is presented with privacy in mind.
+By default, the EK is a restricted encryption key.
+It is not used for signing because the resulting signatures may reveal the TPMs' identity.
+Therefore, the usual procedure is to create a short-lived attestation key (AK) on the TPM.
+The verifier communicates the public part of the AK to a third party privacy CA who ensures that the holder of the AK is the same as the holder of the EK.
+The privacy CA then issues an attestation certificate confirming that the AK originates from a genuine TPM, without revealing the identity of the TPM.
+Finally, the AK can be used by the TPM to sign attestation evidences in a private fashion.
+We waive this separation and use the EK directly for attestations to avoid the need for a third party CA.
 
-% 5.3.2 from https://dl.acm.org/doi/10.1145/3098954.3103165
-% Use the references there to explain why we used HMAC with SHA256
-% Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
+\section{The identity of a firmware TPM}
 
+DICE offers two identities for each component.
+The TCI and the CDI.
+As shown in \autoref{eq:dice_cdi}, the CDI of a component changes when (i) the identity of the hardware changes, i.e., the UDS, (ii) the identity of a preceding component changes, or (iii) the component itself changes.
+In contrast, the TCI is the identity of a single component, considered in isolation, usually the hash of its binary.
+It only changes when the component itself is changed, regardless of the hardware or preceding components.
+So, while a CDI should be statistically unique since it is derived from a UDS with this property, a given TCI can be found on many devices if they contain exactly the same software component.
+Note that the TCI is part of the CDI, as shown in \autoref{fig:identities}.
 
+\input{elements/figure_identities.tex}
 
+Hence, we decided to derive the identity of an fTPM, i.e., its EK, ultimately from the CDI.
+This binds the identity of the fTPM to any security-relevant component preceding it.
+
+The TCI (and thus the CDI too) must also represent security-relevant configurations.
+Compilation flag configurations are already inherently part of the TCI, as they are embedded in the final binary and are therefore automatically measured as part of the measurement of the binary.
+Of more interest are the configurations that are not part of the binary.
+They are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+However, Microsoft's fTPM reference implementation does not contain such configurations, which simplifies the TCI generation of our fTPM by limiting it to the measurement of the fTPM binary data.
+The TPM's storage cannot be part of its identity as it changes during runtime after each data write, e.g., storing an arbitrary key.
+This is a problem because DICE only runs during the boot time in which the identity of the fTPM is measured.
+The identity of the fTPM must not change afterwards, otherwise the identity reported by DICE and the actual identity of the fTPM would be inconsistent.
+We also do not want to restrict the permissible values of the working data of an fTPM.
+
+% Depending on the point of view, there are two identities of an fTPM, as shown in \autoref{fig:identities}.
+% There is the identity of the fTPM measured by DICE, which consists of the hash of the binary and the component configurations as for all DICE components, as shown in \autoref{fig:ftpm-identity}.
+% This identity is referred to as the TCI.
+% Compilation flags are not part of these configurations, as they are embedded in the final binary and are therefore automatically measured as part of the measurement of the binary.
+% Of more interest are the configurations that are not part of the binary.
+% They are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+% However, Microsoft's fTPM reference implementation does not contain such configurations, which simplifies the TCI generation of our fTPM by limiting it to the measurement of the fTPM binary data.
+% The TPM's storage cannot be part of its identity as it changes during runtime after each data write, e.g., storing an arbitrary key.
+% This is a problem because DICE only runs during the boot time in which the identity of the fTPM is measured.
+% The identity of the fTPM must not change afterwards, otherwise the consistency of the identity transmitted by DICE and the actual identity of the fTPM would differ.
+% We also do not want to restrict the permissible values of the working data of an fTPM.
+% In summary, the CDI keeps being updated from layer to layer, the TCI is calculated for each layer individually.
+% Then, there is also the identity of the fTPM in the TPM context, which is represented by its EK.
+% This identity is not only bound to the binary and the configuration of the fTPM, but also the entire underlying firmware stack.
+% We derive the EK from the TPMs CDI, which is derived of the measurements of all preceding firmware components and the TPMs' TCI, see \autoref{eq:dice_cdi}.
+
+% \input{elements/figure_ftpm_identity.tex}
+
+% Configurations required
+% Does contain whole firmware stack?
+% Data cannot be considered, since changes during runtime, not represented by DICE which only happens at boot-time
+% What happens if identity changed? -> Data not accessible, in essence, fTPM fully reset
+% https://trustedfirmware-a.readthedocs.io/en/latest/design_documents/measured_boot.html#critical-data
 
 % \section{Provisioning process}
 
@@ -133,6 +144,9 @@ We use an explicit attestation procedure.
 This makes it sufficient for the verifier to know the trusted TCI, whereas implicit attestation would require a database of known public keys corresponding to a trusted TCI.
 And since each public key for a device is unique, as it is ultimately derived from the device's unique UDS, the verifier would need to know the mapping between public keys and the corresponding TCI for each device, which we consider unrealistic.
 Also, this is a hindrance as the verifier should be able to trust an unknown device by trusting the DICE manufacturer.
+
+% Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
+% This allows a verifier to validate that the prover is in posession of the private key, and hence, the included identities in the certificate chain are trustworthy.
 
 \section{Updating the fTPM}
 
@@ -174,3 +188,10 @@ So, our protection additionally protects data-at-rest, while the data-at-use is 
 
 % Each AliasKey is a identity key as specified in DICE layering Architecture 8.1.1.5
 % They would need to be made independent of the devices identity.
+
+In general, endorsement keys represent device identities and are therefore privacy-sensitive.
+Our EK takes on the role of an attestation key, which has the task of signing attestation evidences.
+Although our EK does not represent the device identity, it does represent the identity of the shorter lived fTPMs.
+This makes our EK also privacy-sensitive, since its generated signatures can be cross-referenced and then traced back to the according EK.
+Our approach has the advantage that we do not need a trusted third party, but trust the manufacturer of our trust anchor directly (DICE).
+In \autoref{sec:privacy}, an extension of our system is presented with privacy in mind.
