@@ -1,0 +1,20 @@
+\begin{table}[htpb]
+\caption[Certificate comparison]{Comparing the requirements for an Alias and endorsement key certificate. If not otherwise stated, the source of these requirements are the previously noted specifications, i.e., \cite{TCGAttestation2021, tcg-ek}.}\label{tab:cert_comparison}
+\centering
+\begin{tblr}{Q[l,m] Q[l,m] Q[l,m] Q[l,m]}
+    \toprule
+    Field & Alias Cert & EKCert & Verdict \\
+    \midrule
+    
+    {Version} & 3 & 3 & No conflict \\
+    {Subject\\ name} & {identify TCB class\\ or instance} & {Uniquely identify\\ TPM or empty} & {Conflict} \\
+    % SAN & {--} & {TPM Model,\\Manufacturer,\\ Version} & {No conflict} \\
+    {Issuer\\ name} & {embedded CA\\ issuing the certificate} & {entity that vouches\\ that TPM is genuine} & {No conflict} \\
+    {Validity\\not before} & {Known time in recent past\\e.g., build time} & {--} & {No conflict} \\
+    {Validity\\not after} & {No expiration} & {No expiration for\\ non-user TPMs \cite{tcgPcClient}} & No conflict \\
+    {Basic\\Constraints} & {--} & {Not a CA} & No conflict \\
+    {Authority Key\\ Identifier} & {--} & {Must be present} & No conflict \\
+    {Policy OIDs} & {Local Attestation\\ Policy OID} & {--} & No conflict \\
+    \bottomrule
+\end{tblr}
+\end{table}

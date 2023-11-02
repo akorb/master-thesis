@@ -12,7 +12,7 @@ In the original DICE release from Microsoft \cite{England2016}, the identifier o
 The TCG consortium later renamed it TCB Component Identifier (TCI).
 We believe this is to emphasize that the TCI does not necessarily have to be the hash of a firmware binary, but could also be, for example, the embedded ID of a hardware component.
 However, TCG has not fully implemented this terminology renaming.
-Their DICE Attestation Architecture \cite{TCGAttestation2020} defines an X.509 extension that contains the TCIs.
+Their DICE Attestation Architecture \cite{TCGAttestation2021} defines an X.509 extension that contains the TCIs.
 They continue to be referred to as FWIDs in the formal definition of this extension, while everywhere else they are referred to as TCIs.
 In personal correspondence with TCG, we have learned that this is due to backwards compatibility.
 The old term FWID is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term TCI in assets that can be updated more quickly, such as the specification text.
@@ -75,6 +75,11 @@ The verifier communicates the public part of the AK to a third party privacy CA 
 The privacy CA then issues an attestation certificate confirming that the AK originates from a genuine TPM, without revealing the identity of the TPM.
 Finally, the AK can be used by the TPM to sign attestation evidences in a private fashion.
 We waive this separation and use the EK directly for attestations to avoid the need for a third party CA.
+
+% EKCert is an AliasCert
+
+The DICE and the TPM infrastructure intersect at the EK certificate.
+From the DICE's point of view it is an alias certificate, from the TPM's point of view it is the EK certificate.
 
 \section{The identity of a firmware TPM}
 
@@ -147,6 +152,44 @@ Also, this is a hindrance as the verifier should be able to trust an unknown dev
 
 % Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
 % This allows a verifier to validate that the prover is in posession of the private key, and hence, the included identities in the certificate chain are trustworthy.
+
+\section{Combining TPM and DICE infrastructure}
+
+The result of our DICE boot process is a certificate chain, starting with the manufacturer certificate and DeviceID certificate, and ending with the EK certificate.
+In between can be an arbitrary number of Alias certificates for ``ordinary'' firmware components.
+
+\begin{equation}
+\label{eq:solution_cert_chain}
+Manufacturer\ Cert \rightarrow DeviceID\ Cert\ [\rightarrow Alias\ Cert]^*\,\rightarrow EK Cert
+\end{equation}
+
+As stated earlier, the EK certificate is where the DICE and the TPM infrastructure meet.
+So, this EK certificate needs to fulfill the requirements for an Alias certificate from the DICE specification \cite{TCGAttestation2021} and the EK certificate requirements from the TPM specification \cite{tcg-ek}.
+
+Therefore, we need to ensure that these two specifications declare no conflicting requirements.
+We only consider restrictions for the X.509 fields, which are hard requirements, and common fields which can appear in both specifications.
+We assume the firmware to not having access to a secure clock, keeping the requirements low.
+Also, we only name the requirements which specifically apply to our certificate.
+For example, it is a leaf of the certificate chain, i.e., no CA.
+
+We present the result of our comparison in \autoref{tab:cert_comparison}.
+In summary, there are mostly no conflicts since both certificates expect the same value, both requirements can be satisfied with one value, or only one of the certificates dictates a restriction for a specific field.
+
+The only conflict is in the subject name.
+An Alias certificate must either identify the TCB class (general) or instance (specific), an EK certificate allows only a value uniquely identifying the TPM (specific) or empty otherwise.
+A general term like ``fTPM'' is prohibited by the EK certificate specification.
+The only common denominator is a unique identifier.
+However, that is already part of the TCI embedded in our EK certificate.
+We chose to favor the EK certificate specification here, and leave the subject name empty.
+This ensures that the EK certificate is also as expected for systems that do not know our solution and do not know the TCI part of the certificates.
+
+The Subject Alternative Name extension is required to contain the TPM Manufacturer, model, and version by the EK certificate specification \cite{tcg-ek}.
+However, we omit this extension because if a verifier trusts a TCI, he should also know which manufacturer, exact code and TPM specification it conforms to.
+Furthermore, the TCI is more accurate and reliable because it is an exact measurement of the firmware TPM rather than relying on information propagated by the TPM.
+For example, an underlying firmware component could alter the firmware TPM to pretend it is compliant with a newer specification (with potential security updates) than it actually is.
+This cannot happen with the TCI that is part of the certificate chain, as this malicious firmware component would be detected.
+
+\input{elements/table_cert_comparison.tex}
 
 \section{Updating the fTPM}
 
