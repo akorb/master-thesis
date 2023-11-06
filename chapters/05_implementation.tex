@@ -53,6 +53,16 @@ However, this is also possible with a generic TPM with a little more effort with
 
 \section{Attester}
 
+\section{Times}
+
+Usually, the notBefore time of Alias certs should be build time, and notAfter should be infinite.
+Network-enable our FVP, but heavy setup for simple demonstration of our system.
+Could malfunction sometimes because of time dependencies.
+To keep our system easily understandable and simple to access a demonstration, we use fixed times.
+
+% List datetimes of all certificates and FVP system time
+% Maybe in a graph with timeline
+
 \section{Technical obstacles}
 
 We would have liked to use RSASSA-PSS which is formally proven to be secure over RSASSA-PKCS1-v1\_5.
