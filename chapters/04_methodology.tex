@@ -136,11 +136,11 @@ We also do not want to restrict the permissible values of the working data of an
 
 \section{Attestation process}
 
-% Check also for revocation of manufacturer cert
+EKpriv = private portion of EK
+EKpub = public portion of EK
+EKcert = certificate with EKpub as subject
 
-\begin{equation}
-trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
-\end{equation}
+% Check also for revocation of manufacturer cert
 
 % We use explicit attestation. See DICE Layering Spec 7.2
 % See 8.1.1.2 for an example about implicit attestation
@@ -148,10 +148,71 @@ trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
 We use an explicit attestation procedure.
 This makes it sufficient for the verifier to know the trusted TCI, whereas implicit attestation would require a database of known public keys corresponding to a trusted TCI.
 And since each public key for a device is unique, as it is ultimately derived from the device's unique UDS, the verifier would need to know the mapping between public keys and the corresponding TCI for each device, which we consider unrealistic.
-Also, this is a hindrance as the verifier should be able to trust an unknown device by trusting the DICE manufacturer.
+Also, this is a hindrance as the verifier should be able to establish trust into an unknown device by trusting the DICE manufacturer, and knowing the identities of trustworthy firmware.
 
 % Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
 % This allows a verifier to validate that the prover is in posession of the private key, and hence, the included identities in the certificate chain are trustworthy.
+
+\subsection{Does the verifier trust the prover's fTPM?}
+
+It is exactly the purpose of our system to make this question answerable for the verifier.
+First, the verifier needs to verify whether the signatures of the DICE certificate chain are valid, and that the root certificate from the manufacturer is considered trusted.
+This also involves checking if the manufacturer certificate or the Device ID certificate was revoked.
+Such an event might occur if the security of an old DICE implementation is broken, and the manufacturer wants to reflect this.
+Then, the verifier can traverse the certificate chain starting from the root and verify whether each component represented by a certificate is trusted, by checking the embedded TCI.
+An untrusted component must be assumed to lie about its conducted measurements.
+For example, it can modify the subsequent component without reflecting this in the measurement of the TCI.
+Consequently, as soon as a component is untrusted, all subsequent components have to be considered untrusted as well.
+This behavior is also represented mathematically in \autoref{eq:dice_attestation}.
+Therefore, trusting the fTPM requires to trust all underlying firmware components.
+
+\begin{equation}
+    \label{eq:dice_attestation}
+    trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
+\end{equation}
+
+After doing this, the verifier can only state that ``I trust the certificate chain and the components of \emph{some} machine represented by it.''
+This is due to the possibility of any actor to simply replay the certificate chain.
+But we need to promote the \emph{some} to \emph{the machine I communicate with}.
+This is solved in higher level protocols where the prover is required to be in control of the private part of the EK which corresponds to the EK of the EK certificate (e.g., this is answered as part of whether the verifier can trust the quote).
+Hence, the verifier also needs to trust that the fTPM did not leak the EK private key, as this would not only allow to replay a whole certificate chain, but even succeed the higher level protocols with the leaked EK private key.
+The verifier can derive whether it considers the EK private key of the fTPM as not leaked based on the fTPM's TCI value, as one requirement of trusting a TCI must be whether the verifier considers the component to keep its security guarantees.
+
+
+\subsubsection{Example security policies for a component}
+
+The $trusted$ function of \autoref{eq:dice_attestation} checks the information provided by a certificate~$C$ against security policies defined by the verifier.
+In the following, we would like to present some example policies for improving comprehensibility for the reader.
+
+\begin{itemize}
+    \item We generally do not trust the component's manufacturer and therefore, do not trust the component.
+    \item The component is up-to-date, and there are no known vulnerabilities and therefore, we trust the component.
+    \item The component is outdated, but all updates are only functional instead of security relevant, so we still trust it.
+    \item We do not know the TCI of the component. We follow a 'Deny by default' policy. Therefore, we do not trust the component.
+\end{itemize}
+
+\subsection{Does the verifier trust the quote from the prover's fTPM?}
+
+For that, the verifier needs to know that the quote was signed with the restricted EKpriv corresponding to the EKpub in EKcert, and that the fTPM is in control of EKpriv.
+
+The verifier sends a nonce, which the receiving prover includes in the quote request sent to the firmware TPM, i.e., \texttt{TPM2\_Quote}.
+The nonce prevents replay attacks.
+The verifier also needs to know that the EK is restricted.
+Otherwise, a compromised prover could generate quotes representing arbitrary states which do not represent the prover's actual state.
+
+Usually, this is ensured by the manufacturer in that he only signs the EKcert for a restricted EK.
+Of course, this cannot be applied to our solution, as our EKcert is dynamically created without a TPM manufacturer asserting specific attributes of the EK.
+Instead, we use the fTPM's TCI embedded in the EKcert to allow the verifier to be ensured that the EK is restricted.
+For the EK's attributes to influence the TCI, the template containing the EK's attributes must be generated in the firmware TPM's code.
+So, the verifier must only trust fTPM TCI's which have the restricted attribute of the EK baked in code.
+
+% \subsection{Does the remote attester trust the event log?}
+
+% [Eventlog](https://www.notion.so/Eventlog-c1e76f302470468aa2064ca35ae1a577?pvs=21)
+
+% In summary, it's reduced to the question whether the attester trusts the quote.
+
+% Also, the event log is not a hard requirement. It just makes the attestation process more flexible and comprehensible, probably not required for my Proof of concept implementation.
 
 \section{Combining TPM and DICE infrastructure}
 

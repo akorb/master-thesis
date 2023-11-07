@@ -46,7 +46,23 @@ In other words, the verifier must be able to derive a decision about the trustwo
 
 % Does it even make sense? (Price wise, maybe energy wise)
 
-\section{Requires reproducible builds}
+\section{Retrieve trustworthy TCIs}
+
+It boils down to whether the verifier can ensure that a specific component does not contain any relevant security holes.
+In an ideal scenario, the software manufacturers publicize the TCIs of their software which are considered as secure.
+However, as of today, this is not common practice.
+% The resulting pool might not be that huge, since there is only a tight spectrum of software fulfilling the purposes of boot firmware.
+
+\subsection{closed source vs. open source}
+
+We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
+The most prominent example is the observation of CVEs to see if specific versions of a software contain relevant security issues.
+For open source software, the verifier has the possibility to derive a security policy based on the source code.
+
+Also, generally speaking, open source software receives more security audits, revealing security holes faster.
+With closed source firmware, the verifier is restricted to reverse-engineering (not necessarily doing that itself, e.g., it could also be done by security researchers), or relying on the developer to reliably publicize CVE's about its product.
+
+Usually, this is easier for open source software, which is not a requirement, however.
 
 % The reference values have to come from somebody. Huge burden to the verifier, see paper of Simon for potential improvement
 
