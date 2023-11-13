@@ -153,9 +153,9 @@ EKcert = certificate with EKpub as subject
 % See 8.1.1.2 for an example about implicit attestation
 % Implicit attestation would require to know all resulting public keys in EKcert, which would require that we booted it up in a controlled manner beforehand and stored the resulting code.
 We use an explicit attestation procedure.
-This makes it sufficient for the verifier to know the trusted TCI, whereas implicit attestation would require a database of known public keys corresponding to a trusted TCI.
-And since each public key for a device is unique, as it is ultimately derived from the device's unique UDS, the verifier would need to know the mapping between public keys and the corresponding TCI for each device, which we consider unrealistic.
-Also, this is a hindrance as the verifier should be able to establish trust into an unknown device by trusting the DICE manufacturer, and knowing the identities of trustworthy firmware.
+This makes it sufficient for the verifier to know its trusted TCIs, whereas implicit attestation would require a database of trusted Alias public keys representing a trusted component.
+And since each Alias public key is device unique, as it roots in the device's unique UDS, the verifier would need to know all Alias public keys for each component on every device he trusts, which we consider unrealistic.
+Also, this would be a hindrance as the verifier should be able to establish trust into an unknown device by trusting the DICE manufacturer, and knowing the identities of trustworthy firmware.
 
 % Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
 % This allows a verifier to validate that the prover is in posession of the private key, and hence, the included identities in the certificate chain are trustworthy.
@@ -175,13 +175,13 @@ Therefore, trusting the fTPM requires to trust all underlying firmware component
 
 \begin{equation}
     \label{eq:dice_attestation}
-    trusted(C_{i}) \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
+    C_{i, \, trusted} \, \coloneqq \, \bigwedge_{k=0}^{i} trusted(C_{k})
 \end{equation}
 
 After doing this, the verifier can only state that ``I trust the certificate chain and the components of \emph{some} machine represented by it.''
 This is due to the possibility of any actor to simply replay the certificate chain.
 But we need to promote the \emph{some} to \emph{the machine I communicate with}.
-This is solved in higher level protocols where the prover is required to be in control of the private part of the EK which corresponds to the EK of the EK certificate (e.g., this is answered as part of whether the verifier can trust the quote).
+This is solved in higher level protocols where the prover is required to be in control of the private part of the EK which corresponds to the EK of the EK certificate, e.g., this is answered as part of whether the verifier can trust the quote.
 Hence, the verifier also needs to trust that the fTPM did not leak the EK private key, as this would not only allow to replay a whole certificate chain, but even succeed the higher level protocols with the leaked EK private key.
 The verifier can derive whether it considers the EK private key of the fTPM as not leaked based on the fTPM's TCI value, as one requirement of trusting a TCI must be whether the verifier considers the component to keep its security guarantees.
 
@@ -194,7 +194,7 @@ In the following, we would like to present some example policies for improving c
 \begin{itemize}
     \item We generally do not trust the component's manufacturer and therefore, do not trust the component.
     \item The component is up-to-date, and there are no known vulnerabilities and therefore, we trust the component.
-    \item The component is outdated, but all updates are only functional instead of security relevant, so we still trust it.
+    \item The component is outdated, but all updates are only functional instead of security-relevant, so we still trust it.
     \item We do not know the TCI of the component. We follow a 'Deny by default' policy. Therefore, we do not trust the component.
 \end{itemize}
 
@@ -210,8 +210,13 @@ Otherwise, a compromised prover could generate quotes representing arbitrary sta
 Usually, this is ensured by the manufacturer in that he only signs the EKcert for a restricted EK.
 Of course, this cannot be applied to our solution, as our EKcert is dynamically created without a TPM manufacturer asserting specific attributes of the EK.
 Instead, we use the fTPM's TCI embedded in the EKcert to allow the verifier to be ensured that the EK is restricted.
-For the EK's attributes to influence the TCI, the template containing the EK's attributes must be generated in the firmware TPM's code.
-So, the verifier must only trust fTPM TCI's which have the restricted attribute of the EK baked in code.
+For the EK's attributes to be represented the TCI, the template containing the EK's attributes must be generated in the firmware TPM's code.
+And, the verifier must only trust fTPM TCI's which have the restricted attribute of the EK baked in code.
+
+% Alternative solution
+% Template und EK an Optee OS, prüfen ob EK reproduzierbar und restricted in Template gesetzt. Nachteil: Algorithmus muss in TPM und Layer davor identisch sein, Abhängigkeit. Vermutlich muss TCI immer noch vertraut werden, dass TPM wirklich gleichen Algorithmus einsetzt. Und DICE Layer vor fTPM muss fTPM aware sein
+% Downside: komlexer, n-1 muss DICE aware sein, und man transferiert das Vertrauen in das restricted Attribut eigentlich nur zu n-1 statt zu n, wie in der ersten vorgestellten Lösung.
+% Aber keine Vorteile? Also erwähne ich es auch nicht, hat keinen Mehrwert
 
 % \subsection{Does the remote attester trust the event log?}
 
