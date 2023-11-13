@@ -95,7 +95,14 @@ Note that the TCI is part of the CDI, as shown in \autoref{fig:identities}.
 
 Hence, we decided to derive the identity of an fTPM, i.e., its EK, ultimately from the CDI.
 This binds the identity of the fTPM to any security-relevant component preceding it.
+The rationale for this is that once a previous component has changed, it is unknown whether it has gone into a benign or malicious state.
+And if it is malicious, it could change the firmware TPM and thereby access its sensitive material such as private keys.
+Although this is later recognized by the verifier during remote attestation, sensitive data could still be leaked.
+If the identity of the firmware TPM is extended to everything prior to the fTPM, its data is no longer accessible as soon as something preceding it changes.
+This is due to the derivation of the storage key from the CDI.
+And this behavior should also be reflected in the EK, so that the storage key and the EK should always change together or not change at all.
 
+% TODO: Vielleicht zu implementation
 The TCI (and thus the CDI too) must also represent security-relevant configurations.
 Compilation flag configurations are already inherently part of the TCI, as they are embedded in the final binary and are therefore automatically measured as part of the measurement of the binary.
 Of more interest are the configurations that are not part of the binary.
