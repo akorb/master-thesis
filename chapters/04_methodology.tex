@@ -142,6 +142,7 @@ We also do not want to restrict the permissible values of the working data of an
 % To summarize, attestation key provisioning must ensure that only valid attestation key material is established in Attesters [RFC 9334]
 
 \section{Attestation process}
+\label{sec:attestation_process}
 
 EKpriv = private portion of EK
 EKpub = public portion of EK
@@ -307,23 +308,32 @@ This might seem redundant because of the storage protection of for example Trust
 So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
 
-
 \section{Privacy}
 \label{sec:privacy}
+
+First, we want to elaborate what reveals the identity of the device when conducting a remote attestation, and then suggest a modification to the architecture to integrate privacy.
+
+In an ordinary remote attestation process with our system as described in \autoref{sec:attestation_process}, the verifier retrieves the certificate chain and a TPM quote.
+The certificate chain starts with the DeviceID certificate, which subject key provides a long-term identity of the device.
+It then continues with Alias certificates, with each containing subject key representing the identity of the hardware and the already executed firmware components.
+The final EK certificate of the chain contains the key representing the identity of the fTPM.
+In addition, the quote's signature is privacy-relevant as well, since the signature is generated based on a unique EKpriv.
+Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity, e.g., with an ephemeral key.
 
 % General: Contradiction
 % Goal of DICE is explicitly to establish a long-term identity. So, we need to work against its design.
 
 % Maybe: The certificates would need to be encrypted as well, as they contain the TCI values, potentially identifying the device
 
-% Use Attestation key not in endorsement (or platform?) hierarchy
+% Use Attestation key not in endorsement (and platform?) hierarchy
 
 % Each AliasKey is a identity key as specified in DICE layering Architecture 8.1.1.5
 % They would need to be made independent of the devices identity.
 
-In general, endorsement keys represent device identities and are therefore privacy-sensitive.
-Our EK takes on the role of an attestation key, which has the task of signing attestation evidences.
-Although our EK does not represent the device identity, it does represent the identity of the shorter lived fTPMs.
-This makes our EK also privacy-sensitive, since its generated signatures can be cross-referenced and then traced back to the according EK.
-Our approach has the advantage that we do not need a trusted third party, but trust the manufacturer of our trust anchor directly (DICE).
-In \autoref{sec:privacy}, an extension of our system is presented with privacy in mind.
+% TODO: Maybe put somewhere earlier
+% In general, endorsement keys represent device identities and are therefore privacy-sensitive.
+% Our EK takes on the role of an attestation key, which has the task of signing attestation evidences.
+% Although our EK does not represent the device identity, it does represent the identity of the shorter lived fTPM.
+% This makes our EK also privacy-sensitive, since its generated signatures can be cross-referenced and then traced back to the according EK.
+% Our approach has the advantage that we do not need a trusted third party, but trust the manufacturer of our trust anchor directly (DICE).
+% In \autoref{sec:privacy}, an extension of our system is presented with privacy in mind.
