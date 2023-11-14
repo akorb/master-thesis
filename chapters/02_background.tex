@@ -9,24 +9,24 @@ This chapter discusses the relevant background knowledge required to understand 
 
 % Motiviation for TEE's
 
-One of the core security concepts of operating systems are the privilege levels of processes \cite{Linden1976}. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes \cite{Bratus2009}. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant \cite{Nimgaonkar2012}. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices \cite{Ning2018}. Hence, protection against more privileged processes is desired.
+One of the core security concepts of operating systems are the privilege levels of processes~\cite{Linden1976}. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes~\cite{Bratus2009}. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider in general could potentially access sensitive data of the cloud tenant~\cite{Nimgaonkar2012}. In edge computing, the edge applications deal with plain text data, while they are potentially running on insecure edge devices~\cite{Ning2018}. Hence, protection against more privileged processes is desired.
 
 
 % What TEE's are
 
 The \acf{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
 The \ac{REE} runs commodity software, e.g., a Linux-based operating system with user applications.
-The TEE is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory \cite{Sabt2015}.
+The TEE is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
 Since a \ac{TEE} is integrated into the processor, there is no separate chip required.
 % The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
-Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS. The kernel space is running a trusted OS, and the user space is running the trusted applications. 
-It focuses on resisting software-based attacks generated in the \ac{REE}, however, also protects against some hardware attacks \cite{GPSysArch}.
+Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS\@. The kernel space is running a trusted OS, and the user space is running the trusted applications. 
+It focuses on resisting software-based attacks generated in the \ac{REE}, however, also protects against some hardware attacks~\cite{GPSysArch}.
 
 
 % Differences to previous technologies
 
-Previous, mostly software-based technologies ensure confidentiality and integrity protection of data-in-transit and data-at-rest \cite{Pecholt2022}, while a \ac{TEE} additionally protects data-in-use in hardware \cite{Pecholt2022, Lee:EECS-2022-96}.
-% For example, smart cards are commonly used to store keys to identify users and to encrypt data-at-rest \cite{Arthur2015}.
+Previous, mostly software-based technologies ensure confidentiality and integrity protection of data-in-transit and data-at-rest~\cite{Pecholt2022}, while a \ac{TEE} additionally protects data-in-use in hardware~\cite{Pecholt2022, Lee:EECS-2022-96}.
+% For example, smart cards are commonly used to store keys to identify users and to encrypt data-at-rest~\cite{Arthur2015}.
 
 % Figure explanation
 
@@ -38,11 +38,11 @@ Previous, mostly software-based technologies ensure confidentiality and integrit
 
 One such \ac{TEE} is ARM's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
 While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own assigned resources.
-Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\% \cite{eclipse}, many of the approaches in this field of research use Arm TrustZone \cite{Valadares2021}.
+Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\%~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
 
 \input{elements/figure_arm_trustzone_arch.tex}
 
-Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM.
+Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM\@.
 
 \subsection{Further TEE technologies}
 
@@ -60,16 +60,16 @@ Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD S
 
 % According to the Cambridge Dictionary an attestation is ``a formal statement that you make and officially say is true''.
 
-According to NIST SP 1800-19B \cite{Bartock2022} an attestation is ``the process of providing a digital signature for a set of measurements securely stored in hardware, and then having the requester validate the signature and the set of measurements.''
+According to NIST SP 1800--19B~\cite{Bartock2022} an attestation is ``the process of providing a digital signature for a set of measurements securely stored in hardware, and then having the requester validate the signature and the set of measurements.''
 Specifically in our context, attestation is a mechanism for software to prove its identity.
 In the following, the two types are discussed.
 
 
 \subsection{Local attestation}
 
-Local attestation is a procedure in which the state of a computer is measured, whereby the measurement result does not leave the computer but is used directly by a local component. One such example is a \ac{TPM} that releases data, e.g., an encryption key, only when the computer is in a known state. This feature is known as sealing \cite{tpm}.
+Local attestation is a procedure in which the state of a computer is measured, whereby the measurement result does not leave the computer but is used directly by a local component. One such example is a \ac{TPM} that releases data, e.g., an encryption key, only when the computer is in a known state. This feature is known as sealing~\cite{tpm}.
 
-% Local attestation enables assertions between two environments on the same system \cite{Anati2013InnovativeTF}. The claim of an environment can be verified by another environment, usually with the help of message authentication codes (MAC) \cite{Menetrey2022}. For example, Intel SGX uses this mechanism to establish assertions between two enclaves \cite{Anati2013InnovativeTF}.
+% Local attestation enables assertions between two environments on the same system~\cite{Anati2013InnovativeTF}. The claim of an environment can be verified by another environment, usually with the help of message authentication codes (MAC)~\cite{Menetrey2022}. For example, Intel SGX uses this mechanism to establish assertions between two enclaves~\cite{Anati2013InnovativeTF}.
 
 % Example is the sealing functionality of the TPM. It only releases information if the state of the system is as expected.
 
@@ -84,23 +84,25 @@ Local attestation is a procedure in which the state of a computer is measured, w
 
 In contrast to that, the measurement, usually called evidence, leaves the measuring machine, and is transmitted to a remote verifier for a remote attestation. This involves cryptographic primitives to establish trust into this evidence which is generally transmitted through an untrusted network.
 
-Remote attestation is a challenge-response protocol initiated by a remote attestor. \autoref{fig:ra} depicts a simplified overview of the data flow of a remote attestation.
-The process is initiated by a remote trusted party (called ``verifier'') to verify that a target environment on the end-device (called ``prover'') has not been tampered with \cite{Menetrey2022, Coker2011}. This challenge contains a nonce, enforcing a fresh response.
+Remote attestation is a challenge-response protocol initiated by a remote attestor.
+\autoref{fig:ra} depicts a simplified overview of the data flow of a remote attestation.
+The process is initiated by a remote trusted party (called ``verifier'') to verify that a target environment on the end-device (called ``prover'') has not been tampered with~\cite{Menetrey2022, Coker2011}. This challenge contains a nonce, enforcing a fresh response.
 The response must be an evidence of the challenged system that it is trustworthy. To build that, an attesting environment on the prover device generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, and (ii) its data has not been maliciously modified at runtime.
 
 The attesting environment acts a root of trust for measurements (SRTM).
 It is required on the prover because at least one trusted component is necessary to conduct trusted measurement of the prover. In many cases, the SRTM is running within the TEE, since thereby it is better protected from attacks.
 
-It typically consists of two parts \cite{McCune2008}. (i) The attestation, and (ii) the accompanying establishment of a secure channel. In this work, we focus on the first step.
+It typically consists of two parts~\cite{McCune2008}.
+(i) The attestation, and (ii) the accompanying establishment of a secure channel.
+In this work, we focus on the first step.
 
 A remote attestation procedure can also be divided into two categories, implicit and explicit attestation.
 In implicit attestation, the state of the verifier is implicitly inferred from the fact that the verifier has control over a signing key that is only accessible in a known state.
 With explicit attestation, the state of the device is explicitly described in the evidence.
 
-\section{Trusted Platform Module}
-\label{sec:tpm}
+\section{Trusted Platform Module}\label{sec:tpm}
 
-The \ac{TCG}\footnote{\url{https://trustedcomputinggroup.org/}} published the first TPM specification (v1.2) in 2009 \cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019 \cite{tpm}.
+The \ac{TCG}\footnote{\url{https://trustedcomputinggroup.org/}} published the first TPM specification (v1.2) in 2009~\cite{ISO11889}, and the most current specification (v2.0 Revision 01.59) ten years later in 2019~\cite{tpm}.
 % First v2.0 version was much earlier
 It describes a cryptographic coprocessor that increases trust in the host platform. Specifically, this means that the platform exhibits the expected behavior and that this behavior can be trusted.
 For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
@@ -114,7 +116,7 @@ Each key generated by a TPM is derived from two parameters, a source of object e
 The object entropy for a primary key comes from the according primary seed, for a derived key from the parent key.
 A template contains metadata of the key, such as the type of key, e.g., RSA, and the object attributes.
 The attributes assign for example whether the key can be used for encryption or signing.
-Keys can also be restricted, which restricts the key to be used with data generated by the TPM.
+Keys can also be restricted, which restricts the key to be used with data generated by the TPM\@.
 For signing keys, this prohibits the TPM to sign data with it which seems to be generated by the TPM, but are actually not.
 This prevents an attacker from asking the TPM to sign an artificially constructed quote.
 And restricted encryption keys can only be used to encrypt TPM generated data like keys.
@@ -126,16 +128,16 @@ And restricted encryption keys can only be used to encrypt TPM generated data li
 % \end{equation}
 
 The \acp{PCR} are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
-This operation is known as 'hash extend' \cite{Arthur2015}.
+This operation is known as `hash extend'~\cite{Arthur2015}.
 Its design prohibits the removal of extensions, which would cause the TPM to forget a measurement, and the arbitrary writing of values, which would overwrite any previously conducted measurements.
 A PCR value holds a hash representing the platform state.
-Thereby, a remote verifier can request a so-called 'quote' from the TPM on the host in question.
+Thereby, a remote verifier can request a so-called `quote' from the TPM on the host in question.
 A quote contains the hash of all requested PCR values and is digitally signed.
-Typically, a TPM contains 24 PCR registers\footnote{Note that we are aware that 'PCR register' is a Redundant Acronym Syndrome, but we have chosen to leave it as such for clarity, as 'PC register' can be associated with other meanings.}, as defined as the minimum by \cite{tcgPcClient}, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted \cite{Arthur2015}.
-%\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification \cite{tcgPcClient}.
-The fixed length of the \ac{PCR} values is important for the memory-constrained nature of TPMs \cite{Arthur2015}.
+Typically, a TPM contains 24 PCR registers\footnote{Note that we are aware that `PCR register' is a Redundant Acronym Syndrome, but we have chosen to leave it as such for clarity, as `PC register' can be associated with other meanings.}, as defined as the minimum by~\cite{tcgPcClient}, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted~\cite{Arthur2015}.
+%\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification~\cite{tcgPcClient}.
+The fixed length of the \ac{PCR} values is important for the memory-constrained nature of TPMs~\cite{Arthur2015}.
 
-The PCR value at index $i$ can only be modified, i.e., extended, by adding together the currently contained hash value and the new hash, as depicted in \autoref{eq:pcr_extend} \cite{tpm}. For the sake of correctness, it should be noted that not every PCR is initialized with zero, as implied in the equation. For example, the TPM PC Client Platform specification \cite{tcgPcClient} defines that PCRs 1--15 are initialized with all bits set to 0, while PCRs 17--22 are initialized with all bits set to 1.
+The PCR value at index \(i\) can only be modified, i.e., extended, by adding together the currently contained hash value and the new hash, as depicted in \autoref{eq:pcr_extend}~\cite{tpm}. For the sake of correctness, it should be noted that not every PCR is initialized with zero, as implied in the equation. For example, the TPM PC Client Platform specification~\cite{tcgPcClient} defines that PCRs 1--15 are initialized with all bits set to 0, while PCRs 17--22 are initialized with all bits set to 1.
 \begin{equation}
   \label{eq:pcr_extend}
 PCR(i)_{t=0} \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ value)
@@ -149,8 +151,8 @@ PCR(i)_{t=0} \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\
 % Core Root of Trust of Measurement: BIOS extension, trusted hashing
 % Attestation: TPM confirms measured state
 
-TPM~1.2 is limited to SHA-1 hashes which are considered broken \cite{cryptoeprint:2005/010, Wang2005, Stevens2017}. Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected \cite{sha1tpm12}, cryptographic algorithms only become weaker over time \cite{Arthur2015}. In reaction, TPM~2.0 offers crypto-agility and allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while a TPM~1.2 needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
-TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages \cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers \cite{win11req}.
+TPM~1.2 is limited to SHA-1 hashes which are considered broken~\cite{cryptoeprint:2005/010, Wang2005, Stevens2017}. Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected~\cite{sha1tpm12}, cryptographic algorithms only become weaker over time~\cite{Arthur2015}. In reaction, TPM~2.0 offers crypto-agility and allows newer algorithms such as SHA-256. In general, TPM~2.0 is more flexible, and is always turned on, while a TPM~1.2 needed to be turned on manually. Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
+TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages~\cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers~\cite{win11req}.
 
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
@@ -163,25 +165,25 @@ There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}. They a
 
 \subsection{Discrete TPM}
 
-This is the classical form of a TPM. It is a dedicated piece of hardware, connected to the CPU via a bus. It is designed and manufactured to be highly temper-resistant against hardware attacks.
-The TPM specifications \cite{tpm, tcgPcClient} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI.
+This is the classical form of a TPM\@. It is a dedicated piece of hardware, connected to the CPU via a bus. It is designed and manufactured to be highly temper-resistant against hardware attacks.
+The TPM specifications~\cite{tpm, tcgPcClient} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
 
-The well-known 'TPM Reset Attack' was independently described in \cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus \cite{lpc} to ground. This results in a reset signal for the TPM, yielding predictable values for the \ac{PCR} registers. This allows an attacker to replay the measurement log of a benign boot process to achieve valid \ac{PCR} values, even though a modified chain has been booted.
-Since TPM 1.2, TCG provides a mitigation specification for this reset attack \cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
+The well-known `TPM Reset Attack' was independently described in~\cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground. This results in a reset signal for the TPM, yielding predictable values for the \ac{PCR} registers. This allows an attacker to replay the measurement log of a benign boot process to achieve valid \ac{PCR} values, even though a modified chain has been booted.
+Since TPM 1.2, TCG provides a mitigation specification for this reset attack~\cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
 % TODO: That's claimed by Winter2013 but that the mitigation works because the attacker cannot gain a valid measurement log is from me. But is measurement log really sensitive? Otherwise I'm not sure how the mitigation prevents the attack, since the spec only changes the behavior of the platform on reset, not the TPM on reset. And with the upper described attack, only the TPM is reset.
-However, this mitigation is still vulnerable to cold boot attacks \cite{Halderman2009, Winter2013}.
+However, this mitigation is still vulnerable to cold boot attacks~\cite{Halderman2009, Winter2013}.
 
-Winter and Dietrich \cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
-Their approach, labeled 'Active LPC frame hijacking', allows them to "lift" commands to a higher locality than the one they were originally sent with. This allows them to evolve the 'TPM Reset attack' from being only usable for S-RTM, to also D-RTM systems.
-They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as previously described \cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the users' device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs. While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
+Winter and Dietrich~\cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
+Their approach, labeled `Active LPC frame hijacking', allows them to ``lift'' commands to a higher locality than the one they were originally sent with. This allows them to evolve the `TPM Reset attack' from being only usable for S-RTM, to also D-RTM systems.
+They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as previously described~\cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the users' device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs. While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
 
-Seunghun Han et al. \cite{aBadDream} report two attacks on discrete TPMs to reset the PCR registers. The first targets a gray area in the power management section of the TPM 2.0 specification. The TPM shall store its state into its non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up. However, the specification is missing a concrete description how to handle a lack of a stored state when waking up. Therefore, some implementations simply reset the state. Their second attack targets a DRTM, namely an implementation flaw in tboot \cite{tboot}, the most widely used measured boot environment used with Intel's Trusted Execution Technology. However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
+Seunghun Han et al.~\cite{aBadDream} report two attacks on discrete TPMs to reset the PCR registers. The first targets a gray area in the power management section of the TPM 2.0 specification. The TPM shall store its state into its non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up. However, the specification is missing a concrete description how to handle a lack of a stored state when waking up. Therefore, some implementations simply reset the state. Their second attack targets a DRTM, namely an implementation flaw in tboot~\cite{tboot}, the most widely used measured boot environment used with Intel's Trusted Execution Technology. However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
 
-A time-based side-channel attack \cite{Moghimi2019} during signature generation based on elliptic curves allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
+A time-based side-channel attack~\cite{Moghimi2019} during signature generation based on elliptic curves allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
 
-A passive sniffing attack is shown in \cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plain text. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted \cite{Winter2013}.
+A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plain text. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
 
-That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010 \cite{tarnovsky}. However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
+That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}. However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
 
 
 \subsection{Firmware TPM}
@@ -191,23 +193,23 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 
 % https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/msr-tr-2015-84.pdf talks about differences in security
 
-As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM is a typical attack vector. An fTPM \cite{Raj2015, 197213} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
-The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family \cite{Boubakri2021}. Also, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers.
+As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM is a typical attack vector. An fTPM~\cite{Raj2015, 197213} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
+The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}. Also, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers.
 
-As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT) \cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an ARM-based coprocessor on the die with Arm's TrustZone \cite{Khalid2020}.
+As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an ARM-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
 
-Running on the main processor, e.g., a fully-fledged Arm Cortex core, entails an advantage and a disadvantage. The disadvantage is that running on the same processor as the rest of the system means less isolation, while a \ac{dTPM} brings its own processor that is completely isolated from the main processor. The advantage, however, is that a main processor is generally much faster because \ac{dTPM} processors are weak \cite{Goh2013, Raj2015}. Raj et al. \cite{Raj2015} and Cheng et al. \cite{Cheng2020} independently concluded that the firmware-based modules are generally much faster after comparing the performance of \acp{fTPM} and \acp{dTPM}.
+Running on the main processor, e.g., a fully-fledged Arm Cortex core, entails an advantage and a disadvantage. The disadvantage is that running on the same processor as the rest of the system means less isolation, while a \ac{dTPM} brings its own processor that is completely isolated from the main processor. The advantage, however, is that a main processor is generally much faster because \ac{dTPM} processors are weak~\cite{Goh2013, Raj2015}. Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that the firmware-based modules are generally much faster after comparing the performance of \acp{fTPM} and \acp{dTPM}.
 
-In fact, there are more disadvantages. First, \acp{fTPM} cannot provide true RNG, since hardware is required for that \cite{Stipcevic2014}.
+In fact, there are more disadvantages. First, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
 % Well, they can if the fTPM RNG is connected to a hardware RNG. I think I even remmeber that there was they tried to harden fTPMs just by doing exactly this.
-Second, they are started later in the hosts' boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the components booted before the fTPM have to be cached and later be forwarded to the \ac{fTPM} as soon as it is available. Arm's Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}, which is the Arm's reference implementation of software in the \ac{SW}, protects this cached event log by keeping it in secure memory \cite{tf-a-measured-boot}, i.e., memory which is only accessible in the \ac{SW}. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the \ac{TEE}, and the boot chain.
+Second, they are started later in the hosts' boot chain than a dTPM that is accessible from the beginning. This has the consequence that the hashes of the components booted before the fTPM have to be cached and later be forwarded to the \ac{fTPM} as soon as it is available. Arm's Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}, which is the Arm's reference implementation of software in the \ac{SW}, protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot}, i.e., memory which is only accessible in the \ac{SW}. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the \ac{TEE}, and the boot chain.
 
 Of course, there are also attacks against fTPMs.
-The previously mentioned side-channel attack \cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
+The previously mentioned side-channel attack~\cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
 
-Jacob et al. \cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP). Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms. To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data. They achieve this by using a voltage fault injection that bypasses the authenticity check in the hosts' boot process and allows them to boot their own firmware component that leaks the required information.
+Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP). Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms. To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data. They achieve this by using a voltage fault injection that bypasses the authenticity check in the hosts' boot process and allows them to boot their own firmware component that leaks the required information.
 
-Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP \cite{cohen}. They store a maliciously crafted payload -- a certificate -- on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
+Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}. They store a maliciously crafted payload --- a certificate --- on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
 
 % \begin{table}[htpb]
 %   \caption[ftpmdownsides]{Advantages and disadvantages of fTPMs.}\label{tab:tpm_comparison}
@@ -225,51 +227,57 @@ Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs th
 
 \subsection{Virtual TPM}
 
-A vTPM is a software-based TPM provided by a hypervisor for one of its managed virtual machines \cite{268868}. The vTPMs can be realized fully in software \cite{268868}, or backed by dTPMs \cite{Liu2010}. The hypervisor can provide a (theoretically) unlimited number of vTPMs. For the virtual machines it seems that they have access exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor. A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine. vTPMs support this as well. Note the different security properties between vTPMs and dTPMs.
+A vTPM is a software-based TPM provided by a hypervisor for one of its managed virtual machines~\cite{268868}.
+The vTPMs can be realized fully in software~\cite{268868}, or backed by dTPMs~\cite{Liu2010}.
+The hypervisor can provide a (theoretically) unlimited number of vTPMs.
+For the virtual machines it seems that they have access exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
+A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine.
+Virtual TPMs support this as well.
+Note the different security properties between vTPMs and dTPMs.
 
-Because of the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused. The initially proposed design \cite{268868} has a large trusted base, e.g., the operating system and the hypervisor need to be trusted.
+Because of the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused. The initially proposed design~\cite{268868} has a large trusted base, e.g., the operating system and the hypervisor need to be trusted.
 
-Wang et al. \cite{Wang2019} bring the vTPM into the \ac{TEE}, namely Intel SGX, essentially creating an fTPM and vTPM hybrid. They launch each vTPM in a private hardware-protected enclave. This reduces the trusted computing base to the individual enclaves and SGX itself, enabling the host operating system and hypervisor to be untrusted.
+Wang et al.~\cite{Wang2019} bring the vTPM into the \ac{TEE}, namely Intel SGX, essentially creating an fTPM and vTPM hybrid. They launch each vTPM in a private hardware-protected enclave. This reduces the trusted computing base to the individual enclaves and SGX itself, enabling the host operating system and hypervisor to be untrusted.
 
-Pecholt and Wessel \cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the hosts' operating system do not need to be trusted as well. This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
+Pecholt and Wessel~\cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the hosts' operating system do not need to be trusted as well. This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
 
-Stateless ephemeral vTPMs \cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
+Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
 However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
 
 
 \section{Secure Boot and Measured Boot}
 
-When the system is started, the root component, e.g., from ROM, is executed. This subsequently launches the next component, and so forth. This boot structure is called the boot chain. Typically, the first component turns on the memory, the second stage initializes the platform, and finally, the last stage boots the operating system \cite{Yao2020}.
+When the system is started, the root component, e.g., from ROM, is executed. This subsequently launches the next component, and so forth. This boot structure is called the boot chain. Typically, the first component turns on the memory, the second stage initializes the platform, and finally, the last stage boots the operating system~\cite{Yao2020}.
 
-Secure Boot \cite{Hendricks2004, UEFI, Frazelle2020} is verifying components of the boot chain directly at boot-time. For that, the boot component is equipped with a public key. With that, they verify the digital signature of the respective subsequent component, before handing over the execution. This ensures the authenticity of the boot components. Alternatively, merely the hashes of the components can be measured and compared with known values, which only ensures integrity and not authenticity. The first boot component, usually stored in ROM, needs to be trusted without verification, i.e., it acts as the root of trust. However, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified \cite{272306}. Hence, further defenses like Measured Boot have been designed.
+Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is verifying components of the boot chain directly at boot-time. For that, the boot component is equipped with a public key. With that, they verify the digital signature of the respective subsequent component, before handing over the execution. This ensures the authenticity of the boot components. Alternatively, merely the hashes of the components can be measured and compared with known values, which only ensures integrity and not authenticity. The first boot component, usually stored in ROM, needs to be trusted without verification, i.e., it acts as the root of trust. However, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}. Hence, further defenses like Measured Boot have been designed.
 
-% Secure Boot is a concept of UEFI \cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
+% Secure Boot is a concept of UEFI~\cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
 % For this purpose, boot chain binaries are first signed and then, deployed universally. Hence, the binaries are not bound to the platform and can be considered portable in this context.
 
-Measured Boot \cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM. It allows remote attestation to a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote attestor to verify the state of the software on the system. The goal is to detect manipulated system configurations.
+Measured Boot~\cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM\@. It allows remote attestation to a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote attestor to verify the state of the software on the system. The goal is to detect manipulated system configurations.
 
 Secure Boot and Measured Boot are often used in conjunction.
 
 \section{Device Identifier Composition Engine}
 
 % Primer
-\ac{DICE} was originally proposed by Microsoft as part of their Robust Internet-of-Things (RIoT) architecture \cite{England2016}. In 2017, the DICE specification was published by \ac{TCG} \cite{tcg-microsoft-tpm}, of which Microsoft is a member.
+\ac{DICE} was originally proposed by Microsoft as part of their Robust Internet-of-Things (RIoT) architecture~\cite{England2016}. In 2017, the DICE specification was published by \ac{TCG}~\cite{tcg-microsoft-tpm}, of which Microsoft is a member.
 Its purposes are to detect firmware tampering and enable device identification for a remote party, while its main attribute is its minimal hardware requirements.
 
 % Measurement chain
 
-DICE operates on a boot process layered into components \cite{dice-layering-arch}.
+DICE operates on a boot process layered into components~\cite{dice-layering-arch}.
 Later components are typically more feature rich and complex than earlier ones.
 Each component is measured prior becoming active by the preceding component.
-Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent \cite{Hristozov2022, Carpent2018}.
+Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent~\cite{Hristozov2022, Carpent2018}.
 The union of all security-relevant components of a device form its Trusted Computing Base (TCB).
 Their identities are called TCB Component Identifier (TCI).
 They are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
 
 % Hardware requirements
 
-The first component is the DICE itself, which consists of software and hardware. The DICE specification \cite{dice-hardware-reqs} states the three hardware requirements, the DICE layer 
+The first component is the DICE itself, which consists of software and hardware. The DICE specification~\cite{dice-hardware-reqs} states the three hardware requirements, the DICE layer 
 \begin{enumerate}
   \item has to store a read-only Unique Device Secret (UDS),
   \item has exclusive access to the UDS,
@@ -278,7 +286,7 @@ The first component is the DICE itself, which consists of software and hardware.
 These requirements can be justified intuitively.
 (1) The UDS must be read-only and unique to the device to enable a base for long term identification.
 (2) The DICE layer reads and uses the UDS, and then needs to erase the UDS from memory while preventing other components from retrieving this secret during the power-on time.
-Otherwise, other entities can forge measurement or identification values. This lock mechanism can, for example, be realized with eFuses \cite{dice-hardware-reqs}.
+Otherwise, other entities can forge measurement or identification values. This lock mechanism can, for example, be realized with eFuses~\cite{dice-hardware-reqs}.
 (3) Moreover, the misbehavior of the DICE layer cannot be detected since it is not preceded by anything that could measure it, i.e., it is the root of trust.
 Therefore, it must be immutable so that it remains in the trusted state in which the manufacturer provided it.
 
@@ -291,7 +299,7 @@ Therefore, if any component is modified, this reflects in the permutation of the
 
 % CDI protection and further uses
 
-Just as the DICE layer must ensure to have exclusive access to the UDS, each later layer must ensure to have exclusive access to its CDI.
+Just as the DICE layer must ensure to have exclusive access to the UDS, each later layer must ensure to have exclusive access to its CDI\@.
 The layers can derive further secrets using their CDI as a seed, such as the Device ID key pair (\autoref{eq:dice_deviceID}) or an alias key pair (\autoref{eq:dice_alias}).
 
 \noindent
@@ -304,14 +312,14 @@ The layers can derive further secrets using their CDI as a seed, such as the Dev
   \label{eq:dice_alias}
   Alias\_KeyPair_n  &= KDF(CDI_n)
 \end{align}
-where $a \circ b = OWF(a,\,b)$, $\circ$ being a left-associated operator, and $KDF$ being a key derivation function.
+where \(a \circ b = OWF(a,\,b)\), \(\circ\) being a left-associated operator, and \(KDF\) being a key derivation function.
 \end{minipage}
 \vskip0.4\baselineskip
 
 % Certificate chain
 
 The end result of a boot process using DICE is a certificate chain, which can be also seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
-Here, each certificate represents a layer by embedding the identity of the layer, i.e., its TCI.
+Here, each certificate represents a layer by embedding the identity of the layer, i.e., its TCI\@.
 The certificate chain is built up step by step during the boot process, with the first two certificates (manufacturer certificate and DeviceID certificate) being static and stored on the device, and the remaining certificates (Alias certificates) being generated during boot time.
 
 \begin{equation}
@@ -351,10 +359,10 @@ Measured TCIs are persisted in alias certificates signed with the private key of
 
 The generation of the CDI values and certificates are shown in \autoref{fig:dice-layers}.
 There, the CDIs and certificates are drawn where they are eventually used or what they represent, not where they are created.
-E.g., CDI\textsubscript{$n$} and Alias Cert\textsubscript{$n$} are both created by layer~$n-1$.
+E.g., CDI\textsubscript{\(n\)} and Alias Cert\textsubscript{\(n\)} are both created by layer~\(n-1\).
 
 % Security statement
 
-To the best of our knowledge, \ac{DICE} is so far considered a secure concept apart from physical attacks, only implementation problems can bear security problems \cite{Jaeger2020, Hristozov2022}.
+To the best of our knowledge, \ac{DICE} is so far considered a secure concept apart from physical attacks, only implementation problems can bear security problems~\cite{Jaeger2020, Hristozov2022}.
 
 % How attestation works

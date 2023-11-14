@@ -3,20 +3,19 @@
 
 \chapter{Methodology}\label{chapter:methodology}
 
-\section{Terminology}
-\label{sec:terminology}
+\section{Terminology}\label{sec:terminology}
 
 Before we dive into technical explanations, we want to clear some potential terminology confusion.
 
-In the original DICE release from Microsoft \cite{England2016}, the identifier of a component is called the Firmware ID (FWID).
+In the original DICE release from Microsoft~\cite{England2016}, the identifier of a component is called the Firmware ID (FWID).
 The TCG consortium later renamed it TCB Component Identifier (TCI).
 We believe this is to emphasize that the TCI does not necessarily have to be the hash of a firmware binary, but could also be, for example, the embedded ID of a hardware component.
 However, TCG has not fully implemented this terminology renaming.
-Their DICE Attestation Architecture \cite{TCGAttestation2021} defines an X.509 extension that contains the TCIs.
+Their DICE Attestation Architecture~\cite{TCGAttestation2021} defines an X.509 extension that contains the TCIs.
 They continue to be referred to as FWIDs in the formal definition of this extension, while everywhere else they are referred to as TCIs.
 In personal correspondence with TCG, we have learned that this is due to backwards compatibility.
 The old term FWID is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term TCI in assets that can be updated more quickly, such as the specification text.
-Therefore, we will use the term TCI in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term FWID, just as it is common practice at the TCG.
+Therefore, we will use the term TCI in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term FWID, just as it is common practice at the TCG\@.
 
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
@@ -27,16 +26,16 @@ Therefore, we will use the term TCI in this theoretical chapter, and in the impl
 
 The architecture of our proposed and later implemented system is illustrated in \autoref{fig:architecture}.
 As you might notice, it is similar to our overview picture of DICE (\autoref{fig:dice-layers}).
-This is to be expected, since our system uses DICE.
+This is to be expected, since our system uses DICE\@.
 We leverage the DICE as our static root of trust for measurements (S-RTM).
 Static in this context means that it uses the trusted state that a device has at the always same point in time, here after switching on, for further measurements.
-This is in contrast to a dynamic RTM (D-RTM), which is able to do this at any time, e.g., Intel SGX.
+This is in contrast to a dynamic RTM (D-RTM), which is able to do this at any time, e.g., Intel SGX\@.
 
 The boot process continues from here in the usual DICE manner until the firmware TPM is reached.
 The component that measures the fTPM is usually the trusted operating system running in EL1 in the secure world, as seen in \autoref{fig:arm_trustzone_arch}.
 Like any other DICE component, the fTPM receives its secret Compound Device Identifier (CDI) from its predecessor layer.
-Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the UDS.
-Two values are derived from the CDI.
+Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the UDS\@.
+Two values are derived from the CDI\@.
 
 % Storage Key generation
 
@@ -44,7 +43,7 @@ First, the storage key is generated.
 This is a symmetric encryption key that is used to encrypt the fTPM storage space in RAM before it is written to a persistent storage space such as a hard disk drive (HDD).
 At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
 Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which is equivalent to a full manufacturer reset.
-This enables the property that an fTPM storage must never be accessible to another TPM.
+This enables the property that an fTPM storage must never be accessible to another TPM\@.
 
 \input{elements/figure_storage_encryption.tex}
 
@@ -52,7 +51,7 @@ This enables the property that an fTPM storage must never be accessible to anoth
 
 Then, the primary endorsement seed (EPS) is generated.
 It is the seed that is used to generate the primary endorsement key (EK).
-A primary key in the sense of the TPM means that it has no parent key, but a parent seed, here the EPS.
+A primary key in the sense of the TPM means that it has no parent key, but a parent seed, here the EPS\@.
 The indirection of generating the CDI via the EPS instead of generating the EK directly from the CDI is introduced because the code of fTPMs can be hardcoded to use the EPS during EK generation.
 And we want our system to require as few modifications to TPM code as possible.
 
@@ -64,17 +63,17 @@ Instead, we use the DICE for this, which is hardware-based.
 Its DeviceID key, as the name suggests, represents the device identity.
 Note that the DeviceID contains the identity of layer 0 of the boot chain, i.e., the first mutable code.
 This can also be seen in \autoref{eq:dice_deviceID}.
-For this reason, the DICE specification suggests keeping the first mutable code as small as possible so that it remains constant throughout the life of the device \cite{dice-layering-arch}.
+For this reason, the DICE specification suggests keeping the first mutable code as small as possible so that it remains constant throughout the life of the device~\cite{dice-layering-arch}.
 
 % EK is a signing key
 
 By default, the EK is a restricted encryption key.
 It is not used for signing because the resulting signatures may reveal the TPMs' identity.
-Therefore, the usual procedure is to create a short-lived attestation key (AK) on the TPM.
-The verifier communicates the public part of the AK to a third party privacy CA who ensures that the holder of the AK is the same as the holder of the EK.
-The privacy CA then issues an attestation certificate confirming that the AK originates from a genuine TPM, without revealing the identity of the TPM.
+Therefore, the usual procedure is to create a short-lived attestation key (AK) on the TPM\@.
+The verifier communicates the public part of the AK to a third party privacy CA who ensures that the holder of the AK is the same as the holder of the EK\@.
+The privacy CA then issues an attestation certificate confirming that the AK originates from a genuine TPM, without revealing the identity of the TPM\@.
 Finally, the AK can be used by the TPM to sign attestation evidences in a private fashion.
-We waive this separation and use the EK directly for attestations to avoid the need for a third party CA.
+We waive this separation and use the EK directly for attestations to avoid the need for a third party CA\@.
 
 % EKCert is an AliasCert
 
@@ -84,7 +83,7 @@ From the DICE's point of view it is an alias certificate, from the TPM's point o
 \section{The identity of a firmware TPM}
 
 DICE offers two identities for each component.
-The TCI and the CDI.
+The TCI and the CDI\@.
 As shown in \autoref{eq:dice_cdi}, the CDI of a component changes when (i) the identity of the hardware changes, i.e., the UDS, (ii) the identity of a preceding component changes, or (iii) the component itself changes.
 In contrast, the TCI is the identity of a single component, considered in isolation, usually the hash of its binary.
 It only changes when the component itself is changed, regardless of the hardware or preceding components.
@@ -93,13 +92,13 @@ Note that the TCI is part of the CDI, as shown in \autoref{fig:identities}.
 
 \input{elements/figure_identities.tex}
 
-Hence, we decided to derive the identity of an fTPM, i.e., its EK, ultimately from the CDI.
+Hence, we decided to derive the identity of an fTPM, i.e., its EK, ultimately from the CDI\@.
 This binds the identity of the fTPM to any security-relevant component preceding it.
 The rationale for this is that once a previous component has changed, it is unknown whether it has gone into a benign or malicious state.
 And if it is malicious, it could change the firmware TPM and thereby access its sensitive material such as private keys.
 Although this is later recognized by the verifier during remote attestation, sensitive data could still be leaked.
 If the identity of the firmware TPM is extended to everything prior to the fTPM, its data is no longer accessible as soon as something preceding it changes.
-This is due to the derivation of the storage key from the CDI.
+This is due to the derivation of the storage key from the CDI\@.
 And this behavior should also be reflected in the EK, so that the storage key and the EK should always change together or not change at all.
 
 % TODO: Vielleicht zu implementation
@@ -111,7 +110,7 @@ However, Microsoft's fTPM reference implementation does not contain such configu
 The TPM's storage cannot be part of its identity as it changes during runtime after each data write, e.g., storing an arbitrary key.
 This is a problem because DICE only runs during the boot time in which the identity of the fTPM is measured.
 The identity of the fTPM must not change afterwards, otherwise the identity reported by DICE and the actual identity of the fTPM would be inconsistent.
-We also do not want to restrict the permissible values of the working data of an fTPM.
+We also do not want to restrict the permissible values of the working data of an fTPM\@.
 
 % Depending on the point of view, there are two identities of an fTPM, as shown in \autoref{fig:identities}.
 % There is the identity of the fTPM measured by DICE, which consists of the hash of the binary and the component configurations as for all DICE components, as shown in \autoref{fig:ftpm-identity}.
@@ -141,8 +140,7 @@ We also do not want to restrict the permissible values of the working data of an
 
 % To summarize, attestation key provisioning must ensure that only valid attestation key material is established in Attesters [RFC 9334]
 
-\section{Attestation process}
-\label{sec:attestation_process}
+\section{Attestation process}\label{sec:attestation_process}
 
 EKpriv = private portion of EK
 EKpub = public portion of EK
@@ -167,9 +165,9 @@ It is exactly the purpose of our system to make this question answerable for the
 First, the verifier needs to verify whether the signatures of the DICE certificate chain are valid, and that the root certificate from the manufacturer is considered trusted.
 This also involves checking if the manufacturer certificate or the Device ID certificate was revoked.
 Such an event might occur if the security of an old DICE implementation is broken, and the manufacturer wants to reflect this.
-Then, the verifier can traverse the certificate chain starting from the root and verify whether each component represented by a certificate is trusted, by checking the embedded TCI.
+Then, the verifier can traverse the certificate chain starting from the root and verify whether each component represented by a certificate is trusted, by checking the embedded TCI\@.
 An untrusted component must be assumed to lie about its conducted measurements.
-For example, it can modify the subsequent component without reflecting this in the measurement of the TCI.
+For example, it can modify the subsequent component without reflecting this in the measurement of the TCI\@.
 Consequently, as soon as a component is untrusted, all subsequent components have to be considered untrusted as well.
 This behavior is also represented mathematically in \autoref{eq:dice_attestation}.
 Therefore, trusting the fTPM requires to trust all underlying firmware components.
@@ -189,14 +187,14 @@ The verifier can derive whether it considers the EK private key of the fTPM as n
 
 \subsubsection{Example security policies for a component}
 
-The $trusted$ function of \autoref{eq:dice_attestation} checks the information provided by a certificate~$C$ against security policies defined by the verifier.
+The \(trusted\) function of \autoref{eq:dice_attestation} checks the information provided by a certificate~\(C\) against security policies defined by the verifier.
 In the following, we would like to present some example policies for improving comprehensibility for the reader.
 
 \begin{itemize}
     \item We generally do not trust the component's manufacturer and therefore, do not trust the component.
     \item The component is up-to-date, and there are no known vulnerabilities and therefore, we trust the component.
     \item The component is outdated, but all updates are only functional instead of security-relevant, so we still trust it.
-    \item We do not know the TCI of the component. We follow a 'Deny by default' policy. Therefore, we do not trust the component.
+    \item We do not know the TCI of the component. We follow a `Deny by default' policy. Therefore, we do not trust the component.
 \end{itemize}
 
 \subsection{Does the verifier trust the quote from the prover's fTPM?}
@@ -208,8 +206,8 @@ The nonce prevents replay attacks.
 The verifier also needs to know that the EK is restricted.
 Otherwise, a compromised prover could generate quotes representing arbitrary states which do not represent the prover's actual state.
 
-Usually, this is ensured by the manufacturer in that he only signs the EKcert for a restricted EK.
-Of course, this cannot be applied to our solution, as our EKcert is dynamically created without a TPM manufacturer asserting specific attributes of the EK.
+Usually, this is ensured by the manufacturer in that he only signs the EKcert for a restricted EK\@.
+Of course, this cannot be applied to our solution, as our EKcert is dynamically created without a TPM manufacturer asserting specific attributes of the EK\@.
 Instead, we use the fTPM's TCI embedded in the EKcert to allow the verifier to be ensured that the EK is restricted.
 For the EK's attributes to be represented the TCI, the template containing the EK's attributes must be generated in the firmware TPM's code.
 And, the verifier must only trust fTPM TCI's which have the restricted attribute of the EK baked in code.
@@ -238,12 +236,12 @@ Manufacturer\ Cert \rightarrow DeviceID\ Cert\ [\rightarrow Alias\ Cert]^* \righ
 \end{equation}
 
 As stated earlier, the EK certificate is where the DICE and the TPM infrastructure meet.
-So, this EK certificate needs to fulfill the requirements for an Alias certificate from the DICE specification \cite{DICE_certs}, and the EK certificate requirements from the TPM specification \cite{tcg-ek}.
+So, this EK certificate needs to fulfill the requirements for an Alias certificate from the DICE specification~\cite{DICE_certs}, and the EK certificate requirements from the TPM specification~\cite{tcg-ek}.
 Therefore, we need to ensure that these two specifications declare no conflicting requirements.
-DICE \cite{DICE_certs} defines the requirements for various certificate types.
+DICE~\cite{DICE_certs} defines the requirements for various certificate types.
 Our certificate is referred to as an attestation certificate in their specification.
 
-We only consider restrictions for the X.509 fields that are absolute requirements, i.e., declared as ``MUST'' according to RFC 2119 \cite{Bradner1997}, and common fields that can occur in both specifications.
+We only consider restrictions for the X.509 fields that are absolute requirements, i.e., declared as ``MUST'' according to RFC 2119~\cite{Bradner1997}, and common fields that can occur in both specifications.
 In general, the EK certificate specification ``does not preclude the use of other certificate extensions''.
 The alias certificate specification leaves this undefined, i.e., it makes no statement whether this is permitted or prohibited.
 However, it is irrelevant for us, since the EK certificate specification does not define any own X.509 extensions.
@@ -268,8 +266,8 @@ This ensures that the EK certificate is also as expected for systems that do not
 It also seems to be common practice, since all endorsement certificates we observed have an empty subject name.
 This should not be regarded as representable, however, since the sample size is three.
 
-The Subject Alternative Name extension is required to contain the TPM Manufacturer, model, and version by the EK certificate specification \cite{tcg-ek}.
-It is assumed that the EK certificate is generated by the manufacturer who has this knowledge about the TPM.
+The Subject Alternative Name extension is required to contain the TPM Manufacturer, model, and version by the EK certificate specification~\cite{tcg-ek}.
+It is assumed that the EK certificate is generated by the manufacturer who has this knowledge about the TPM\@.
 In our system, however, the DICE layer measuring the firmware TPM and ultimately generating the EK certificate does not know these values, as they are not constant and can change any time when the firmware TPM is exchanged.
 One possible solution is to keep these values in the metadata of the fTPM's binary, which the preceding layer can read and embed in the certificate.
 But this increases the complexity and the maintenance burden for the firmware TPM, which is usually not required since all this information (manufacturer, model, version) can be deduced from the TCI part of the certificate.
@@ -285,7 +283,7 @@ For example, the manufacturer could be defined as ``DICE'', the model as ``FW'',
 
 We consider it as critical that the \ac{fTPM} is updatable. This is due to the history of \acp{fTPM} showing vulnerabilities which have been patched consequently. % cite... all from background probably
 
-Our \ac{fTPM} can be only updated with the system shut down. This is due to the required out-of-band signing procedure of trusted applications before being deployed. This also  with while system is shut down. This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM.
+Our \ac{fTPM} can be only updated with the system shut down. This is due to the required out-of-band signing procedure of trusted applications before being deployed. This also  with while system is shut down. This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM\@.
 
 % Clear data
 
@@ -299,7 +297,7 @@ As soon as an integrity violation is detected, the \ac{fTPM} is fully reset, eff
 Note that an attacker could thereby easily trigger a data loss.
 This has to avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere. % Maybe cite something, I feel like Microsoft has something for that
 This introduces storage and memory overhead.
-Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only ... % TODO: When s it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
+Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When s it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
 Hence, there is no performance penalty during common uses of a \ac{TPM}, e.g., key creation.
 
 % Add layered figure which shows that the hard drive never sees decrypted data, but only the secure memory. Important because data can be stored in NW.
@@ -308,15 +306,14 @@ This might seem redundant because of the storage protection of for example Trust
 So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
 
-\section{Privacy}
-\label{sec:privacy}
+\section{Privacy}\label{sec:privacy}
 
 First, we want to elaborate what reveals the identity of the device when conducting a remote attestation, and then suggest a modification to the architecture to integrate privacy.
 
 In an ordinary remote attestation process with our system as described in \autoref{sec:attestation_process}, the verifier retrieves the certificate chain and a TPM quote.
 The certificate chain starts with the DeviceID certificate, which subject key provides a long-term identity of the device.
 It then continues with Alias certificates, with each containing subject key representing the identity of the hardware and the already executed firmware components.
-The final EK certificate of the chain contains the key representing the identity of the fTPM.
+The final EK certificate of the chain contains the key representing the identity of the fTPM\@.
 In addition, the quote's signature is privacy-relevant as well, since the signature is generated based on a unique EKpriv.
 Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity, e.g., with an ephemeral key.
 

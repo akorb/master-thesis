@@ -1,5 +1,5 @@
 \begin{table}[htpb]
-\caption[Certificate comparison]{Comparing the requirements for an Alias and endorsement key certificate. If not otherwise stated, the source of these requirements are the previously noted specifications, i.e., \cite{DICE_certs, tcg-ek}. The upper half contains basic certificate fields, and the lower half certificate extensions.}\label{tab:cert_comparison}
+\caption[Certificate comparison]{Comparing the requirements for an Alias and endorsement key certificate. If not otherwise stated, the source of these requirements are the previously noted specifications, i.e.,~\cite{DICE_certs, tcg-ek}. The upper half contains basic certificate fields, and the lower half certificate extensions.}\label{tab:cert_comparison}
 \centering
 \begin{tblr}{Q[l,m] Q[l,m] Q[l,m] Q[l,m]}
     \toprule
@@ -11,7 +11,7 @@
     {Issuer\\ name} & {embedded CA\\ issuing the certificate} & {entity that vouches\\ that TPM is genuine} & {No} \\
     % SAN & {--} & {TPM Model,\\Manufacturer,\\ Version} & {No} \\
     {Validity\\not before} & {Known time in recent past\\e.g., build time} & {--} & {No} \\
-    {Validity\\not after} & {No expiration} & {No expiration for\\ non-user TPMs \cite{tcgPcClient}} & No \\
+    {Validity\\not after} & {No expiration} & {No expiration for\\ non-user TPMs~\cite{tcgPcClient}} & No \\
     \midrule
     {Authority Key\\ Identifier} & {--} & {Must be present} & No \\
     {Key Usage} & {keyCertSign unset} & {digitalSignature set} & {No} \\

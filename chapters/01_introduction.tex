@@ -11,7 +11,7 @@ This chapter includes an explanation of the exact problem we are addressing, and
 
 % Which area this thesis is talking about (Zero Trust)
 
-Modern trust relationships, such as Zero Trust \cite{isaca2021}, require trustworthy platforms, which can reliably report their system state.
+Modern trust relationships, such as Zero Trust~\cite{isaca2021}, require trustworthy platforms, which can reliably report their system state.
 In such models, trustworthiness can only be assumed after the platform configuration has been proved by all parties of the communication.
 
 % Primer on remote attestation
@@ -22,12 +22,12 @@ This is solved by remote attestation. In the simplest case, there is a prover an
 
 % TPMs become more important
 
-For example, this can be done with a \ac{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs \cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021 \cite{win11req}.
-They provide remote attestation mechanisms of system states, and their applications are still expanding beyond their traditional use-cases. For example, they are used in anti-cheat software for games \cite{valorant}.
+For example, this can be done with a \ac{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs~\cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021~\cite{win11req}.
+They provide remote attestation mechanisms of system states, and their applications are still expanding beyond their traditional use-cases. For example, they are used in anti-cheat software for games~\cite{valorant}.
 
 % Short intro why fTPMs were introduced (for weak devices, exactly our target platform)
 
-A dedicated hardware TPM (dTPM) increases cost and hardware complexity - especially for embedded platforms.
+A dedicated hardware TPM (dTPM) increases cost and hardware complexity --- especially for embedded platforms.
 Through \acp{TEE}, such as Arm TrustZone, a \ac{fTPM} can be used to provide similar security guarantees as a dTPM chip.
 
 % Why establishing trust in an fTPM is harder than in a dTPM
@@ -48,7 +48,11 @@ This is possible since in the most general sense, one can derive from an endorse
 
 \input{elements/figure_current_state.tex}
 
-This process is illustrated in figure \autoref{fig:current_state}. The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain. The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component. Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM. To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
+This process is illustrated in figure \autoref{fig:current_state}.
+The provers' area shows its boot chain, the verifiers' area shows how it evaluates the trustworthiness against the provers' boot chain.
+The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component.
+Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM\@.
+To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
 
 % Summary with limitations
 
@@ -76,7 +80,7 @@ This enables a verifier to establish trust in an \ac{fTPM} if the underlying fir
 
 The research questions are:
 \begin{itemize}
-  \item What constitutes the identity of an fTPM? %(e.g., hash, configuration, boot chain)
+  \item What constitutes the identity of an fTPM\@? %(e.g., hash, configuration, boot chain)
   \item How to combine the DICE and TPM infrastructure? %(e.g., AliasCert $\cup$ EKcert)
   \item How to manage an fTPM's persistent data securely? %(e.g., flush data on update)
   \item How to enable privacy for the attestation mechanism?
@@ -99,7 +103,7 @@ However, we assume that the fTPM cannot be modified by malicious parties after t
 Out-of-scope are hardware attacks, side-channel attacks, control-flow attacks, and Denial of Service attacks.
 
 % Attacker model: What an attacker can do (abilities) and cannot do (limits)
-For the network, we assume the Dolev-Yao attacker model \cite{Dolev1983}. That is, we consider an attacker who has the ability to perform any active or passive attacks on the network. The attacker may also have control over parts or the entire network, e.g., all routers, switches, and connections. However, attackers are limited in that they cannot control the end systems. They also cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
+For the network, we assume the Dolev-Yao attacker model~\cite{Dolev1983}. That is, we consider an attacker who has the ability to perform any active or passive attacks on the network. The attacker may also have control over parts or the entire network, e.g., all routers, switches, and connections. However, attackers are limited in that they cannot control the end systems. They also cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
 
 % - In-scope
 %     - Modification of fTPM (at boot, not runtime) (Q: Only at boot-time because the OP-TEE is trusted and therefore, no (malicious) runtime modifications are expected, correct?)
@@ -113,8 +117,8 @@ For the network, we assume the Dolev-Yao attacker model \cite{Dolev1983}. That i
 
 \section{Environment}
 
-This work was created at the 'Fraunhofer-Institut für Angewandte und Integrierte Sicherheit AISEC' in Garching.
-It is part of the 'Fraunhofer Society for the Promotion of Applied Research e.~V.', which is an organization distributed over Europe with main focus on applied research.
+This work was created at the `Fraunhofer-Institut für Angewandte und Integrierte Sicherheit AISEC' in Garching.
+It is part of the `Fraunhofer Society for the Promotion of Applied Research e.~V.', which is an organization distributed over Europe with main focus on applied research.
 In the roughly 35 years of its existence, it rose to become the largest research institute in Europe with around 30,000 employees.
 
 \section{Outline}
