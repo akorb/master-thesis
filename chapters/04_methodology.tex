@@ -159,7 +159,7 @@ Also, this would be a hindrance as the verifier should be able to establish trus
 % Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
 % This allows a verifier to validate that the prover is in posession of the private key, and hence, the included identities in the certificate chain are trustworthy.
 
-\subsection{Does the verifier trust the prover's fTPM?}
+\subsection{Does the verifier trust the prover's fTPM?}\label{subsec:trust_prover_tpm}
 
 It is exactly the purpose of our system to make this question answerable for the verifier.
 First, the verifier needs to verify whether the signatures of the DICE certificate chain are valid, and that the root certificate from the manufacturer is considered trusted.
@@ -197,7 +197,7 @@ In the following, we would like to present some example policies for improving c
     \item We do not know the TCI of the component. We follow a `Deny by default' policy. Therefore, we do not trust the component.
 \end{itemize}
 
-\subsection{Does the verifier trust the quote from the prover's fTPM?}
+\subsection{Does the verifier trust the quote from the prover's fTPM?}\label{subsec:trust_quote_from_prover}
 
 For that, the verifier needs to know that the quote was signed with the restricted EKpriv corresponding to the EKpub in EKcert, and that the fTPM is in control of EKpriv.
 
@@ -308,32 +308,62 @@ So, our mechanism additionally protects data-at-rest, while the data-at-use is p
 
 \section{Privacy}\label{sec:privacy}
 
-First, we want to elaborate what reveals the identity of the device when conducting a remote attestation, and then suggest a modification to the architecture to integrate privacy.
+First, we elaborate what reveals the identity of the device when conducting a remote attestation, and then suggest a modification to our architecture to integrate privacy.
 
 In an ordinary remote attestation process with our system as described in \autoref{sec:attestation_process}, the verifier retrieves the certificate chain and a TPM quote.
-The certificate chain starts with the DeviceID certificate, which subject key provides a long-term identity of the device.
-It then continues with Alias certificates, with each containing subject key representing the identity of the hardware and the already executed firmware components.
-The final EK certificate of the chain contains the key representing the identity of the fTPM\@.
-In addition, the quote's signature is privacy-relevant as well, since the signature is generated based on a unique EKpriv.
+After the root certificate, the certificate chain is continued with the DeviceID certificate, whose subject key provides the long-term identity of the device.
+It then continues with Alias certificates, each of which contains subject keys that represent the identity of the hardware and the firmware components that have already been executed.
+The closing EK certificate of the chain contains the key representing the identity of the fTPM\@.
+The quote's signature is also relevant to the prover's privacy, as the signature is generated with a unique EKpriv.
 Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity, e.g., with an ephemeral key.
 
-Both is solved by introducing a new key, the attestation key~(AK), which is used for signing the quote.
-It is created by the prover, and is an ephemeral key.
-So, the prover can create arbitrary often a new attestation key, e.g., for each remote attestation process.
+Both is solved by introducing a new key --- the attestation key~(AK) --- which is used for signing the quote.
+It is created by the prover's TPM, and is an ephemeral key.
+Hence, the prover can generate any number of attestation keys at any time, e.g., for each remote attestation process.
 This prevents cross-referencing signatures.
-We also \ldots do not do this.
+The AK also has to be certified to originate from an authentic TPM, just as the EK\@.
+In contrast to certifying EKs, manufacturers cannot be called upon to vouch for AKs.
+This is because if they certify an AK, the manufacturer of the TPM (or rooting DICE) which generated the AK will still be known to the verifier, since the verifier needs to know the manufacturer's certificate.
+This can be a privacy-relevant information.
+Instead, we rely on a third-party Certificate Authority~(CA), commonly referred to as privacy CA\@.
+Also, our EK is changed from a signing key to an encryption key, since signing with the EK can reveal the TPM's identity.
+
+The privacy CA replaces the DICE manufacturer as the root of trust for the verifier.
+For this purpose, it first retrieves the original certificate chain and an AK from the prover.
+In a pure TPM system, the privacy CA must verify that the EKcert represents an authentic TPM by verifying the certificate chain and retrieving the manufacturer from the EKcert.
+In our system the only difference is that it is about the DICE manufacturer\@.
+The privacy CA must then ensure that the AK provided by the prover comes from the same TPM as the EK of the just retrieved EKcert.
+In short, this works by the privacy CA generating a challenge encrypted with EKpub, which can only be solved with AK\@.
+This process also allows the privacy CA to verify that the AK is restricted.
+The procedure is described in more detail in the TPM specification~\cite{tpm} under ``Attestation Key Identity Certification'' and ``Credential Protection.''
 
 \input{elements/figure_privacy_arch.tex}
 
-% General: Contradiction
-% Goal of DICE is explicitly to establish a long-term identity. So, we need to work against its design.
+We also need to transfer the DICE information from the old certificate chain to the new private one.
+After performing the formerly described actions, the privacy CA creates a certificate vouching for that the AK was generated by an authentic TPM, hiding which exact TPM, even the manufacturer.
+The privacy CA also copies each TCI of the old certificate chain into the AK certificate, as depicted in \autoref{fig:privacy_arch}.
+The yielding private certificate chain is returned to the prover, who can forward it to a verifier without revealing its identity.
 
-% Maybe: The certificates would need to be encrypted as well, as they contain the TCI values, potentially identifying the device
+Whether the verifier trusts the firmware TPM is conducted in the same way as described in \autoref{subsec:trust_prover_tpm}, with the only difference is that the TCIs are all embedded into a single certificate, i.e., the AK certificate.
 
-% Use Attestation key not in endorsement (and platform?) hierarchy
+The verifier must also be able to trust the prover's quote as explained in \autoref{subsec:trust_quote_from_prover}.
+For that, he must trust the issuer of the AK certificate that he has verified the properties of the AK, i.e., that it stored on an authentic TPM and restricted.
 
-% Each AliasKey is a identity key as specified in DICE layering Architecture 8.1.1.5
-% They would need to be made independent of the devices identity.
+Ultimately, this adapted privacy architecture changes the statement a verifier can make from ``I am communicating with this authentic TPM in control of this EK'', to ``I am communicating with some authentic TPM in control of this AK.''
+In other words, the verifier does not know exactly which TPM they are communicating with.
+It is guaranteed by the fact that the prover does not transmit any data derived from its UDS to the verifier.
+This protects the privacy of the prover.
+
+Nevertheless, privacy is not fully ensured because of the TCI values revealed to the verifier.
+The order and values of the TCIs of an AK certificate might be sufficient to identify that it communicated with this particular prover before.
+This can only be prevented by transferring the evaluation of the TCIs from the verifier to another entity, e.g., the privacy CA\@.
+One possible realization is for the privacy CA to add to its policy that it will only certify AKs if they originate from a prover it considers trustworthy based on the TCIs it provided.
+However, this makes the verifier dependent on another entity that decides whether the TCIs provided are trustworthy or not, which we consider undesirable.
+
+We also want to highlight that the AK does not need to be a child of the EK, it does not even have to be part of the endorsement hierarchy.
+In fact, it should not be part of the endorsement or platform hierarchy, since the TPM behaves differently when signing a quote depending on the hierarchy of the signing key~\cite{tpm}.
+If the signing key is part of the endorsement or platform hierarchy, the TPM assumes that privacy is irrelevant and embeds the TPM's firmware version, reset count, and restart count in plain text in its generated quote.
+If the key is part of another hierarchy, this data is obfuscated by adding random offsets to each value.
 
 % TODO: Maybe put somewhere earlier
 % In general, endorsement keys represent device identities and are therefore privacy-sensitive.
