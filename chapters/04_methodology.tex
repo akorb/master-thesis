@@ -320,6 +320,14 @@ The final EK certificate of the chain contains the key representing the identity
 In addition, the quote's signature is privacy-relevant as well, since the signature is generated based on a unique EKpriv.
 Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity, e.g., with an ephemeral key.
 
+Both is solved by introducing a new key, the attestation key~(AK), which is used for signing the quote.
+It is created by the prover, and is an ephemeral key.
+So, the prover can create arbitrary often a new attestation key, e.g., for each remote attestation process.
+This prevents cross-referencing signatures.
+We also \ldots do not do this.
+
+\input{elements/figure_privacy_arch.tex}
+
 % General: Contradiction
 % Goal of DICE is explicitly to establish a long-term identity. So, we need to work against its design.
 
