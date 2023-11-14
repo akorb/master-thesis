@@ -363,7 +363,8 @@ However, this makes the verifier dependent on another entity that decides whethe
 We also want to highlight that the AK does not need to be a child of the EK, it does not even have to be part of the endorsement hierarchy.
 In fact, it should not be part of the endorsement or platform hierarchy, since the TPM behaves differently when signing a quote depending on the hierarchy of the signing key~\cite{tpm}.
 If the signing key is part of the endorsement or platform hierarchy, the TPM assumes that privacy is irrelevant and embeds the TPM's firmware version, reset count, and restart count in plain text in its generated quote.
-If the key is part of another hierarchy, this data is obfuscated by adding random offsets to each value.
+This tuple might identify the TPM\@.
+If the key is part of another hierarchy, this data is obfuscated by adding random offsets to each value, which is desirable if privacy is a concern.
 
 % TODO: Maybe put somewhere earlier
 % In general, endorsement keys represent device identities and are therefore privacy-sensitive.
