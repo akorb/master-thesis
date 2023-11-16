@@ -7,13 +7,18 @@ As explained in \autoref{sec:terminology}, from now on the term Firmware ID (FWI
 
 \section{Overview}
 
-We implement our system on ARM's Fixed Virtual Platform~(FVP\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}}) and the software infrastructure provided by OP-TEE for it.
+We implement our system on ARM's Fixed Virtual Platform~(FVP)\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}} and the software infrastructure provided by OP-TEE for it.
 Therefore, the firmware components consist of ARM's TrustedFirmware-A~(TF-A)\footnote{\url{https://www.trustedfirmware.org/projects/tf-a/}}.
 However, their attestation is mocked, i.e., their Alias certificates are mocked, since TF-A does not implement DICE\@.
 The development efforts to implement that exceed the benefits, as also with mocked certificates up to the firmware the concept can be demonstrated.
 For that, only the certificates up to the OP-TEE OS are mocked, including OP-TEE OS's private key to sign the subsequent Alias certificate, which is our EKcert.
 
 Our implementation with instructions can be found on GitHub\footnote{\url{https://github.com/akorb/master-thesis-meta}}.
+
+\section{Boot chain}
+
+The boot process is depicted in \autoref{fig:boot_chain}.
+DICE is the root of trust, because incorrect behavior remains undetected and would jeopardize the security of our attestation process.
 
 \input{elements/figure_boot_chain.tex}
 
@@ -30,22 +35,32 @@ The Application Processor~(AP) Trusted ROM sets up the platform-specific excepti
 The Trusted Boot Firmware enables the MMU, performs the platform security setup, and other tasks.
 The final component of TF-A --- EL3 Runtime Software --- replaces the simple and rudimentary initialization performed by the AP Trusted ROM with more complete configurations by detecting the system topology, and enabling normal world software to function correctly.
 The EL3 Runtime Software also provides the monitor which conducts the context switches between the secure world and the normal world.
+More complete and detailed information can be found in the TF-A documentation\footnote{\url{https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html}}.
 
-\paragraph{OP-TEE OS}
-Eventually, the OP-TEE OS is loaded and executed.
-Just like an ordinary operating system, it initializes its functions offered to the user space of the secure world.
+\paragraph{OP-TEE~OS}
+Finally, the OP-TEE~OS\footnote{\url{https://github.com/OP-TEE/optee_os}} is loaded and executed.
+Just like an ordinary operating system, it initializes its functions offered to the user space of the secure world, i.e., the trusted applications.
 
 \paragraph{Trusted Applications}
-TAs are not launched automatically.
-In fact, we are not aware of any functionality provided by the OP-TEE OS to register a TA to be started during the boot process. 
-Instead, TAs are initialized the first time an application from the normal world wants to interact with it.
-Our TA in focus is the firmware TPM\@.
-A firmware TPM allows only a single connection at any time, i.e., it prohibits concurrent access as this could lead to inconsistent states.
-This also mirrors hardware TPMs, which are usually attached by serial buses like SPI\@.
-Most commonly, the only entity communicating with the fTPM will be a Linux kernel module, making it transparent to the user applications whether the TPM is implemented in firmware or hardware.
 
-\paragraph{REE}
-Last, the 
+Our TA in focus is the firmware TPM\footnote{\url{https://github.com/microsoft/ms-tpm-20-ref/}}\@.
+It consists of the reference code by Microsoft which implements a TPM, and the stub code, which provides and implements the interfaces required to be a TA of OP-TEE\@.
+This fTPM only allows a single connection at any time, i.e., it prohibits concurrent access as this could lead to inconsistent states.
+This also mirrors hardware TPMs, which are usually attached via serial buses like SPI to the processor.
+Typically, the only entity that communicates with the fTPM is a Linux kernel module\footnote{\url{https://docs.kernel.org/security/tpm/tpm_ftpm_tee.html}}, so it is transparent to the user applications whether the TPM is implemented in firmware or hardware.
+Note that TAs are not started automatically.
+In fact, we are not aware of any function provided by OP-TEE~OS to register a TA to be started during the boot process. 
+Instead, TAs are initialized the first time someone wants to interact with them.
+
+\paragraph{EDK2}
+TianoCore EDK II\footnote{\url{https://github.com/tianocore/edk2}} is the first component launched in the normal world.
+It is a reference implementation of UEFI~\cite{UEFI} by Intel.
+
+\paragraph{GRUB}
+The GNU GRand Unified Bootloader\footnote{\url{https://www.gnu.org/software/grub/}} is a bootloader which is responsible for loading and transferring control to OS kernel software.
+
+\paragraph{Linux}
+As expected, the final component to boot is the Linux\footnote{\url{https://www.kernel.org/}} operating system.
 
 
 

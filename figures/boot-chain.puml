@@ -23,7 +23,7 @@ component REE {
     [Linux]
 }
 
-[DICE] -left-> [AP Trusted ROM]
+[DICE] -right-> [AP Trusted ROM]
 [AP Trusted ROM] -down-> [Trusted Boot Firmware]
 [Trusted Boot Firmware] -down-> [EL3 Runtime Software]
 [EL3 Runtime Software] -down-> [OP-TEE OS]
