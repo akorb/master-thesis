@@ -66,6 +66,18 @@ The GNU GRand Unified Bootloader\footnote{\url{https://www.gnu.org/software/grub
 \paragraph{Linux}
 As expected, the final component to boot is the Linux\footnote{\url{https://www.kernel.org/}} operating system.
 
+\section{Firmware TPM initialization}
+
+% Formula from https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf
+\begin{equation}
+  EPS = HMAC(CDI,\ ``EPS'')
+\end{equation}
+
+Generate EK with \texttt{TPM2\_CreatePrimary}.
+
+Create EKCert with EKPub as subject signed by OP-TEE private key containing the hash of the fTPM TA\@.
+Only memory that is executable, i.e., does not change.
+% Add notion.so notes
 
 
 % Use the attributes for the NVindex of the EKcert as defined by TPM PC Client Spec 4.5.2.1
@@ -101,7 +113,7 @@ So, the an NV index is with ordinary TPM commands, providing the required policy
 We consider this configuration as out-of-scope for attestation, for the former mentioned reason.
 In other words, it could be that everyone can change the NV index, where the template is stored.
 And in the subsequent boot, we would create a EKcert for it, without anything.
-Therefore, during EKcert creation, generate the template in code (which is attested), and use this directly. 
+Therefore, during EKcert creation, generate the template in code (which is attested), and use this directly.
 
 % 5.3.2 from https://dl.acm.org/doi/10.1145/3098954.3103165
 % Use the references there to explain why we used HMAC with SHA256

@@ -1,0 +1,24 @@
+@startuml tpm initialization
+!pragma teoz true
+
+skinparam NoteTextAlignment center
+
+
+"fTPM TA" -> "fTPM TA": Generate storage key\nfrom CDI
+"fTPM TA" -> "fTPM TA": Generate EPS from CDI
+"fTPM TA" -> "fTPM TA": Generate EK
+
+"fTPM TA" -> "Attestation\nPTA" ++: create_ekcert(EKpub)
+
+"Attestation\nPTA" -> "fTPM TA": Read memory
+"Attestation\nPTA" -> "Attestation\nPTA": Hash fTPM\nmemory
+"fTPM TA" <-- "Attestation\nPTA" --: EKcert
+
+box "Prover"
+    box "Secure World (OP-TEE)" #LightBlue
+    participant "fTPM TA"
+    participant "Attestation\nPTA"
+    end box
+end box
+
+@enduml
