@@ -7,13 +7,16 @@ As explained in \autoref{sec:terminology}, from now on the term Firmware ID (FWI
 
 \section{Overview}
 
-We implement our system on ARM's Fixed Virtual Platform~(FVP)\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}} and the software infrastructure provided by OP-TEE for it.
-Therefore, the firmware components consist of ARM's TrustedFirmware-A~(TF-A)\footnote{\url{https://www.trustedfirmware.org/projects/tf-a/}}.
-However, their attestation is mocked, i.e., their Alias certificates are mocked, since TF-A does not implement DICE\@.
-The development efforts to implement that exceed the benefits, as also with mocked certificates up to the firmware the concept can be demonstrated.
-For that, only the certificates up to the OP-TEE OS are mocked, including OP-TEE OS's private key to sign the subsequent Alias certificate, which is our EKcert.
 
-Our implementation with instructions can be found on GitHub\footnote{\url{https://github.com/akorb/master-thesis-meta}}.
+We run our implementation on ARM's Fixed Virtual Platform~(FVP)\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}} which is a complete simulation of the Armv8-A architecture including TrustZone.
+
+To do this, we use the software infrastructure provided by OP-TEE for various platforms, including FVP\@.
+OP-TEE uses the TrustedFirmware-A~(TF-A)\footnote{\url{https://www.trustedfirmware.org/projects/tf-a/}} package from ARM as firmware boot components.
+However, we mock their attestation, i.e., their Alias certificates are statically compiled into the binaries instead of being dynamically generated, as TF-A does not implement DICE\@.
+The development efforts to implement that exceeds the benefits, as the concept can also be demonstrated with mocked certificates.
+For that, only the certificates up to the OP-TEE~OS are mocked, including OP-TEE~OS's private key to sign the subsequent Alias certificate, which is our EKcert.
+
+Our implementation with compilation and running instructions can be found on GitHub\footnote{\url{https://github.com/akorb/master-thesis-meta}}.
 
 \section{Boot chain}
 
@@ -24,8 +27,9 @@ DICE is the root of trust, because incorrect behavior remains undetected and wou
 
 
 \paragraph{DICE}
-The boot chain begins with the DICE hardware, which we mock as well, since ARM's FVP does not provide support for it.
-It is independent hardware, and therefore, neither part of the TEE nor the REE\@.
+Theoretically, the boot chain begins with the DICE hardware, but this is not included in FVP\@.
+Therefore, we simply assume its presence by mocking the first few certificates of the yielding certificate chain.
+Furthermore, it is independent hardware, and therefore, neither part of the TEE nor the REE\@.
 
 \paragraph{TF-A}
 After reset, the CPU executes within the secure world.
