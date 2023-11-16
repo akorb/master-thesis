@@ -1,0 +1,37 @@
+@startuml boot chain
+skinparam BackgroundColor transparent
+skinparam componentStyle rectangle
+
+[DICE] #DD1C1A
+component TEE {
+    component TF-A {
+        [AP Trusted ROM] #07A0C3
+        [Trusted Boot Firmware] #07A0C3
+        [EL3 Runtime Software] #07A0C3
+    }
+
+    [OP-TEE OS] #07A0C3
+    component TAs {
+        [fTPM] #07A0C3
+        [...]
+    }
+}
+
+component REE {
+    [EDK2]
+    [GRUB]
+    [Linux]
+}
+
+[DICE] -left-> [AP Trusted ROM]
+[AP Trusted ROM] -down-> [Trusted Boot Firmware]
+[Trusted Boot Firmware] -down-> [EL3 Runtime Software]
+[EL3 Runtime Software] -down-> [OP-TEE OS]
+[OP-TEE OS] -down-> [fTPM]
+[OP-TEE OS] -down-> [...]
+
+[OP-TEE OS] -right-> [EDK2]
+[EDK2] -down-> [GRUB]
+[GRUB] -down-> [Linux]
+
+@enduml
