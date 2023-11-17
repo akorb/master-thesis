@@ -68,20 +68,86 @@ As expected, the final component to boot is the Linux\footnote{\url{https://www.
 
 \section{Firmware TPM initialization}
 
-% Formula from https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf
-\begin{equation}
-  EPS = HMAC(CDI,\ ``EPS'')
-\end{equation}
+Initialization begins with the derivation of all secrets from the CDI\@.
+Note that we mocked the CDI that would be passed from OP-TEE OS to the fTPM in practice.
+However, OP-TEE OS does not implement DICE\@.
 
-Generate EK with \texttt{TPM2\_CreatePrimary}.
+We use the Mbed TLS library\footnote{\url{https://mbed-tls.readthedocs.io/en/latest/}} providing cryptographic primitives for the derivation of the secrets, and also to build X.509 certificates.
+Mbed TLS is already part of OP-TEE, and its functionality is modular and allows certain functionality to be activated or deactivated at a fine granular level.
+Since the target machines are embedded devices with limited resources, the user should only activate the functions that he really needs.
+We therefore had to activate some functions.
 
-Create EKCert with EKPub as subject signed by OP-TEE private key containing the hash of the fTPM TA\@.
-Only memory that is executable, i.e., does not change.
+The formulas which derive secrets directly from the CDI (\autoref{eq:storage_key_formula}, \autoref{eq:eps_formula}) use a keyed-hash message authentication code~(HMAC) function.
+This is inspired by the CDI derivation proposed in the DICE hardware requirements specification~\cite{dice-hardware-reqs}.
+Actually, it proposes two functions to combine information to a new secret.
+A simple hash function, and the HMAC function.
+It also states that it recommends the HMAC function which calculation takes a little more time, but protects the CDI with twice the level than the simple hash function.
+% https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength
+This is backed by Jäger et al.~\cite{Jaeger2017}, and NIST SP 800--57~\cite{Barker2020}.
+We declare the inner hash function used by the HMAC according to the required data size of the secret.
+For example, for storage encryption, we use AES-256, and therefore, use the SHA256 function to retrieve a key with a sufficient size.
+The HMAC functions are seeded with a fixed character string that describes the purpose of the output secret, e.g., `EPS'.
+
+% Formula from (2) in https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf
+\begin{align}
+  \label{eq:storage_key_formula}
+  K_{storage} &= HMAC_{SHA256}(CDI,\ `DATA\ STORAGE\ KEY\text{'})\\
+  \label{eq:eps_formula}
+  EPS &= HMAC_{SHA512}(CDI,\ `EPS\text{'})\\
+  \label{eq:ek_formula}
+  EK  &= KDF(EPS,\ EK_{template})
+\end{align}
+
+\input{elements/figure_tpm_initialization.tex}
+
+We must ensure we retrieve exactly the same EK as the TPM would generate by a \texttt{TPM2\_CreatePrimary} command with our EK template.
+Therefore, we use the firmware TPM internal functions to generate the EK\@.
+The EK consists of a private and a public portion.
+The private part never leaves the TPM, and the public portion is forwarded to the attestation PTA to be used as the subject key for EKcert, as shown by \autoref{fig:ftpm_initialization}.
+A pseudo trusted application~(PTA) provides the same interfaces as an ordinary TA, but is actually not a separate process in the user space of the secure world, but runs as part of the OP-TEE OS\@.
+Therefore, it has more privileges than an ordinary TA\@.
+These privileges are required by the attestation PTA provided by OP-TEE to read the memory of the calling TA, which is required for attestation.
+The attestation PTA creates EKcert with EKpub as subject signed by OP-TEE's private key containing the FWID of the fTPM TA\@.
+Note that fTPM has never access to private alias key of OP-TEE OS, so it cannot spoof its Alias Cert/EKcert.
+
+The attestation PTA hashes the memory pages of the calling TA that are executable or read-only data, i.e., are constant.
+It can also simply extract the hash embedded in the TA's binary header.
+A TA is an ELF binary wrapped in an OP-TEE specific format, which header contains a signature over all metadata and the payload, i.e., the ELF executable.
+While it is simpler and faster, it does not attest the TA's dynamically linked libraries.
+Although the reference firmware TPM does not link dynamically to any library, we use the attestation of the memory data to be more future-proof.
+
+To embed the FWID into the EKcert, we use the X.509 extension defined by the DICE Attestation Architecture~\cite{TCGAttestation2021}.
+Therein, the TCB Info Evidence Extension is defined.
+It allows many FWIDs to be embed into an X.509 certificate.
+Our implementation always only stores one FWID into each Alias certificate or EKcert.
+However, the privacy focused architecture explained in \autoref{sec:privacy} could leverage the possibility to store multiple FWIDs in the extension.
+Each FWID consists of an identifier of the hash algorithm used, and the according digest.
+We use SHA256.
+The TCB Info Evidence Extension is defined formally in the ASN.1 description language.
+Consequently, we use ASN1c\footnote{\url{https://github.com/vlm/asn1c}} to translate this formal definition to C~code.
+In particular, we use a self-compiled version of ASN1c, since its last official release dates back to 2017, whereby its generated C~code throws various warnings with a modern C~compiler.
+
+The resulting certificate generated by the attestation PTA is returned to the firmware TPM, which also has access to all preceding certificates.
+We implemented a new TA command for the firmware TPM to obtain the whole certificate chain.
+We would like to emphasize that we do not mean a new TPM command that would require an extension of the TPM specification, but a new TA command that is intercepted by the OP-TEE stub code of the fTPM and processed without the involvement of the TPM-specific core code.
+
+
 % Add notion.so notes
 
 
 % Use the attributes for the NVindex of the EKcert as defined by TPM PC Client Spec 4.5.2.1
 % The attributes set such that the NV index can only be written or deleted if the policy is fulfilled. However, it has an empty policy, which can never be fulfilled. This yields an undeletable EK certificate.
+
+\section{Implementing encrypted storage}
+
+Overall storage is n big, separated in j and k.
+AES-256 in GCM mode.
+IV changes on every write.
+
+The data from the hard drive is only loaded and decrypted at start up time.
+And only written if the cache of the TPM is flushed.
+Therefore, the performance impact should be minimal.
+
 
 % \section{Providing a custom EK template}
 \section{Adaption of the Endorsement Key}
@@ -105,7 +171,7 @@ This is possible by allowing to delete the NV index only when an unfulfillable p
 
 % Ensure that the template generated by code is also directly used, instead of indirectly via unmeasured storages.
 The NV storage is not attested since it's ``working data'' and not ``configuration data'', and would be hard to attest since it's encrypted and the cipher text often changes since the IV is generated randomly on each store.
-However, the component right before the fTPM knows the fTPM's CDI, could generate the according symmetric key to decrypt the NV storage, and integrate the required NV values in the TCI\@.
+However, the component right before the fTPM knows the fTPM's CDI, could generate the according symmetric key to decrypt the NV storage, and integrate the required NV values in the FWID\@.
 By baking the EK template generation in code which is already attested (and the code exists anyways), we prevent this complexity.
 
 The ``working data'' is not attested, since this would restrict the functionality of the fTPM\@.
@@ -114,15 +180,6 @@ We consider this configuration as out-of-scope for attestation, for the former m
 In other words, it could be that everyone can change the NV index, where the template is stored.
 And in the subsequent boot, we would create a EKcert for it, without anything.
 Therefore, during EKcert creation, generate the template in code (which is attested), and use this directly.
-
-% 5.3.2 from https://dl.acm.org/doi/10.1145/3098954.3103165
-% Use the references there to explain why we used HMAC with SHA256
-% Even though https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-Device-Identifier-Composition-Engine-r78_For-Publication.pdf says hash-only is also an option, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf (Table 3) shows that the HMAC version has roughly double security strength. Cite all three here (ACM, TCG, NIST)!
-
-% Derivate secrets from CDI
-% Used HMAC as recommeded by TPM Hrdware spec
-
-% Attestation PTA hashes calling TA, not arbitrary TA
 
 \section{Prover}
 \subsection{Normal World}
@@ -133,7 +190,7 @@ Therefore, during EKcert creation, generate the template in code (which is attes
 
 \section{Attester}
 
-\section{Times}
+\section{Period of validity of the certificates}
 
 Usually, the notBefore time of Alias certs should be build time, and notAfter should be infinite.
 Network-enable our FVP, but heavy setup for simple demonstration of our system.
