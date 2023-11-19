@@ -12,8 +12,8 @@ skinparam NoteTextAlignment center
 
 "fTPM TA" -> "Attestation\nPTA" ++: create_ekcert(EKpub)
 
-' "Attestation\nPTA" -> "fTPM TA": Read memory
 "Attestation\nPTA" -> "Attestation\nPTA": Hash fTPM\nmemory
+"Attestation\nPTA" -> "Attestation\nPTA": Create EKcert
 "fTPM TA" <-- "Attestation\nPTA" --: EKcert
 
 "fTPM TA" -> "fTPM TA": Execute command

@@ -1,0 +1,43 @@
+@startuml tpm attestation
+!pragma teoz true
+hide footbox
+
+skinparam NoteTextAlignment center
+
+actor "Verifier"
+
+"Verifier" -> Application ++: PCR list + nonce
+
+Application -> "fTPM TA" ++: TA_FTPM_ATTEST
+Application <-- "fTPM TA" --: DICE cert chain incl. EKcert
+
+Application -> "fTPM TA" ++: TPM2_NV_Read(EK<sub>template,index</sub>)
+Application <-- "fTPM TA" --: EK<sub>template</sub>
+
+Application -> "fTPM TA" ++: TPM2_CreatePrimary(EK<sub>template</sub>, EH)
+Application <-- "fTPM TA" --: EK<sub>Handle</sub>, EKpub
+
+note over Application
+  The subject key of EKcert
+  should match EKpub.
+end note
+
+Application -> "fTPM TA" ++: TPM2_Quote(PCR list, nonce, EK<sub>Handle</sub>)
+Application <-- "fTPM TA" --: Quote signed by EKpriv
+
+'Application <-- "fTPM TA" --: Evidence =\nQuote incl. nonce\nsigned by EKpriv,\nDICE cert chain incl. EKCert
+"Verifier" <-- Application --: Quote + cert chain
+
+"Verifier" -> "Verifier": Make security decision\nregarding own policy\nbased on provided evidence
+
+box "Prover"
+    box "Normal World" #Salmon
+    participant Application
+    end box
+
+    box "Secure World" #LightBlue
+    participant "fTPM TA"
+    end box
+end box
+
+@enduml
