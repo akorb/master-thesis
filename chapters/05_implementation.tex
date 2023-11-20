@@ -258,15 +258,24 @@ Since a TPM can store arbitrary data, this would explode the amount of TCI value
 
 \section{Attester}
 
-\section{Period of validity of the certificates}
+\section{Times in certificates and systems}
 
-Usually, the notBefore time of Alias certs should be build time, and notAfter should be infinite.
-Network-enable our FVP, but heavy setup for simple demonstration of our system.
-Could malfunction sometimes because of time dependencies.
-To keep our system easily understandable and simple to access a demonstration, we use fixed times.
+In \autoref{tab:cert_comparison} we presented the restrictions the Alias and the EK certificate specifications conduct on the valid times of the certificates.
+Thereby, the period of validity of our certificates must be from a known time in the recent past, e.g., the component's build time, without expiration date.
 
-% List datetimes of all certificates and FVP system time
-% Maybe in a graph with timeline
+We initially aimed for using the build time for the start of the validity period.
+However, this turned out to be infeasible, since the guest machine in the FVP does not have internet access out of the box, and FVP also does not provide an option to use the time of the host.
+Therefore, the time of the host and the FVP guest would need to be synchronized manually, requiring unnecessary engineering effort.
+Instead, we fix the times of all entities, i.e., the guest machine and the certificate's validity periods.
+This ensures that the FVP does not have to be configured for internet access which keeps the effort to launch the demonstration low, and results in a higher stability of the demonstration system.
+
+We use \texttt{2023--07--25 00:00:00} as the start period for the certificates.
+This date has no further meaning and was chosen arbitrarily at some point during development.
+As required in the specifications, we indicate that the certificates do not have a well-defined expiration date, which is indicated by \texttt{9999--12--31 23:59:59}~\cite{Boeyen2008}.
+
+The time of the guest machine is automatically set to \texttt{2023--08--02 11:46} with the Linux tool \texttt{date} at startup.
+As before, this date has no further meaning.
+It is only important that this date is after the start period of the certificates.
 
 \section{Technical obstacles}
 
