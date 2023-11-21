@@ -320,7 +320,7 @@ Consequently, all these keys have to be hidden to preserve privacy, and the sign
 Both is solved by introducing a new key --- the attestation key~(AK) --- which is used for signing the quote.
 It is created by the prover's TPM, and is an ephemeral key.
 Hence, the prover can generate any number of attestation keys at any time, e.g., for each remote attestation process.
-This prevents cross-referencing signatures.
+This prevents the correlation of signatures, i.e., the proof that multiple signatures originate from the same TPM\@.
 The AK also has to be certified to originate from an authentic TPM, just as the EK\@.
 In contrast to certifying EKs, manufacturers cannot be called upon to vouch for AKs.
 This is because if they certify an AK, the manufacturer of the TPM (or rooting DICE) which generated the AK will still be known to the verifier, since the verifier needs to know the manufacturer's certificate.
