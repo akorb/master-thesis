@@ -22,3 +22,5 @@ exfiltration
 GlobalPlatform
 DeviceID
 hardcoded
+verifiers
+Verifiers

@@ -47,6 +47,51 @@ However, this means that the verifier only shares its state with certain verifie
 This is a trade-off that must be weighed up by the implementers of our solution.
 
 
+\section{Build pool of trusted TCIs}
+
+In our proposed solution, the verifiers must know the TCIs they trust.
+However, these reference values must be obtained from somewhere.
+This is a general problem of TPM~(PCRs) and DICE~(TCIs) attestation and not specific to our system.
+% If the prover's vendor uses off-the-shelf binaries 
+In an ideal scenario, the software developers of boot components publish the TCIs and the corresponding security attributes.
+The developers would also need to keep these listings up to date, e.g., if a vulnerability was discovered in a particular version to declare it insecure.
+The verifiers can then collect these TCIs, possibly filter them again with their own security policies, and save them as their trusted TCI pool.
+To date, however, we are not aware of this being common practice.
+% bundle their  the TCIs of their software which are considered as secure.
+% But then, the manufacturers also have to provide the matching binary of the software, except if reproducible builds are possible.
+% The resulting pool might not be that huge, since there is only a tight spectrum of software fulfilling the purposes of boot firmware.
+
+Alternatively, verifiers can also create their own trusted TCI pool.
+This could be a possible solution if a verifier expects a manageable number of possible firmware on the prover.
+This is the case, for example, if the verifier provisions the devices that will later be the provers themselves.
+
+\subsection{Closed source vs.\ Open source}
+
+It is counter-intuitive for the acquisition of TCIs that it is irrelevant whether the software is closed or open source.
+In fact, it can be more difficult with open source software.
+This is because the calculation of TCIs is based on the binary code and not the source code, since the binary code is eventually loaded in the memory of a device and executed.
+While closed-source software must always be provided as a binary file, open-source software may only be distributed in the form of its source code.
+The binary file must then be compiled by the device provisioner itself.
+If its build environment does not support reproducible builds~\cite{Lamb2022}, there may be many binaries and conversely many TCIs that differ only in irrelevant details, e.g., embedded timestamps.
+This is unlikely to appear with closed source software, as there is only a single distributor.
+
+However, closed source software restricts the criteria that can be used to decide whether a TCI is trustworthy or not.
+The trustworthiness of open source software can be derived independently of its source code, and also its exact change history if an older version is evaluated.
+With closed source software, you have to rely on the developer of the closed-source software to communicate openly if security problems occur.
+
+
+% We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
+% The most prominent example is the observation of CVEs to see if specific versions of a software contain relevant security issues.
+% For open source software, the verifier has the possibility to derive a security policy based on the source code.
+
+% Also, generally speaking, open source software receives more security audits, revealing security holes faster.
+% With closed source firmware, the verifier is restricted to reverse-engineering (not necessarily doing that itself, e.g., it could also be done by security researchers), or relying on the developer to reliably publicize CVE's about its product.
+
+% Usually, this is easier for open source software, which is not a requirement, however.
+
+% The reference values have to come from somebody. Huge burden to the verifier, see paper of Simon for potential improvement
+
+
 \section{Hardware knowledge dependency}
 % Or hardware-agnostic?
 
@@ -62,26 +107,9 @@ This is a trade-off that must be weighed up by the implementers of our solution.
 \section{Hardware requirements DICE + fTPM vs TPM}
 
 % Does it even make sense? (Price wise, maybe energy wise)
-
-\section{Retrieve trustworthy TCIs}
-
-It boils down to whether the verifier can ensure that a specific component does not contain any relevant security holes.
-In an ideal scenario, the software manufacturers publicize the TCIs of their software which are considered as secure.
-However, as of today, this is not common practice.
-% The resulting pool might not be that huge, since there is only a tight spectrum of software fulfilling the purposes of boot firmware.
-
-\subsection{Closed source vs.\ Open source}
-
-We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
-The most prominent example is the observation of CVEs to see if specific versions of a software contain relevant security issues.
-For open source software, the verifier has the possibility to derive a security policy based on the source code.
-
-Also, generally speaking, open source software receives more security audits, revealing security holes faster.
-With closed source firmware, the verifier is restricted to reverse-engineering (not necessarily doing that itself, e.g., it could also be done by security researchers), or relying on the developer to reliably publicize CVE's about its product.
-
-Usually, this is easier for open source software, which is not a requirement, however.
-
-% The reference values have to come from somebody. Huge burden to the verifier, see paper of Simon for potential improvement
+% Big advantage of fTPM is that it doesn't require additional hardware, except for TEE which is already ubiquotious.
+% But DICE involves hardware requirements.
+% The question is naheliegend whether it even makes sense, then.
 
 \section{Personal opinion about developed system}
 
