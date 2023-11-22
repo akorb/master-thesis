@@ -80,6 +80,9 @@ We waive this separation and use the EK directly for attestations to avoid the n
 The DICE and the TPM infrastructure intersect at the EK certificate.
 From the DICE's point of view it is an alias certificate, from the TPM's point of view it is the EK certificate.
 
+% TODO: Explain how to prevent rollback attacks. eMMC with replay-protected memory block (RPMB) as described by Microsoft fTPM paper, and is supported by OP-TEE OS
+% Maybe put in implementation that we do not implement this but use ordinary flash storage instead since FVP does not simulate eMMC.
+
 \section{The identity of a firmware TPM}
 
 DICE offers two identities for each component.
@@ -242,11 +245,11 @@ DICE~\cite{DICE_certs} defines the requirements for various certificate types.
 Our certificate is referred to as an attestation certificate in their specification.
 
 We only consider restrictions for the X.509 fields that are absolute requirements, i.e., declared as ``MUST'' according to RFC 2119~\cite{Bradner1997}, and common fields that can occur in both specifications.
-In general, the EK certificate specification ``does not preclude the use of other certificate extensions''.
+In general, the EK certificate specification ``does not preclude the use of other certificate extensions.''
 The alias certificate specification leaves this undefined, i.e., it makes no statement whether this is permitted or prohibited.
 However, it is irrelevant for us, since the EK certificate specification does not define any own X.509 extensions.
-Some requirements depend on whether the measuring firmware has access to a secure clock.
-We assume the firmware to not having access to a secure clock, keeping the requirements low.
+The requirements about the certificate's validity depend on whether the measuring firmware has access to a secure real-time clock~(SRTC) containing the absolute physical time.
+We assume the firmware to not having access to an SRTC, keeping the requirements low.
 The restrictions of our certificate also depend on its further usage.
 It is a leaf of the certificate chain.
 Therefore, we do not consider requirements for a certificate representing a certificate authority~(CA) signing further certificates.

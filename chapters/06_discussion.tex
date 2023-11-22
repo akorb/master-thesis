@@ -104,12 +104,24 @@ With closed source software, you have to rely on the developer of the closed-sou
 
 % See abstract of https://www.ietf.org/archive/id/draft-birkholz-rats-corim-01.html
 
-\section{Hardware requirements DICE + fTPM vs TPM}
+\section{Hardware requirements: DICE + fTPM vs.\ dTPM}
 
-% Does it even make sense? (Price wise, maybe energy wise)
-% Big advantage of fTPM is that it doesn't require additional hardware, except for TEE which is already ubiquotious.
-% But DICE involves hardware requirements.
-% The question is naheliegend whether it even makes sense, then.
+% TODO: Rework. Especially eMMC part, and abbreviations
+The major advantage of firmware TPMs over dTPMs besides the better performance is that they involve less additional hardware for the final system.
+They require a TEE, eMMC storage with RPMB, a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
+The eMMC is a storage type, where storage has to present anyway.
+So, it does not involve extra hardware, but a constraint for the storage type. % hat man echt eMMC allein?
+A hardware fuse, a secure entropy source, and a TEE are commonly part of the processor.
+Hence, they do not present additional external hardware as well.
+
+% Not a secure real-time clock~(SRTC) containing the absolute physical time, but relatively to determine how much time passed.
+However, our solution with DICE involves hardware requirements.
+The question at hand is whether the hardware requirements of DICE undermine the lower hardware requirements of an fTPM\@.
+
+The purpose of DICE's hardware requirements is to protect the UDS\@.
+This is usually implemented in latches as part of the processor, e.g., STM32G071RB based on the ARM Cortex-M0+ and STM32L476 based on the ARM Cortex-M4~\cite{Lorych2022}.
+For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.
+So, we are not cancelling out the advantage of less additional hardware components, and instead add a restriction in the choice of processors.
 
 \section{Personal opinion about developed system}
 
