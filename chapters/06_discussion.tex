@@ -13,17 +13,27 @@
 
 \ac{TCG} defines as part of their Trusted Attestation Protocol~\cite{tap} the requirements for an attestation process to provide assurance to a verifier that it is (i) accurate, (ii) interpretable, and (iii) attributable.
 
-(i) Accurate attestation data represents the actual state of the device.
+\paragraph{Accurate}
+Accurate attestation data represents the actual state of the device.
 This includes freshness, i.e., the data is not replayed and does not represent an old, outdated state of the device.
+While our system ensures this not alone, accuracy is established by the higher level protocol, e.g., retrieving a quote, as long as a nonce is involved.
 
-(ii) Intuitively, the data must be interpretable by the verifier.
+\paragraph{Interpretable}
+Intuitively, the data must be interpretable by the verifier.
 In other words, the verifier must be able to derive a decision about the trustworthiness of the prover based on the attestation data.
+Our system ensures that by propagating the TCIs as part of the publicly specified TCB Info Evidence extension.
+Also, the TCIs constitute of a hash, and the identifier of the used hash algorithm.
+Both are well-known concepts easily understandable for a verifier.
 
-(iii) It must be possible to assign the attestation data to a specific device, i.e., it must be verifiable that the attestation data originates from the prover.
+\paragraph{Attributable}
+It must be possible to assign the attestation data to a specific device, i.e., it must be verifiable that the attestation data originates from the prover.
+This is solved by the higher level protocol as well, since such protocols usually involve signing of attestation data, usually a quote.
+The quote must be signed with the private EK corresponding to the public key in the EKcert, i.e., the leaf of the certificate chain.
+And this private EK can only be created by a device that has the TCIs represented by the previously obtained certificate chain and the according UDS, which is secret and unique for the respective prover.
 
-% Why they are reached
 
-\section{Higher level protocols' compatibility}
+% \section{Higher level protocols' compatibility}
+% Part of related work
 
 \section{Implications of missing privacy}
 
@@ -53,7 +63,7 @@ In an ideal scenario, the software manufacturers publicize the TCIs of their sof
 However, as of today, this is not common practice.
 % The resulting pool might not be that huge, since there is only a tight spectrum of software fulfilling the purposes of boot firmware.
 
-\subsection{closed source vs. open source}
+\subsection{Closed source vs.\ Open source}
 
 We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
 The most prominent example is the observation of CVEs to see if specific versions of a software contain relevant security issues.
