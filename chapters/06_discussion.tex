@@ -108,7 +108,8 @@ With closed source software, you have to rely on the developer of the closed-sou
 
 % TODO: Rework. Especially eMMC part, and abbreviations
 The major advantage of firmware TPMs over dTPMs besides the better performance is that they involve less additional hardware for the final system.
-They require a TEE, eMMC storage with RPMB, a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
+They require a TEE, storage hardware supporting Replay Protected Memory Block~(RPMB), a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
+RPMB is for example provided by eMMC and UFS\@.
 The eMMC is a storage type, where storage has to present anyway.
 So, it does not involve extra hardware, but a constraint for the storage type. % hat man echt eMMC allein?
 A hardware fuse, a secure entropy source, and a TEE are commonly part of the processor.
