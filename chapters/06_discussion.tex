@@ -133,3 +133,9 @@ So, we are not cancelling out the advantage of less additional hardware componen
 
 % https://dl.acm.org/doi/pdf/10.1145/2897937.2898083
 % Problems of the prover not being authenticated. This needs to be solved on top of our solution.
+
+\section{Caveats of a static RTM}
+
+The huge disadvantage of a static RTM is that it generally cannot provide guarantees for a system's state at the current time, but can only present the state the system inhibited at boot time~\cite{EURECOM+3536}.
+However, attacks can appear during the system's runtime, which is then undetected.
+Since our solution integrates DICE which does not provide capabilities of a dynamic RTM, we are restricted to a static RTM\@.
