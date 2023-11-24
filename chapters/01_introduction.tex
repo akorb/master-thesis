@@ -112,18 +112,35 @@ In this section, we want to formally describe the security goals of our solution
 \begin{enumerate}
   % \item{\textbf{Establish trustworthiness to firmware TPM}}
 
-  \item{\textbf{Identification of the fTPM stack};\\
-  The verifier should be informed of the exact versions of each component of the fTPM stack in a trustworthy manner, so that the verifier can independently decide whether to trust the fTPM.}\label{enum:tpm-id}
-  %ID is part of certificate chain. And TPM can prove that the certificate chain represents it by proving being in control of EKpriv.
+  \item{\textbf{Compromised fTPM cannot fake its state}}
+  % Does not have access to OP-TEE's private key, code in user mode does not have access to data in kernel mode
+  \item{\textbf{Small root of trust}}
+  % To reduce attack surface, simpler to protect
+  % DICE's UDS
+  
 
-  \item{\textbf{Confidentiality and integrity of TPM storage};\\
-  Data should not be accessible or modifiable outside of TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
-  % Also not to other TA's, which can spoof UUID. But not possible, since CDI of fTPM unknown and can then not decrypt data.
+  \item{\textbf{Isolation of fTPM storage}}
+  % Data should not be accessible or modifiable outside of TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
+  % Data is only accessible via TPM defined 
+  % against other TA's, since they can know the fTPM's UUID
+  % But they cannot know its CDI, since the OP-TEE OS does not allow measuring of arbitrary applications, but TA's can only measure themselves.
+  % This prevents other TA's from generating the fTPM's CDI, and subsequently its storage key.
+  
+  \item{\textbf{Circumvent downgrade attack of fTPM}}
+  
 
-  \item{\textbf{Data of TPM bound to compound identity of fTPM stack};\\
-  The current storage of the fTPM should be only accessible to the identity of its entire stack which includes its underlying firmware components.
-  Conversely, as soon as a component that could affect the fTPM is modified, the fTPM with then a new identity should not have access to the previous data anymore.
-  This includes an update of any relevant component.}
+  % \item{\textbf{Identification of the fTPM stack};\\
+  % The verifier should be informed of the exact versions of each component of the fTPM stack in a trustworthy manner, so that the verifier can independently decide whether to trust the fTPM.}\label{enum:tpm-id}
+  % %ID is part of certificate chain. And TPM can prove that the certificate chain represents it by proving being in control of EKpriv.
+
+  % \item{\textbf{Confidentiality and integrity of TPM storage};\\
+  % Data should not be accessible or modifiable outside of TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
+  % % Also not to other TA's, which can spoof UUID. But not possible, since CDI of fTPM unknown and can then not decrypt data.
+
+  % \item{\textbf{Data of TPM bound to compound identity of fTPM stack};\\
+  % The current storage of the fTPM should be only accessible to the identity of its entire stack which includes its underlying firmware components.
+  % Conversely, as soon as a component that could affect the fTPM is modified, the fTPM with then a new identity should not have access to the previous data anymore.
+  % This includes an update of any relevant component.}
 
   \item{\textbf{Privacy of attestation process};\\
   The verifier should be able to establish trust in the authenticity of an fTPM without having to know the identity of the fTPM, i.e., its EK\@.
