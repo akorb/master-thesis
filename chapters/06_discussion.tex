@@ -108,21 +108,22 @@ With closed source software, you have to rely on the developer of the closed-sou
 
 % TODO: Rework. Especially eMMC part, and abbreviations
 The major advantage of firmware TPMs over dTPMs besides the better performance is that they involve less additional hardware for the final system.
-They require a TEE, storage hardware supporting Replay Protected Memory Block~(RPMB), a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
-RPMB is for example provided by eMMC and UFS\@.
-The eMMC is a storage type, where storage has to present anyway.
-So, it does not involve extra hardware, but a constraint for the storage type. % hat man echt eMMC allein?
+They require a TEE, storage hardware supporting a Replay Protected Memory Block~(RPMB) partition, a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
 A hardware fuse, a secure entropy source, and a TEE are commonly part of the processor.
-Hence, they do not present additional external hardware as well.
+Hence, they do not present additional external hardware.
+RPMB is for example provided by eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+Storage has to present anyway.
+Thus, it does not involve extra hardware, but a constraint for the storage type.
 
 % Not a secure real-time clock~(SRTC) containing the absolute physical time, but relatively to determine how much time passed.
-However, our solution with DICE involves hardware requirements.
+However, our solution with DICE involves new hardware requirements.
 The question at hand is whether the hardware requirements of DICE undermine the lower hardware requirements of an fTPM\@.
-
 The purpose of DICE's hardware requirements is to protect the UDS\@.
-This is usually implemented in latches as part of the processor, e.g., STM32G071RB based on the ARM Cortex-M0+ and STM32L476 based on the ARM Cortex-M4~\cite{Lorych2022}.
+This is usually implemented in latches as part of the processor which block access to a specific memory area after a bit has been set~\cite{Lorych2022}.
+E.g., STM32G0 based on the Arm Cortex-M0+ or STM32L4 based on the Arm Cortex-M4~\cite{Lorych2022}.
 For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.
-So, we are not cancelling out the advantage of less additional hardware components, and instead add a restriction in the choice of processors.
+
+So, we are not cancelling out the advantage of less additional hardware components over a dedicated TPM, and instead add a restriction in the choice of processors and storage type.
 
 \section{Personal opinion about developed system}
 

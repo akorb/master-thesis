@@ -36,9 +36,9 @@ Previous, mostly software-based technologies ensure confidentiality and integrit
 
 \subsection{Arm TrustZone}
 
-One such \ac{TEE} is ARM's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
+One such \ac{TEE} is Arm's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
 While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own assigned resources.
-Since ARM is the dominant processor architectures for IoT devices with a market share of 86\,\%~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
+Since Arm is the dominant processor architectures for IoT devices with a market share of 86\,\%~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
 
 \input{elements/figure_arm_trustzone_arch.tex}
 
@@ -46,13 +46,13 @@ Our implementation also leverages TrustZone to enable the execution and the remo
 
 \subsection{Further TEE technologies}
 
-Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and ARM Confidential Computing Architecture~(CCA). Since we focus on the implementation of our concept with ARM TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to ARM processors and can also be applied to others, they are mentioned for the sake of completeness.
+Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and Arm Confidential Computing Architecture~(CCA). Since we focus on the implementation of our concept with Arm TrustZone, we do not go into detail about these other technologies here. However, since our concept is not tied to Arm processors and can also be applied to others, they are mentioned for the sake of completeness.
 
 % TrustZone, Trusted applications are not isolated -> they need to trust each other
 
 % From TrustZone section in TPM book: Peripherals can be switched between the NW and SW by configuring the system monitor to forward the peripheral interrupts only to the assigned world, because some peripherals might need to be secure only temporarily.
 
-% static: ARM TZ
+% static: Arm TZ
 % dynamic: Intel SGX, TDX, AMD SEV
 
 
@@ -224,7 +224,7 @@ That invasive hardware attacks against dTPMs are possible was already shown by T
 As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM is a typical attack vector. An fTPM~\cite{Raj2015, 197213} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
 The trend is moving towards fTPMs, which can also been seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}. Also, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers.
 
-As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an ARM-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
+As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an Arm-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
 
 Running on the main processor, e.g., a fully-fledged Arm Cortex core, entails an advantage and a disadvantage. The disadvantage is that running on the same processor as the rest of the system means less isolation, while a \ac{dTPM} brings its own processor that is completely isolated from the main processor. The advantage, however, is that a main processor is generally much faster because \ac{dTPM} processors are weak~\cite{Goh2013, Raj2015}. Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that the firmware-based modules are generally much faster after comparing the performance of \acp{fTPM} and \acp{dTPM}.
 

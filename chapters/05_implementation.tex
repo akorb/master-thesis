@@ -8,10 +8,10 @@ As explained in \autoref{sec:terminology}, from now on the term Firmware ID (FWI
 \section{Overview}
 
 
-We run our implementation on ARM's Fixed Virtual Platform~(FVP)\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}} which is a complete simulation of the Armv8-A architecture including TrustZone.
+We run our implementation on Arm's Fixed Virtual Platform~(FVP)\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Fixed\%20Virtual\%20Platforms}} which is a complete simulation of the Armv8-A architecture including TrustZone.
 
 To do this, we use the software infrastructure provided by OP-TEE for various platforms, including FVP\@.
-OP-TEE uses the TrustedFirmware-A~(TF-A)\footnote{\url{https://www.trustedfirmware.org/projects/tf-a/}} package from ARM as firmware boot components.
+OP-TEE uses the TrustedFirmware-A~(TF-A)\footnote{\url{https://www.trustedfirmware.org/projects/tf-a/}} package from Arm as firmware boot components.
 However, we mock their attestation, i.e., their Alias certificates are statically compiled into the binaries instead of being dynamically generated, as TF-A does not implement DICE\@.
 The development efforts to implement that exceeds the benefits, as the concept can also be demonstrated with mocked certificates.
 For that, only the certificates up to the OP-TEE~OS are mocked, including OP-TEE~OS's private key to sign the subsequent Alias certificate, which is our EKcert.
