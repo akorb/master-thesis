@@ -43,7 +43,7 @@ An attacker could use the TCIs to find the exact version of the running software
 To counteract this, the certificate chain can be transferred from the prover to the verifier via TCP/TLS, which guarantees the confidentiality of the TCI part of the certificates from eavesdroppers.
 However, a malicious verifier could initiate the entire attestation process, which is then the TLS endpoint that receives the certificates.
 This can be circumvented by authenticating the verifier.
-However, this means that the verifier only shares its state with certain verifiers.
+However, this means that the prover only shares its state with certain verifiers.
 This is a trade-off that must be weighed up by the implementers of our solution.
 
 
