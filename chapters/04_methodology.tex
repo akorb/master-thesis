@@ -40,10 +40,13 @@ Two values are derived from the CDI\@.
 % Storage Key generation
 
 First, the storage key is generated.
-This is a symmetric encryption key that is used to encrypt the fTPM storage space in RAM before it is written to a persistent storage space such as a hard disk drive (HDD).
+This is a symmetric encryption key that is used to encrypt the fTPM storage space in RAM before it is written to a persistent storage space such as a hard disk drive~(HDD).
 At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
-Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which is equivalent to a full manufacturer reset.
+Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which results in a full manufacturer reset of the fTPM\@.
 This enables the property that an fTPM storage must never be accessible to another TPM\@.
+% TODO: Well, yes, but that is also accomplished with RPMB
+It also prevents downgrade attacks of the fTPM\@.
+For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the fTPM itself nor the attacker will be able to decrypt the data.
 
 \input{elements/figure_storage_encryption.tex}
 

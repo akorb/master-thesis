@@ -255,7 +255,7 @@ It is only important that this date is after the start period of the certificate
 
 \section{Implementing encrypted storage}
 
-Overall, the reference TPM's memory size has a size of 16896\,bytes, separated in a NV storage of 16384\,bytes, and the admin space of 512\,bytes.
+Overall, the reference TPM's memory size has a size of 16896 bytes, separated in a NV storage of 16384 bytes, and the admin space of 512 bytes.
 The admin space is reserved to persist defined data like the TPM's attributes, e.g., \texttt{tpmGeneratedEPS}.
 The NV storage can store arbitrary data, e.g., the EK template, certificate, or an encryption key.
 For example, Microsoft's BitLocker stores the encryption key for hard disk encryption in the NV storage.
@@ -263,12 +263,12 @@ For example, Microsoft's BitLocker stores the encryption key for hard disk encry
 The OP-TEE~OS manages storage in blocks.
 It is only possible to write entire blocks, not partial blocks.
 Therefore, little changes can be expensive to persist if the according block is big.
-Hence, the OP-TEE specific code of the reference fTPM splits the memory size of 16896\,bytes in 512\,bytes blocks resulting in \( 16896 \div 512 = 33 \) blocks.
+Hence, the OP-TEE specific code of the reference fTPM splits the memory size of 16896 bytes in 512 bytes blocks resulting in \( 16896 \div 512 = 33 \) blocks.
 
 We use the recommendations of the BSI~\cite{bsi-key-recommendations} to determine the encryption method.
-Therefore, we use AES-128 in GCM mode to protect the data's confidentiality and integrity with an initialization vector~(IV) and tags of length 96\,bits.
+Therefore, we use AES-128 in GCM mode to protect the data's confidentiality and integrity with an initialization vector~(IV) and tags of length 96 bits.
 These are the recommended minimum sizes that we have chosen in order to spare resources.
-There is one IV and tag for each block, which results in a storage overhead of 792\,bytes as shown in \autoref{eq:memory_overhead}.
+There is one IV and tag for each block, which results in a storage overhead of 792 bytes as shown in \autoref{eq:memory_overhead}.
 
 \begin{equation}
   \label{eq:memory_overhead}
@@ -281,6 +281,39 @@ On any mismatch between the stored tag and the tag produced during decryption, t
 The data is loaded from the hard disk and then decrypted only at startup time.
 And it is written only during shutdown of the TPM or if a command modifies the TPM's storage.
 As data is mainly written to the TPM during the provisioning time and only read during daily use, we assume that the impact on performance will be small.
+
+\section{Isolating storage of fTPM in OP-TEE}
+
+The data of the individual TAs must be saved somewhere permanently, otherwise they would be lost after each restart.
+This data must be protected as it is stored in OP-TEE in the REE\@ file system.
+OP-TEE encrypts the secure storage files before sending them to the REE for permanent storage using a pseudo-randomly generated key, the File Encryption Key~(FEK).
+It is stored in the metadata of the corresponding file, encrypted with a key unique to each trusted application, the Trusted Application Storage Key~(TSK). % (https://optee.readthedocs.io/en/latest/architecture/secure\_storage.html#trusted-application-storage-key-tsk).
+It is derived from the Secure Storage Key~(SSK), which is unique to the device.
+% \begin{itemize}
+%   \item SSK:\ Unique per device
+%   \item TSK:\ Unique per TA
+%   \item FEK:\ Unique per file
+% \end{itemize}
+\begin{align}
+  % \label{eq:ssk_formula}
+  % SSK &= HMAC_{SHA256}(HUK,\ Chip\ ID\ \|\ `static\ string\text{'})\\
+  \label{eq:tsk_formula}
+  TSK &= HMAC_{SHA256}(SSK,\ TA_{UUID})\\
+  \label{eq:fek_formula}
+  FEK &= decrypt_{TSK}(File_{metadata})\\
+  data_{plain} &= decrypt_{FEK}(File_{payload})
+\end{align}
+% where HUK is a hardware unique key, and the chip ID a UUID unique to the hardware, possibly derived from the HUK\@.
+% More details can be found in OP-TEE's documentation\footnote{\url{https://optee.readthedocs.io/en/latest/architecture/porting\_guidelines.html}}.
+
+\autoref{eq:tsk_formula} shows that the TSK depends only on the SSK and the TA's UUID\@.
+As said, the SSK is same for the whole device and hence for every TA, and the \( TA_{UUID} \) is public.
+A close look reveals that other TA's on the same device could therefore use the publicly available UUID to generate the fTPM's TSK and consequently, decrypt the FEKs of the fTPM's files and access private data of the fTPM\@.
+However, this is prevented by our integration of an additional storage key, which encrypts the data before it is sent to the OP-TEE~OS\@.
+
+The TEE specification offers an ultimate solution for that on the conception level of the trusted OS without requiring a manual encryption step in the TA itself.
+It is defined in the TEE Management Framework~\cite{GP_ManagementFramework}, which offers the possibility of grouping TAs into domains and subdomains, whereby only TAs in the same domain or subdomain can potentially decrypt each other's data.
+However, as of time of writing, this is not implemented in OP-TEE~OS yet.
 
 \section{Technical obstacles}
 
