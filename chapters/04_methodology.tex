@@ -45,9 +45,16 @@ This is a symmetric encryption key that is used to encrypt the fTPM storage spac
 At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
 Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which results in a full manufacturer reset of the fTPM\@.
 This enables the property that an fTPM storage must never be accessible to another TPM\@.
+Note that an attacker could thereby easily trigger a data loss.
+This has to avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere. % TODO: Maybe cite something, I feel like Microsoft has something for that
 % TODO: Well, yes, but that is also accomplished with RPMB
 It also prevents downgrade attacks of the fTPM\@.
 For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the fTPM itself nor the attacker will be able to decrypt the data.
+However, it should be noted that although this protects the fTPM from downgrade attacks, it does not protect its data from downgrade attacks.
+However, this is usually achieved by storing the data on a Replay Protected Memory Block~(RPMB) partition.
+This is the reason why a RPMB partition is part of Microsoft's hardware requirements for a firmware TPM~\cite{Raj2015}.
+
+So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
 \input{elements/figure_storage_encryption.tex}
 
@@ -289,34 +296,39 @@ For example, the manufacturer could be defined as ``DICE'', the model as ``FW'',
 
 \section{Updating the fTPM}
 
-
 We consider it as critical that the \ac{fTPM} is updatable. This is due to the history of \acp{fTPM} showing vulnerabilities which have been patched consequently.
 % cite... all from background probably, or ref section in Related Work
 Our \ac{fTPM} can be only updated with the system shut down.
 This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM\@.
 % This is due to the required out-of-band signing procedure of trusted applications before being deployed.
 
+The code of the fTPM is replaced during an update.
+The fTPM therefore retrieves a new CDI and then a new storage key.
+The old data can therefore no longer be accessed, which effectively leads to a manufacturer reset.
+
+This mechanism is common practice as this is also described in the manuals for TPM upgrades by Lenovo~\cite{LenovoTpmUpgrade} and Intel~\cite{intelTpmUpgrade}. 
+It is underpinned by the importance of pausing BitLocker before upgrading a TPM due to its upcoming data loss~\cite{BitlockerTpmUpgrade}.
+Thereby, the encryption key is temporarily stored in plain text on the hard drive, which is consequently restored on the TPM after its update.
+
+
 % Clear data
 
 % RPMB also does that
-To protect against downgrade attacks:
-NV data is encrypted/integrity with AEAD
-Encryption required to ensure confidentiality
-AEAD used to also ensure integrity
-This is required since also the cipher text of the NV could be modified, which might change security critical information.
-Encryption-only would not prohibit that.
-As soon as an integrity violation is detected, the \ac{fTPM} is fully reset, effectively invalidating all previously stored data.
-Note that an attacker could thereby easily trigger a data loss.
-This has to avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere. % Maybe cite something, I feel like Microsoft has something for that
-This introduces storage and memory overhead.
-Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When does it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
-Hence, there is no performance penalty during common uses of a \ac{TPM}, e.g., key creation.
+% To protect against downgrade attacks:
+% NV data is encrypted/integrity with AEAD
+% Encryption required to ensure confidentiality
+% AEAD used to also ensure integrity
+% This is required since also the cipher text of the NV could be modified, which might change security critical information.
+% Encryption-only would not prohibit that.
+% As soon as an integrity violation is detected, the \ac{fTPM} is fully reset, effectively invalidating all previously stored data.
+
+% This introduces storage and memory overhead.
+% Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When does it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
+% Hence, there is no performance penalty during common uses of a \ac{TPM}, e.g., key creation.
 
 % Add layered figure which shows that the hard drive never sees decrypted data, but only the secure memory. Important because data can be stored in NW.
-This might seem redundant because of the storage protection of for example TrustZone, but this does not protect against downgrade attacks.
-With our approach, the access to the data is bound to the exact identity of the fTPM which includes all underlying firmware as well.
-
-So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
+% This might seem redundant because of the storage protection of for example TrustZone, but this does not protect against downgrade attacks.
+% With our approach, the access to the data is bound to the exact identity of the fTPM which includes all underlying firmware as well.
 
 
 \section{Privacy}\label{sec:privacy}
