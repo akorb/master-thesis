@@ -46,13 +46,16 @@ At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
 Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which results in a full manufacturer reset of the fTPM\@.
 This enables the property that an fTPM storage must never be accessible to another TPM\@.
 Note that an attacker could thereby easily trigger a data loss.
-This has to avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere. % TODO: Maybe cite something, I feel like Microsoft has something for that
+This must be avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere.
+Microsoft recommends backing up all secrets stored on the TPM before clearing it~\cite{MicrosoftClearRecommendations}, what can be generalized to the backup of the fTPM data in all cases where data loss causes serious damage.
+
 % TODO: Well, yes, but that is also accomplished with RPMB
-It also prevents downgrade attacks of the fTPM\@.
-For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the fTPM itself nor the attacker will be able to decrypt the data.
-However, it should be noted that although this protects the fTPM from downgrade attacks, it does not protect its data from downgrade attacks.
-However, this is usually achieved by storing the data on a Replay Protected Memory Block~(RPMB) partition.
-This is the reason why a RPMB partition is part of Microsoft's hardware requirements for a firmware TPM~\cite{Raj2015}.
+Establishing the storage key also prevents an attacker from accessing an fTPM's data by downgrading it\@.
+For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the attacker itself nor the fTPM itself will be able to decrypt the previous data.
+
+However, it should be noted that this does not protect the fTPM data from a rollback attack.
+This is normally achieved by storing the data on a Replay Protected Memory Block~(RPMB) partition.
+For this reason, an RPMB partition is part of Microsoft's hardware requirements for a firmware TPM~\cite{Raj2015}.
 
 So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
@@ -310,17 +313,6 @@ This mechanism is common practice as this is also described in the manuals for T
 It is underpinned by the importance of pausing BitLocker before upgrading a TPM due to its upcoming data loss~\cite{BitlockerTpmUpgrade}.
 Thereby, the encryption key is temporarily stored in plain text on the hard drive, which is consequently restored on the TPM after its update.
 
-
-% Clear data
-
-% RPMB also does that
-% To protect against downgrade attacks:
-% NV data is encrypted/integrity with AEAD
-% Encryption required to ensure confidentiality
-% AEAD used to also ensure integrity
-% This is required since also the cipher text of the NV could be modified, which might change security critical information.
-% Encryption-only would not prohibit that.
-% As soon as an integrity violation is detected, the \ac{fTPM} is fully reset, effectively invalidating all previously stored data.
 
 % This introduces storage and memory overhead.
 % Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When does it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
