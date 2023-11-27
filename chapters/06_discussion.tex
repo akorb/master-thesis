@@ -104,16 +104,17 @@ With closed source software, you have to rely on the developer of the closed-sou
 
 % See abstract of https://www.ietf.org/archive/id/draft-birkholz-rats-corim-01.html
 
-\section{Hardware requirements: DICE + fTPM vs.\ dTPM}
+% \section{Hardware requirements: DICE + fTPM vs.\ dTPM}
+\section{Hardware requirements}
 
 % TODO: Rework. Especially eMMC part, and abbreviations
 The major advantage of firmware TPMs over dTPMs besides the better performance is that they involve less additional hardware for the final system.
 They require a TEE, storage hardware supporting a Replay Protected Memory Block~(RPMB) partition, a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
 A hardware fuse, a secure entropy source, and a TEE are commonly part of the processor.
-Hence, they do not present additional external hardware.
-RPMB is for example provided by eMMC~\cite{eMMC} and UFS~\cite{UFS}.
-Storage has to present anyway.
+And storage has to present anyway.
 Thus, it does not involve extra hardware, but a constraint for the storage type.
+Support for a RPMB partition is for example provided by eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+
 
 % Not a secure real-time clock~(SRTC) containing the absolute physical time, but relatively to determine how much time passed.
 However, our solution with DICE involves new hardware requirements.

@@ -16,6 +16,7 @@ They continue to be referred to as FWIDs in the formal definition of this extens
 In personal correspondence with TCG, we have learned that this is due to backwards compatibility.
 The old term FWID is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term TCI in assets that can be updated more quickly, such as the specification text.
 Therefore, we will use the term TCI in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term FWID, just as it is common practice at the TCG\@.
+This ensures that the explanation of our implementation better matches the actual code, where FWID is the term as it is used by automatically generated code.
 
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
@@ -148,6 +149,7 @@ We also do not want to restrict the permissible values of the working data of an
 
 \section{Attestation process}\label{sec:attestation_process}
 
+% Todo: Move to terminology section or explain on first usage
 EKpriv = private portion of EK
 EKpub = public portion of EK
 EKcert = certificate with EKpub as subject
@@ -287,27 +289,32 @@ For example, the manufacturer could be defined as ``DICE'', the model as ``FW'',
 
 \section{Updating the fTPM}
 
-We consider it as critical that the \ac{fTPM} is updatable. This is due to the history of \acp{fTPM} showing vulnerabilities which have been patched consequently. % cite... all from background probably
 
-Our \ac{fTPM} can be only updated with the system shut down. This is due to the required out-of-band signing procedure of trusted applications before being deployed. This also  with while system is shut down. This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM\@.
+We consider it as critical that the \ac{fTPM} is updatable. This is due to the history of \acp{fTPM} showing vulnerabilities which have been patched consequently.
+% cite... all from background probably, or ref section in Related Work
+Our \ac{fTPM} can be only updated with the system shut down.
+This ensures that the TCI part of the EKcert generated at boot-time does not become obsolete, in other words, keeps representing the state of the currently running fTPM\@.
+% This is due to the required out-of-band signing procedure of trusted applications before being deployed.
 
 % Clear data
 
+% RPMB also does that
 To protect against downgrade attacks:
-NV data is encrypted/integrity with AESP
+NV data is encrypted/integrity with AEAD
 Encryption required to ensure confidentiality
-AESP used to also ensure integrity
+AEAD used to also ensure integrity
 This is required since also the cipher text of the NV could be modified, which might change security critical information.
 Encryption-only would not prohibit that.
 As soon as an integrity violation is detected, the \ac{fTPM} is fully reset, effectively invalidating all previously stored data.
 Note that an attacker could thereby easily trigger a data loss.
 This has to avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere. % Maybe cite something, I feel like Microsoft has something for that
 This introduces storage and memory overhead.
-Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When s it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
+Processing overhead only slightly, since the data is already decrypted during start-time, which happens only once at boot time, and then later data is encrypted only while it is stored, which happens only \ldots % TODO: When does it happen? I remember there were not many places in the code where storing of the NV onto the persistent storage is triggered. 
 Hence, there is no performance penalty during common uses of a \ac{TPM}, e.g., key creation.
 
 % Add layered figure which shows that the hard drive never sees decrypted data, but only the secure memory. Important because data can be stored in NW.
-This might seem redundant because of the storage protection of for example TrustZone, but this does not protect against downgrade attacks. With our approach, the access to the data is bound to the exact identity of the fTPM which includes all underlying firmware as well.
+This might seem redundant because of the storage protection of for example TrustZone, but this does not protect against downgrade attacks.
+With our approach, the access to the data is bound to the exact identity of the fTPM which includes all underlying firmware as well.
 
 So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
