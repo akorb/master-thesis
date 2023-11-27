@@ -208,16 +208,28 @@ An fTPM~\cite{Raj2015, 197213} is executed directly by the CPU within a \ac{TEE}
 This isolates it from the \ac{REE}, which means that even the operating system in the REE cannot arbitrarily access the memory of the fTPM\@.
 The \ac{REE} can only send commands to the fTPM via controlled interfaces.
 These commands are piggybacked by calls from the \ac{REE} to the fTPM in the \ac{TEE}.
+The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}.
 
-The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}. Also, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers.
+As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
+Running on the main processor, e.g., a fully-fledged Arm Cortex core, entails advantages and disadvantages.
 
-As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too. For example, common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), which in fact is an Arm-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
+% Disadvantages
 
-Running on the main processor, e.g., a fully-fledged Arm Cortex core, entails an advantage and a disadvantage. The disadvantage is that running on the same processor as the rest of the system means less isolation, while a \ac{dTPM} brings its own processor that is completely isolated from the main processor. The advantage, however, is that a main processor is generally much faster because \ac{dTPM} processors are weak~\cite{Goh2013, Raj2015}. Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that firmware TPMs are generally much faster after comparing their performance with \acp{dTPM}.
-
-In fact, there are more disadvantages. First, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
+A disadvantage is that running on the same processor as the rest of the system means less isolation from the remaining system, while a \ac{dTPM} brings its own processor, memory, and storage that is completely isolated from the main system. 
+Also, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
 % Well, they can if the fTPM RNG is connected to a hardware RNG. I think I even remember that in some paper they tried to harden fTPMs just by doing exactly this.
-Second, they are started later in the host's boot chain than a dTPM that is accessible from the beginning. This has the consequence that the measurements of the components booted before the fTPM have to be cached and later be forwarded to the \ac{fTPM} as soon as it is available. Arm's Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}, which is the Arm's reference implementation of software in the \ac{TEE}, protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot}, i.e., memory which is only accessible in the \ac{TEE}. Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
+Furthermore, they are started later in the host's boot chain than a dTPM that is accessible from the beginning.
+This has the consequence that the measurements of the components booted before the fTPM have to be cached and later be forwarded to the \ac{fTPM} as soon as it is available.
+Arm's Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}, which is the Arm's reference implementation of software in the \ac{TEE}, protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot}, i.e., memory which is only accessible in the \ac{TEE}. 
+Last, fTPMs depend on more components for its security than single-component dTPMs, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
+
+% Advantages
+
+However, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers as they require less extra hardware.
+In addition, TPM processors are weak~\cite{Goh2013, Raj2015}.
+Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that firmware TPMs executed on main processors are generally much faster than \acp{dTPM}.
+They are also a viable option for adding TPM functionality to older devices through software updates rather than hardware replacements, which is particularly valuable in times like the recent chip supply shortage~\cite{Voas2021, casper2021}.
+
 
 % \begin{table}[htpb]
 %   \caption[ftpmdownsides]{Advantages and disadvantages of fTPMs.}\label{tab:tpm_comparison}
