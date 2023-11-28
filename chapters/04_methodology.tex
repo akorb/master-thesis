@@ -82,7 +82,7 @@ For this reason, the DICE specification suggests keeping the first mutable code 
 % EK is a signing key
 
 By default, the EK is a restricted encryption key.
-It is not used for signing because the resulting signatures may reveal the TPMs' identity.
+It is not used for signing because the resulting signatures may reveal the TPM's identity.
 Therefore, the usual procedure is to create a short-lived attestation key (AK) on the TPM\@.
 The verifier communicates the public part of the AK to a third party privacy CA who ensures that the holder of the AK is the same as the holder of the EK\@.
 The privacy CA then issues an attestation certificate confirming that the AK originates from a genuine TPM, without revealing the identity of the TPM\@.
@@ -143,7 +143,7 @@ We also do not want to restrict the permissible values of the working data of an
 % In summary, the CDI keeps being updated from layer to layer, the TCI is calculated for each layer individually.
 % Then, there is also the identity of the fTPM in the TPM context, which is represented by its EK.
 % This identity is not only bound to the binary and the configuration of the fTPM, but also the entire underlying firmware stack.
-% We derive the EK from the TPMs CDI, which is derived of the measurements of all preceding firmware components and the TPMs' TCI, see \autoref{eq:dice_cdi}.
+% We derive the EK from the TPMs CDI, which is derived of the measurements of all preceding firmware components and the TPM's TCI, see \autoref{eq:dice_cdi}.
 
 % \input{elements/figure_ftpm_identity.tex}
 

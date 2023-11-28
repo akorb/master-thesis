@@ -304,7 +304,7 @@ Therefore, it must be immutable so that it remains in the trusted state in which
 
 While the UDS is exclusive to the DICE layer, each other component retrieves a Compound Device Identifier (CDI) from its previous component.
 The CDI of each layer depends on two variables combined in a one-way function (OWF).
-(i) The own TCI, binding the CDI to the current layers' identity, i.e., the hash of itself, and (ii) the CDI of the previous layer, making each CDI depending on the identities of all previous component identities.
+(i) The own TCI, binding the CDI to the current layer's identity, i.e., the hash of itself, and (ii) the CDI of the previous layer, making each CDI depending on the identities of all previous component identities.
 Therefore, if any component is modified, this reflects in the permutation of the CDIs of all subsequent components, as implied by \autoref{eq:dice_cdi}.
 
 % CDI protection and further uses
@@ -337,12 +337,12 @@ The certificate chain is built up step by step during the boot process, with the
   Manufacturer\ Cert \rightarrow DeviceID\ Cert \rightarrow Alias\ Cert\ [\rightarrow Alias\ Cert]^*
 \end{equation}
 
-The chains' root is the certificate of the DICE manufacturer. It is either provided by the device or can be retrieved from the manufacturer itself, e.g., via its website.
+The chain's root is the certificate of the DICE manufacturer. It is either provided by the device or can be retrieved from the manufacturer itself, e.g., via its website.
 
 % DeviceID certificate
 
 The next certificate is the DeviceID certificate.
-It is generated during device provisioning by the manufacturer, and signed by the manufacturers' private key.
+It is generated during device provisioning by the manufacturer, and signed by the manufacturer's private key.
 This links the DICE implementation to a manufacturer, which is important to retrieve the guarantees the manufacturer conducts for its DICE implementation to protect its UDS value, which is the hardware root of trust.
 % The DeviceID certificate also contains the TCI of layer~0.
 % Hence, during provisioning, the manufacturer must ensure to only sign a DeviceID certificate containing a TCI matching the actual TCI of layer 0.
@@ -352,9 +352,9 @@ Since thereby the identification relies on asymmetric cryptography, the manufact
 
 % How the trust chain is continued
 
-While the DeviceIDs' public key is publicly stored on the device as part of the DeviceID certificate, the corresponding private key still must be generated during the boot process.
+While the DeviceID's public key is publicly stored on the device as part of the DeviceID certificate, the corresponding private key still must be generated during the boot process.
 Only if the matching private key is generated, which is only the case if the identity of layer 0 did not change, the certificate chain can be continued.
-This continues the chain of trust, because if layer 0 changes, the DeviceIDs' private key also changes.
+This continues the chain of trust, because if layer 0 changes, the DeviceID's private key also changes.
 This invalidates the signature of the next certificate for the public key in the DeviceID certificate.
 
 % AliasCert
