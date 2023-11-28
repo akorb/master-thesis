@@ -49,13 +49,33 @@ Note that an attacker could thereby easily trigger a data loss.
 This must be avoided by integrating the good-practices with working with a \ac{TPM}, which includes having secrets stored also elsewhere.
 Microsoft recommends backing up all secrets stored on the TPM before clearing it~\cite{MicrosoftClearRecommendations}, what can be generalized to the backup of the fTPM data in all cases where data loss causes serious damage.
 
-% TODO: Well, yes, but that is also accomplished with RPMB
-Establishing the storage key also prevents an attacker from accessing an fTPM's data by downgrading it\@.
-For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the attacker itself nor the fTPM itself will be able to decrypt the previous data.
+% For pure data rollback: RPMB reduces possible attackers to components in the TEE. No entire protection.
+% But for data protection by downgrading the fTPM: Our solution is more secure than only using RPMB, see paragraph below. In short, we do not need to trust entire software stack in TEE.
 
-However, it should be noted that this does not protect the fTPM data from a rollback attack.
-This is normally achieved by storing the data on a Replay Protected Memory Block~(RPMB) partition.
+% TODO: Well, yes, but that is also accomplished with RPMB
+Establishing the storage key also prevents an attacker from accessing an fTPM's data by downgrading the fTPM\@.
+For example, if an attacker wants to access data stored in a particular fTPM and can exploit a vulnerability of an earlier version of that fTPM, it is not possible to replace the fTPM with its old version, as neither the attacker nor the fTPM itself will be able to decrypt the previous data.
+
+However, it should be noted that this does not protect the fTPM data from a rollback attack, i.e., the freshness of the fTPM data is not guaranteed.
+This attack can be attractive for malicious actors to reset the try count of PINs to work around the lockout mechanism of the TPM\@.
+Another example is to restore the data wherein a secret was stored, however, not yet protected by a PIN\@.
+% A malicious actor requires the TPM to decrypt the data, as it is encrypted.
+The protection against rollback of fTPM data can be achieved by storing the data in a Replay Protected Memory Block~(RPMB) partition.
 For this reason, an RPMB partition is part of Microsoft's hardware requirements for a firmware TPM~\cite{Raj2015}.
+
+With RPMB, only the TEE can write to the memory (authenticated write).
+And the TEE can ensure that received data really originates from the RPMB (authenticated read).
+Each command is unique due to a nonce (for read operations) or a write counter (for write operations), which prevents replay attacks.
+However, the software stack in the TEE must be trusted, as each component in the TEE can read from or write to the RPMB partition arbitrarily.
+This is independent of the component's identities.
+In our approach with the storage key, the fTPM does not have to trust its preceding components, because as soon as one of them changes, the fTPM itself no longer has access to the data.
+In other words, we seal the data of the fTPM with the identity of the fTPM instead of allowing the entire TEE to access the data at any time\@.
+
+% Indeed, the fTPM itself can also be stored in a RPMB partition, which builds another rollback protection aside of our approach with the storage key.
+% However, this protects the data on different levels.
+% The encryption with our storage key introduces confidentiality and integrity of the fTPM's data sealed to the identity of the fTPM\@.
+% RPMB protects the data's confidentiality, integrity and freshness from access outside the TEE, assuming the RPMB is only accessible from the TEE, which is the typical design.
+% Hence, while the RPMB protects additionally freshness, we bind our security guarantees tighter to the exact identity of the fTPM instead of merely to the specific TEE\@.
 
 So, our mechanism additionally protects data-at-rest, while the data-at-use is protected by the TEE's secure memory, i.e., the memory isolation from the normal world.
 
