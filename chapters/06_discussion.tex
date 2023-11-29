@@ -128,7 +128,8 @@ However, storage has to present anyway, and a RPMB partition is supported  by st
 
 Our solution also involves the hardware requirements of DICE\@.
 The purpose of its hardware requirements is to protect the UDS\@.
-This is usually implemented in latches as part of the processor which block access to a specific memory area after a bit has been set~\cite{Lorych2022}, e.g., by the STM32G0 based on the Arm Cortex-M0+ or the STM32L4 based on the Arm Cortex-M4~\cite{Lorych2022}.
+According to Lorych and Jäger~\cite{Lorych2022}, this is usually implemented in latches which block access to a specific memory area after a bit has been set; such latches are commonly part of processors.
+They name the STM32G0 based on the Arm Cortex-M0+ or the STM32L4 based on the Arm Cortex-M4 as examples.
 For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.
 
 So, we are not cancelling out the advantage of less additional hardware components over a dedicated TPM, and instead we add restriction in the choice of processors and storage type.
