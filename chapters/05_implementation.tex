@@ -150,7 +150,7 @@ To do this, it first reads the EK template from the non-volatile~(NV) memory of 
 
 Consequently, it then sends the template that has just been retrieved back to the TPM as part of the command \texttt{TPM2\_CreatePrimary}.
 Since this command creates a primary key, no parent has be specified as the primary seed of the specified hierarchy is used instead.
-Of course, we specify the endorsement hierarchy (EH), which makes the TPM use the endorsement primary seed (EPS) derived from the CDI to generate the EK\@.
+Of course, we specify the endorsement hierarchy~(EH), which makes the TPM use the endorsement primary seed~(EPS) derived from the CDI to generate the EK\@.
 The TPM returns a handle to the EK just created, which is an integer, as well as the public part of the EK\@.
 The private part of the EK is not returned, as this never leaves the TPM in plain text.
 

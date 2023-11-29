@@ -107,24 +107,31 @@ With closed source software, you have to rely on the developer of the closed-sou
 % \section{Hardware requirements: DICE + fTPM vs.\ dTPM}
 \section{Hardware requirements}
 
-% TODO: Rework. Especially eMMC part, and abbreviations
-The major advantage of firmware TPMs over dTPMs besides the better performance is that they involve less additional hardware for the final system.
-They require a TEE, storage hardware supporting a Replay Protected Memory Block~(RPMB) partition, a secure world hardware fuse, and a secure entropy source~\cite{Raj2015}.
-A hardware fuse, a secure entropy source, and a TEE are commonly part of the processor.
-And storage has to present anyway.
-Thus, it does not involve extra hardware, but a constraint for the storage type.
-Support for a RPMB partition is for example provided by eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+A major advantage of firmware TPMs over dedicated TPMs besides the better performance is that they involve less hardware components for the final system.
+The question at hand is whether the hardware requirements of an fTPM with the addition of the hardware requirements of our solution undermine this advantage.
 
+At the introduction of firmware TPMs by Raj et al.\ from Microsoft~\cite{Raj2015}, they require a TEE, storage hardware supporting a Replay Protected Memory Block~(RPMB) partition, a secure world hardware fuse, and a secure entropy source for the integration of a secure firmware TPM\@.
+Thereof, a hardware fuse, a secure entropy source, and a TEE are commonly part of the processor without the need for additional hardware.
+Raj et al.\ require a RPMB partition to protect the fTPM's storage from access outside the TEE, and prevent rollback attacks.
+Rollback attacks of the fTPM's data or the fTPM itself are not prevented by our introduction of the storage key.
+So, we also recommend using a trusted OS implementing secure storage on a RPMB partition, which involves the additional hardware requirement of an RPMB which is not necessary for dedicated TPMs.
+However, storage has to present anyway, and a RPMB partition is supported  by storage technologies commonly used in embedded devices, e.g., eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+
+% With DICE hardware RoT we establish a binding of the fTPM's data to the fTPM's identity, without needing to trust all remaining components in the TEE\@.
+% This is also not accomplished with RPMB\@.
+% Instead, it protects against downgrade attacks of the fTPM's data and the fTPM itself from outside the TEE\@.
+
+% Thus, it does not involve extra hardware, but a constraint for the storage type.
+% Support for a RPMB partition is for example provided by eMMC~\cite{eMMC} and UFS~\cite{UFS}.
 
 % Not a secure real-time clock~(SRTC) containing the absolute physical time, but relatively to determine how much time passed.
-However, our solution with DICE involves new hardware requirements.
-The question at hand is whether the hardware requirements of DICE undermine the lower hardware requirements of an fTPM\@.
-The purpose of DICE's hardware requirements is to protect the UDS\@.
-This is usually implemented in latches as part of the processor which block access to a specific memory area after a bit has been set~\cite{Lorych2022}.
-E.g., STM32G0 based on the Arm Cortex-M0+ or STM32L4 based on the Arm Cortex-M4~\cite{Lorych2022}.
+
+Our solution also involves the hardware requirements of DICE\@.
+The purpose of its hardware requirements is to protect the UDS\@.
+This is usually implemented in latches as part of the processor which block access to a specific memory area after a bit has been set~\cite{Lorych2022}, e.g., by the STM32G0 based on the Arm Cortex-M0+ or the STM32L4 based on the Arm Cortex-M4~\cite{Lorych2022}.
 For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.
 
-So, we are not cancelling out the advantage of less additional hardware components over a dedicated TPM, and instead add a restriction in the choice of processors and storage type.
+So, we are not cancelling out the advantage of less additional hardware components over a dedicated TPM, and instead we add restriction in the choice of processors and storage type.
 
 % \section{Personal opinion about developed system}
 
