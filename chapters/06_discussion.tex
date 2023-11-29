@@ -143,6 +143,17 @@ So, we are not cancelling out the advantage of less additional hardware componen
 % https://dl.acm.org/doi/pdf/10.1145/2897937.2898083
 % Problems of the prover not being authenticated. This needs to be solved on top of our solution.
 
+\section{Proving the fTPM runs in the TEE}
+
+It is important for the verifier to know that the fTPM runs within the TEE and not the REE\@.
+Otherwise, the fTPM would not be isolated from the components within the REE, which usually offer a large attack surface because they communicate with the Internet, for example.
+The remote attestation process we propose enables this by passing the processor's name of the prover within the DeviceID certificate to the verifier.
+The verifier can then understand, e.g., from the hardware's manual, that the hardware starts in the TEE and can derive from the TCIs part of the certificate chain when the system switches to the REE\@.
+It can therefore understand that the fTPM is running in the TEE\@.
+
+For our proposed architecture with privacy in mind, this check has to be conducted by the privacy CA\@.
+That is due to that the verifier must not know details of the prover's hardware, since this might reveal its identity.
+
 \section{Caveats of a static RTM}
 
 The huge disadvantage of a static RTM is that it generally cannot provide guarantees for a system's state at the current time, but can only present the state the system inhibited at boot time~\cite{EURECOM+3536}.
