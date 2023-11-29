@@ -12,6 +12,10 @@ In addition, the impact of our solution on the performance of the system can the
 Although it makes sense to show our solution on Arm hardware first, we are, as mentioned, not limited to it.
 Therefore, a future work is to concretize the description of our implementation for TEE technologies other than Arm, e.g. Intel~TXT\@.
 
+The system we propose can also be transferred from the DICE architecture to other technologies that also perform firmware measurements.
+A new technological framework that generalizes DICE is Caliptra~\cite{caliptra}.
+It is based on the concept of DICE, but is not limited to it.
+
 As mentioned in \autoref{sec:arch_overview}, RPMB's rollback protection only protects against attacks from outside the TEE\@.
 We would like to establish a design that tightens the rollback protection from the trust of the entire TEE to the identity of the fTPM\@.
 This can probably be achieved by encrypting the metadata stored on the RPMB with the storage key derived from the identity of the fTPM, i.e., its CDI, before sending it to the RPMB\@.
