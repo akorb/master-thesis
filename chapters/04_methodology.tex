@@ -121,9 +121,6 @@ We waive this separation and use the EK directly for attestations to avoid the n
 The DICE and the TPM infrastructure intersect at the EK certificate.
 From the DICE's point of view it is an alias certificate, from the TPM's point of view it is the EK certificate.
 
-% TODO: Explain how to prevent rollback attacks. eMMC with replay-protected memory block (RPMB) as described by Microsoft fTPM paper, and is supported by OP-TEE OS
-% Maybe put in implementation that we do not implement this but use ordinary flash storage instead since FVP does not simulate eMMC.
-
 \section{The identity of a firmware TPM}
 
 DICE offers two identities for each component.
