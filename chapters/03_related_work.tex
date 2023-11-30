@@ -65,7 +65,7 @@ One approach is to verify the code of fTPMs~\cite{Mukhamedov2013}. Here, the TPM
 There exist efforts to improve the security of TPM by introducing the concept of hybrid TPMs~\cite{Kim2019, Gross2021}. Kim and Kim~\cite{Kim2019} extend a hardware TPM with software support, which they name hTPM\@. This increases the defense of the TPM, e.g., circumventing side-channel attacks, and also enables more secure TPM functions, e.g., enabling true random number generation. Their hTPM implementation also shows significantly better performance due to the use of modern CPU features.
 Vice versa, Gross et al.~\cite{Gross2021} propose the reverse approach of backing an fTPM with hardware. While their implementation has similar properties to hTPM, it inherits some downsides of fTPMs. For example, their fTPM is still started later in the boot chain than a dTPM, which is not the case for hTPM\@. However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
-% Attacks which we would avoid (e.g., exchange/spoof EKCert)
+% Attacks which we would avoid (e.g., exchange/spoof EKcert)
 
 
 % https://dl.acm.org/doi/pdf/10.1145/3600160.3600171
