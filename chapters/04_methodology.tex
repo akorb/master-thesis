@@ -375,7 +375,7 @@ Also, our EK is changed from a signing key to an encryption key, since signing w
 The privacy CA replaces the DICE manufacturer as the root of trust for the verifier.
 For this purpose, it first retrieves the original certificate chain and an AK from the prover.
 In a pure TPM system, the privacy CA must verify that the EKcert represents an authentic TPM by verifying the certificate chain and retrieving the manufacturer from the EKcert.
-In our system the only difference is that it is about the DICE manufacturer\@.
+In our system the only difference is that it is about the DICE manufacturer.
 The privacy CA must then ensure that the AK provided by the prover comes from the same TPM as the EK of the just retrieved EKcert.
 In short, this works by the privacy CA generating a challenge encrypted with EKpub, which can only be solved with AK\@.
 This process also allows the privacy CA to verify that the AK is restricted.

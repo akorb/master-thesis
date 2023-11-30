@@ -335,7 +335,7 @@ We did not want to deviate from the standard nonce, which is a buffer of 256\,by
 Therefore, we did not write a nonce to the NV index, and only the EK template with the default nonce, which conforms to the TPM specification~\cite{tcg-ek}.
 However, \texttt{tpm2\_createek} expected a template and a nonce to be present.
 We ended up writing an empty nonce in the according NV index of the firmware TPM with the sole aim of circumventing this problem.
-Then, it turned out that this tool has another bug that caused the address of the nonce  to be used instead of the actual nonce\@.
+Then, it turned out that this tool has another bug that caused the address of the nonce  to be used instead of the actual nonce.
 We have fixed this bug\footnote{\url{https://github.com/tpm2-software/tpm2-tools/pull/3280}}.
 
 

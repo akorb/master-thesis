@@ -1,11 +1,13 @@
 \chapter{\abstractname}
 
-TPMs are authenticated by getting to know their manufacturer, who guarantees the fulfillment of the TPM specification to ensure its security properties.
-While this approach is sufficient for hardware TPMs since they are independent chips, it assumes for firmware TPMs that the manufacturer of the firmware TPM is the same as the one of all firmware components booted before the firmware TPM\@.
-That is due to the fact that each preceding firmware component can compromise the firmware TPM while loading it.
-The verifier in the remote attestation process has no way of verify the entire boot chain up to the firmware TPM\@.
-We propose a remote attestation system which enables the verifier to do that.
-For that, we introduce a new hardware root of trust implementing DICE\@.
-The verifier only needs to trust the manufacturer of DICE, while everything beyond is explicitly attested by propagating their entity to the verifier.
-This allows the manufacturer of the firmware TPM and every preceding component to be independent.
-Our system also binds the fTPM's data to the fTPM's identity, such that its data is not accessible anymore when the fTPM or any preceding firmware component is modified, or potentially compromised.
+TPMs authenticate themselves by propagating their so-called endorsement certificate naming their manufacturer, who guarantees fulfillment of the TPM specification to ensure their security properties.
+While this approach is sufficient for hardware TPMs as they are standalone chips, for firmware TPMs it is assumed that the manufacturer of the firmware TPM is the same as that of all firmware components that were booted before the firmware TPM\@.
+This is due to the fact that any previous firmware component can compromise the firmware TPM during loading.
+The verifier in the remote attestation procedure has no way of verifying the entire boot chain up to the firmware TPM\@.
+We propose a remote attestation system that provides the verifier with this possibility.
+To this end, we utilize a new hardware root of trust that implements DICE\@.
+The verifier only needs to trust the manufacturer of DICE, while everything beyond that is explicitly certified by passing their identities to the verifier.
+In this way, the manufacturer of the firmware TPM and each preceding component can be independent.
+Our system also binds the data of the fTPM to the identity of the fTPM, so that the data can no longer be accessed if the fTPM or a preceding firmware component is changed or potentially compromised.
+To summarize, our system ensures that potentially malicious changes to a system are detected during the boot process and that the fTPM's data is only accessible as long as the identity of the fTPM does not change, making downgrade attacks and changes to the fTPM less attractive to attackers.
+Conversely, this ensures that the data is only accessible for precisely this fTPM and not for another fTPM\@.
