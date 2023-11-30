@@ -122,8 +122,6 @@ They also cannot break cryptographic primitives, e.g., encryption, signing, and 
 In this section, we want to formally describe the security goals of our solution so that we can later briefly discuss whether and how we have achieved the corresponding objectives.
 
 \begin{itemize}
-  % \item{\textbf{Establish trustworthiness to firmware TPM}}
-
   \item{\textbf{Compromised fTPM cannot fake its identity}\\
   A compromised fTPM must not be able to lie to the verifier about its identity.
   In more general terms, it is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}
@@ -137,40 +135,13 @@ In this section, we want to formally describe the security goals of our solution
   \item{\textbf{Isolation of fTPM storage}\\
   Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
   This includes the protection against other trusted applications running in the same TEE\@.
-  % TA UUID is public.
-  % But they cannot know its CDI, since the OP-TEE OS does not allow measuring of arbitrary applications, but TA's can only measure themselves.
-  % This prevents other TA's from generating the fTPM's CDI, and subsequently its storage key.
-  % The trusted OS, e.g., OP-TEE OS can potentially access the fTPM's memory and thereby extract the storage key, but the trusted OS is also measured as part of our certificate chain and therefore be declared as trustworthy, which implies it does not abuse its privileges.
   
   \item{\textbf{Protect fTPM data from downgrade attack of the fTPM}\\
   The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}
 
-  % \item{\textbf{Identification of the fTPM stack};\\
-  % The verifier should be informed of the exact versions of each component of the fTPM stack in a trustworthy manner, so that the verifier can independently decide whether to trust the fTPM.}\label{enum:tpm-id}
-  % %ID is part of certificate chain. And TPM can prove that the certificate chain represents it by proving being in control of EKpriv.
-
-  % \item{\textbf{Confidentiality and integrity of TPM storage};\\
-  % Data should not be accessible or modifiable outside of TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
-  % % Also not to other TA's, which can spoof UUID. But not possible, since CDI of fTPM unknown and can then not decrypt data.
-
-  % \item{\textbf{Data of TPM bound to compound identity of fTPM stack};\\
-  % The current storage of the fTPM should be only accessible to the identity of its entire stack which includes its underlying firmware components.
-  % Conversely, as soon as a component that could affect the fTPM is modified, the fTPM with then a new identity should not have access to the previous data anymore.
-  % This includes an update of any relevant component.}
-
   \item{\textbf{Privacy of remote attestation process}\\
   The verifier should be able to establish trust to an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}
 \end{itemize}
-
-% - In-scope
-%     - Modification of fTPM (at boot, not runtime) (Q: Only at boot-time because the OP-TEE is trusted and therefore, no (malicious) runtime modifications are expected, correct?)
-%     - Exchange of SD card
-% - Out-of-scope
-%     - HW attacks
-%     - Side-channel attacks
-%     - Control-flow attacks
-%     - DoS attacks
-
 
 \section{Environment}
 
@@ -180,4 +151,7 @@ In the roughly 35 years of its existence, it rose to become the largest research
 
 \section{Outline}
 
-% Übersicht über die Kapitel, was der Inhalt der Kapitel ist (Outline, mit bisschen mehr Text)
+In the Background, we provide knowledge that is necessary to understand the rest of the work.
+Afterwards, in Related Work, we discuss attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
+Under Methodology, we explain the concept of our solution and then present our proof-of-concept implementation.
+Finally, we discuss other points that we consider relevant, followed by Future work and Conclusion.
