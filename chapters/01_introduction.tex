@@ -104,19 +104,14 @@ The research questions we aim to answer are listed below.
 
 % https://trustedfirmware-a.readthedocs.io/en/latest/threat_model/threat_model.html
 
-% We only need to trust the isolation between the TEE and REE
-% And we also need to inherintly trust our root of trust (SRTM) starting the measurements of the subsequent firmware components
-% Just because authenticity including integrity is given for boot components, this doesn't mean they are free of software bugs. We do not assume that the firmware, e.g., Arm trusted firmware-a, is free of bugs. That is up to the verifier to decide.
-
-The main threat is trusting a remote firmware TPM which is in fact not trustworthy.
-For that, an attacker could inject a malicious update of a relevant firmware component at the developer's website, which is then possibly blindly installed by device vendors.
-Or the attacker could exchange the SD card storing the firmware including the fTPM which has stored old versions with easily exploitable vulnerabilities.
-% The main threat is the modification of the binary of the fTPM before or during boot.
-% For example, by exchanging the SD card storing the binary.
-However, we assume that the fTPM cannot be modified by malicious parties after the boot process regardless of whether the fTPM is benign or compromised because we trust the TEE environment.
-Out-of-scope are hardware attacks, side-channel attacks, control-flow attacks, and Denial of Service attacks.
-
 % Attacker model: What an attacker can do (abilities) and cannot do (limits)
+
+The attacker we are interested in is able to replace the fTPM or one of its predecessor components.
+Therefore, there is a risk that a remote party trusts a firmware TPM that is in fact not trustworthy.
+To this end, an attacker could install a malicious update of a relevant firmware component on the target device.
+However, we assume that the attacker is only able to do this before or during the boot process of the device, but not afterwards.
+Hardware attacks, side-channel attacks, control-flow attacks and denial-of-service attacks are out-of-scope.
+
 For the network, we assume the Dolev-Yao attacker model~\cite{Dolev1983}.
 That is, we consider an attacker who has the ability to perform any active or passive attacks on the network.
 The attacker may also have control over parts or the entire network, e.g., all routers, switches, and connections.
