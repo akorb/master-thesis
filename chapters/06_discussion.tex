@@ -194,8 +194,10 @@ It can therefore understand that the fTPM is running in the TEE\@.
 For our proposed architecture with privacy in mind, this check has to be conducted by the privacy CA\@.
 That is due to that the verifier must not know details of the prover's hardware, since this might reveal its identity.
 
-\section{Caveats of a static RTM}
+\section{Caveats of attesting the fTPM's identity}
 
-The huge disadvantage of a static RTM is that it generally cannot provide guarantees for a system's state at the current time, but can only present the state the system inhibited at boot time~\cite{EURECOM+3536}.
-However, attacks can appear during the system's runtime, which is then undetected.
-Since our solution integrates DICE which does not provide capabilities of a dynamic RTM, we are restricted to a static RTM\@.
+The identity of a software component does not contain its current state.
+While the identity of a software can be derived from its binary file assuming it is statically linked, its state is derived from a snapshot of its memory during runtime.
+
+We attest the identity of the fTPM and not its state.
+This means that we do not detect attacks that occur after the startup process, i.e., during its runtime.
