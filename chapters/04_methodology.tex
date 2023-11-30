@@ -361,7 +361,7 @@ The closing EK certificate of the chain contains the key representing the identi
 The quote's signature is also relevant to the prover's privacy, as the signature is generated with a unique EKpriv.
 Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity, e.g., with an ephemeral key.
 
-Both is solved by introducing a new key --- the attestation key~(AK) --- which is used for signing the quote.
+Both is solved by introducing a new key---the attestation key~(AK)---which is used for signing the quote.
 It is created by the prover's TPM, and is an ephemeral key.
 Hence, the prover can generate any number of attestation keys at any time, e.g., for each remote attestation process.
 This prevents the correlation of signatures, i.e., the proof that multiple signatures originate from the same TPM\@.

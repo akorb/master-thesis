@@ -37,7 +37,7 @@ That is also the reason why machines that are unaware of the separation between 
 This also ensures that TrustZone unaware systems have all expected privileges, which would be restricted in the normal world.
 The Application Processor~(AP) Trusted ROM sets up the platform-specific exception vectors.
 The Trusted Boot Firmware enables the MMU, performs the platform security setup, and other tasks.
-The final component of TF-A --- EL3 Runtime Software --- replaces the simple and rudimentary initialization performed by the AP Trusted ROM with more complete configurations by detecting the system topology, and enabling normal world software to function correctly.
+The final component of TF-A---EL3 Runtime Software---replaces the simple and rudimentary initialization performed by the AP Trusted ROM with more complete configurations by detecting the system topology, and enabling normal world software to function correctly.
 The EL3 Runtime Software also provides the monitor which conducts the context switches between the secure world and the normal world.
 More complete and detailed information can be found in the TF-A documentation.\footnote{\url{https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html}}
 

@@ -34,7 +34,7 @@ The previously mentioned side-channel attack~\cite{Moghimi2019} against dTPMs, c
 
 Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP). Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms. To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data. They achieve this by using a voltage fault injection that bypasses the authenticity check in the host's boot process and allows them to boot their own firmware component that leaks the required information.
 
-Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}. They store a maliciously crafted payload --- a certificate --- on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
+Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}. They store a maliciously crafted payload---a certificate---on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
 
 \section{Hardening of TPMs}
 
