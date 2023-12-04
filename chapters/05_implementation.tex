@@ -152,7 +152,7 @@ Consequently, it then sends the template that has just been retrieved back to th
 Since this command creates a primary key, no parent has be specified as the primary seed of the specified hierarchy is used instead.
 Of course, we specify the endorsement hierarchy~(EH), which makes the TPM use the endorsement primary seed~(EPS) derived from the CDI to generate the EK\@.
 The TPM returns a handle to the EK just created, which is an integer, as well as the public part of the EK\@.
-The private part of the EK is not returned, as this never leaves the TPM in plain text.
+The private part of the EK is not returned, as this never leaves the TPM in plaintext.
 
 Eventually, the prover wants to create a quote to establish trust to the prover's system state in the normal world, and to prove that it is in control of the EKpriv.
 So, it issues the command \texttt{tpm2\_quote} to the TPM, specifying the PCR registers requested by the verifier, the verifier supplied nonce, and the handle to the EK just generated.
@@ -171,8 +171,8 @@ We also use \texttt{tpm2\_checkquote} in the verifier's implementation to check 
 Note that the implementation just described assumes that the quote returned by \texttt{TPM2\_Quote} contains the values of the PCR registers.
 While this was the case with TPM~1.2, this changed with version~2.0.
 Instead, the resulting quote only contains a hash of the values of the requested PCR registers.
-The corresponding plain text PCR values are transmitted unprotected to the verifier.
-After validating the quote, the verifier can check whether the hash of the plain text PCR values computed by itself matches the PCR hash from the quote.
+The corresponding plaintext PCR values are transmitted unprotected to the verifier.
+After validating the quote, the verifier can check whether the hash of the plaintext PCR values computed by itself matches the PCR hash from the quote.
 If this is the case, it can trust them.
 This is also done by the tool \texttt{tpm2\_checkquote}.
 We have omitted it from the previous explanation and \autoref{fig:ftpm_attestation} in order to focus on the important aspects.

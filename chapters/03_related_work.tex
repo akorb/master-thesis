@@ -20,7 +20,7 @@ Seunghun Han et al.~\cite{aBadDream} report two attacks on discrete TPMs to rese
 
 A time-based side-channel attack~\cite{Moghimi2019} during signature generation based on elliptic curves allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
 
-A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plain text. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
+A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plaintext. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
 
 That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}. However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
 
@@ -49,6 +49,10 @@ Pecholt and Wessel~\cite{Pecholt2022} describe a design named CoCoTPM where the 
 Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
 However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
+
+\subsection{Firmware TPMs}
+
+% Also, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
 
 \section{Attestation schemes of TPMs}
 

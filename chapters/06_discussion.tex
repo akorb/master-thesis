@@ -19,8 +19,8 @@ Here, we return to the security goals defined in the introduction and describe h
 
     \item{\textbf{Small root of trust}\\
     We base the trust in our system on the design and guarantees of the DICE architecture.
-    The root of trust of the DICE architecture consists of the UDS and its protection mechanisms.
-    The UDS may only be read once per operating time of the implementing device and only by DICE\@.
+    The root of trust of the DICE architecture consists of the \ac{UDS} and its protection mechanisms.
+    The \ac{UDS} may only be read once per operating time of the implementing device and only by DICE\@.
     As the actual secret is a single integer value that represents a statistically unique value, we consider the root of trust to be small.}
 
     \item{\textbf{Isolation of fTPM storage}\\
@@ -69,7 +69,7 @@ Both are well-known concepts easily understandable for a verifier.
 It must be possible to assign the attestation data to a specific device, i.e., it must be verifiable that the attestation data originates from the prover.
 This is solved by the higher level protocol as well, since such protocols usually involve signing of attestation data, usually a quote.
 The quote must be signed with the private EK corresponding to the public key in the EKcert, i.e., the leaf of the certificate chain.
-And this private EK can only be created by a device that has the TCIs represented by the previously obtained certificate chain and the according UDS, which is secret and unique for the respective prover.
+And this private EK can only be created by a device that has the TCIs represented by the previously obtained certificate chain and the according \ac{UDS}, which is secret and unique for the respective prover.
 
 
 % \section{Compatibility of higher level protocols}
@@ -167,7 +167,7 @@ However, storage has to present anyway, and a RPMB partition is supported  by st
 % Not a secure real-time clock~(SRTC) containing the absolute physical time, but relatively to determine how much time passed.
 
 Our solution also involves the hardware requirements of DICE\@.
-The purpose of its hardware requirements is to protect the UDS\@.
+The purpose of its hardware requirements is to protect the \ac{UDS}\@.
 According to Lorych and Jäger~\cite{Lorych2022}, this is usually implemented in latches which block access to a specific memory area after a bit has been set; such latches are commonly part of processors.
 They name the STM32G0 based on the Arm Cortex-M0+ or the STM32L4 based on the Arm Cortex-M4 as examples.
 For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.

@@ -35,14 +35,14 @@ This is in contrast to a dynamic RTM~(D-RTM), which is able to do this at any ti
 The boot process continues from here in the usual DICE manner until the firmware TPM is reached.
 The component that measures the fTPM is usually the trusted operating system running in EL1 in the secure world, as seen in \autoref{fig:arm_trustzone_arch}.
 Like any other DICE component, the fTPM receives its secret Compound Device Identifier (CDI) from its predecessor layer.
-Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the UDS\@.
+Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the \ac{UDS}\@.
 Two values are derived from the CDI\@.
 
 % Storage Key generation
 
 First, the storage key is generated.
 This is a symmetric encryption key that is used to encrypt the fTPM storage space in RAM before it is written to a persistent storage space such as a hard disk drive~(HDD).
-At no time does the HDD see plain text data (\autoref{fig:storage-encryption}).
+At no time does the HDD see plaintext data (\autoref{fig:storage-encryption}).
 Since the storage key is derived from the CDI, the old storage data is inaccessible if the identity of the TPM changes, e.g., due to a TPM modification or an update of a previous firmware component, which results in a full manufacturer reset of the fTPM\@.
 This enables the property that an fTPM storage must never be accessible to another TPM\@.
 Note that an attacker could thereby easily trigger a data loss.
@@ -125,10 +125,10 @@ From the DICE's point of view it is an alias certificate, from the TPM's point o
 
 DICE offers two identities for each component.
 The TCI and the CDI\@.
-As shown in \autoref{eq:dice_cdi}, the CDI of a component changes when (i) the identity of the hardware changes, i.e., the UDS, (ii) the identity of a preceding component changes, or (iii) the component itself changes.
+As shown in \autoref{eq:dice_cdi}, the CDI of a component changes when (i) the identity of the hardware changes, i.e., the \ac{UDS}, (ii) the identity of a preceding component changes, or (iii) the component itself changes.
 In contrast, the TCI is the identity of a single component, considered in isolation, usually the hash of its binary.
 It only changes when the component itself is changed, regardless of the hardware or preceding components.
-So, while a CDI should be statistically unique since it is derived from a UDS with this property, a given TCI can be found on many devices if they contain exactly the same software component.
+So, while a CDI should be statistically unique since it is derived from a \ac{UDS} with this property, a given TCI can be found on many devices if they contain exactly the same software component.
 Note that the TCI is part of the CDI, as shown in \autoref{fig:identities}.
 
 \input{elements/figure_identities.tex}
@@ -195,7 +195,7 @@ EKcert = certificate with EKpub as subject
 % Implicit attestation would require to know all resulting public keys in EKcert, which would require that we booted it up in a controlled manner beforehand and stored the resulting code.
 We use an explicit attestation procedure.
 This makes it sufficient for the verifier to know its trusted TCIs, whereas implicit attestation would require a database of trusted Alias public keys representing a trusted component.
-And since each Alias public key is device unique, as it roots in the device's unique UDS, the verifier would need to know all Alias public keys for each component on every device he trusts, which we consider unrealistic.
+And since each Alias public key is device unique, as it roots in the device's unique \ac{UDS}, the verifier would need to know all Alias public keys for each component on every device he trusts, which we consider unrealistic.
 Also, this would be a hindrance as the verifier should be able to establish trust into an unknown device by trusting the DICE manufacturer, and knowing the identities of trustworthy firmware.
 
 % Secure channel must be established by requiring communication with the private key corresponding to the public key in the EKcert.
@@ -335,7 +335,7 @@ The old data can therefore no longer be accessed, which effectively leads to a m
 
 This mechanism is common practice as this is also described in the manuals for TPM upgrades by Lenovo~\cite{LenovoTpmUpgrade} and Intel~\cite{intelTpmUpgrade}. 
 It is underpinned by the importance of pausing BitLocker before upgrading a TPM due to its upcoming data loss~\cite{BitlockerTpmUpgrade}.
-Thereby, the encryption key is temporarily stored in plain text on the hard drive, which is consequently restored on the TPM after its update.
+Thereby, the encryption key is temporarily stored in plaintext on the hard drive, which is consequently restored on the TPM after its update.
 
 
 % This introduces storage and memory overhead.
@@ -392,7 +392,7 @@ For that, he must trust the issuer of the AK certificate that he has verified th
 
 Ultimately, this adapted privacy architecture changes the statement a verifier can make from ``I am communicating with this authentic TPM in control of this EK'', to ``I am communicating with some authentic TPM in control of this AK.''
 In other words, the verifier does not know exactly which TPM they are communicating with.
-It is guaranteed by the fact that the prover does not transmit any data derived from its UDS to the verifier.
+It is guaranteed by the fact that the prover does not transmit any data derived from its \ac{UDS} to the verifier.
 This protects the privacy of the prover.
 
 Nevertheless, privacy is not fully ensured because of the TCI values revealed to the verifier.
@@ -403,7 +403,7 @@ However, this makes the verifier dependent on another entity that decides whethe
 
 We also want to highlight that the AK does not need to be a child of the EK, it does not even have to be part of the endorsement hierarchy.
 In fact, it should not be part of the endorsement or platform hierarchy, since the TPM behaves differently when signing a quote depending on the hierarchy of the signing key~\cite{tpm}.
-If the signing key is part of the endorsement or platform hierarchy, the TPM assumes that privacy is irrelevant and embeds the TPM's firmware version, reset count, and restart count in plain text in its generated quote.
+If the signing key is part of the endorsement or platform hierarchy, the TPM assumes that privacy is irrelevant and embeds the TPM's firmware version, reset count, and restart count in plaintext in its generated quote.
 This tuple might identify the TPM\@.
 If the key is part of another hierarchy, this data is obfuscated by adding random offsets to each value, which is desirable if privacy is a concern.
 

@@ -56,7 +56,7 @@ This is possible since in the most general sense, one can derive from an endorse
 \input{elements/figure_current_state.tex}
 
 This process is illustrated in figure \autoref{fig:current_state}.
-The prover's area shows its boot chain, the verifier's area shows how it evaluates the trustworthiness against the prover's boot chain.
+The prover's box shows its boot chain, the verifier's box shows how it evaluates the trustworthiness against the prover's boot chain.
 The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component.
 Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM\@.
 To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
@@ -69,7 +69,7 @@ This approach is limited, as with this mechanism, independent verifiers have to 
 
 \section{Goal}
 
-We establish independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a zero trust environment with little hardware requirements and no compromising on security.
+We establish an independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a zero trust environment with little hardware requirements and no compromising on security.
 The goal of this approach is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on their manufacturer.
 Instead, it is sufficient to trust the independent manufacturer of the hardware root of trust, which in contrast requires no assumptions.
 
@@ -108,14 +108,14 @@ The research questions we aim to answer are listed below.
 
 The attacker we are interested in is able to replace the fTPM or one of its predecessor components.
 Therefore, there is a risk that a remote party trusts a firmware TPM that is in fact not trustworthy.
-To this end, an attacker could install a malicious update of a relevant firmware component on the target device.
+For example, an attacker could install a malicious update of a relevant firmware component on the target device.
 However, we assume that the attacker is only able to do this before or during the boot process of the device, but not afterwards.
-Hardware attacks, side-channel attacks, control-flow attacks and denial-of-service attacks are out-of-scope.
+Hardware attacks, side-channel attacks, control-flow attacks, and denial-of-service attacks are out-of-scope.
 
 For the network, we assume the Dolev-Yao attacker model~\cite{Dolev1983}.
 That is, we consider an attacker who has the ability to perform any active or passive attacks on the network.
 The attacker may also have control over parts or the entire network, e.g., all routers, switches, and connections.
-They also cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
+Last, they cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
 
 \section{Security goals}
 
@@ -124,13 +124,13 @@ In this section, we want to formally describe the security goals of our solution
 \begin{itemize}
   \item{\textbf{Compromised fTPM cannot fake its identity}\\
   A compromised fTPM must not be able to lie to the verifier about its identity.
-  In more general terms, it is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}
+  It is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}
   % Does not have access to OP-TEE's private key, code in user mode does not have access to data in kernel mode
 
   \item{\textbf{Small root of trust}\\
   A root of trust of small size, e.g., in the means of code size, hardware size, and complexity, yields a small attack surface~\cite{Singaravelu2006}.
   This is due to the fact that a small component yields less potential implementation errors, and its approaches to guarantee specific security properties are more manageable.}
-  % DICE, its design, not concrete HW, its protection of the UDS
+  % DICE, its design, not concrete HW, its protection of the \ac{UDS}
   
   \item{\textbf{Isolation of fTPM storage}\\
   Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm}.}
@@ -151,7 +151,7 @@ In the roughly 35 years of its existence, it rose to become the largest research
 
 \section{Outline}
 
-In the Background, we provide knowledge that is necessary to understand the rest of the work.
-Afterwards, in Related Work, we discuss attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
-Under Methodology, we explain the concept of our solution and then present our proof-of-concept implementation.
-Finally, we discuss other points that we consider relevant, followed by Future work and Conclusion.
+In the background, we provide knowledge that is necessary to understand the rest of the work.
+Afterwards, we discuss related work, i.e., attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
+Under methodology, we explain the concept of our solution and subsequently present our proof-of-concept implementation.
+Finally, we discuss our design and implementation, rounded off by future work and the conclusion.
