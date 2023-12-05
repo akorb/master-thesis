@@ -16,7 +16,7 @@ One of the core security concepts of operating systems are the privilege levels 
 
 The \acf{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
 The \ac{REE} runs commodity software, e.g., a Linux-based operating system with user applications.
-The TEE is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
+The \ac{TEE} is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
 Since a \ac{TEE} is integrated into the processor, there is no separate chip required.
 % The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
 Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS\@. The kernel space is running a trusted OS, and the user space is running the trusted applications~(TAs). 
@@ -31,7 +31,7 @@ Previous, mostly software-based technologies ensure confidentiality and integrit
 % Figure explanation
 
 \autoref{fig:tee_motivation} illustrates the motivation of a \ac{TEE}\@.
-In the traditional architecture, i.e., without a TEE, if an attacker compromises the \ac{REE} the full system is affected.
+In the traditional architecture, i.e., without a \ac{TEE}, if an attacker compromises the \ac{REE} the full system is affected.
 With a \ac{TEE}, the attacker is limited to the \ac{REE}, while the \ac{TEE} continues to protect the secure assets, such as encryption keys.
 This results from the observation that the attack surface of a rich OS is much larger than that of a trusted OS, e.g., due to its network connectivity and the high dynamics of software installations, while the attack surface of a trusted OS is rather small and has tightly controlled interfaces.
 
@@ -95,9 +95,9 @@ This challenge contains a nonce, enforcing a fresh response.
 The response must be an evidence of the challenged system that it is trustworthy.
 % To build that, an attesting environment on the prover device generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, and (ii) its data has not been maliciously modified at runtime.
 
-The attesting environment acts a root of trust for measurements (RTM).
+The attesting environment acts a \ac{RTM}.
 It is required on the prover because at least one trusted component is necessary to conduct trusted measurement of the prover.
-Typically, the RTM runs within the TEE, as this isolates it from the target environment to be attested.
+Typically, the \ac{RTM} runs within the \ac{TEE}, as this isolates it from the target environment to be attested.
 
 Remote attestation commonly consists of two steps~\cite{McCune2008}.
 (i) The attestation, and (ii) the accompanying establishment of a secure channel.
@@ -244,7 +244,7 @@ Last, fTPMs depend on more components for its security than single-component \ac
 
 % Advantages
 
-However, since they require only a TEE which is mostly already available at currently used processors, they are cheaper for manufacturers as they require less extra hardware.
+However, since they require only a \ac{TEE} which is mostly already available at currently used processors, they are cheaper for manufacturers as they require less extra hardware.
 In addition, TPM processors are weak~\cite{Goh2013, Raj2015}.
 Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that firmware TPMs executed on main processors are generally much faster than \acp{dTPM}.
 \acp{fTPM} are also a viable option for adding \ac{TPM} functionality to older devices through software updates rather than hardware replacements, which is particularly valuable in times like the recent chip supply shortage~\cite{Voas2021, casper2021}.

@@ -7,16 +7,16 @@
 
 Before we dive into technical explanations, we want to clear some potential terminology confusion.
 
-In the original DICE release from Microsoft~\cite{England2016}, the identifier of a component is called the Firmware ID (FWID).
-The TCG consortium later renamed it TCB Component Identifier (TCI).
+In the original DICE release from Microsoft~\cite{England2016}, the identifier of a component is called the \ac{FWID}.
+The \ac{TCG} consortium later renamed it \ac{TCI}.
 We believe this is to emphasize that the TCI does not necessarily have to be the hash of a firmware binary, but could also be, for example, the embedded ID of a hardware component.
-However, TCG has not fully implemented this terminology renaming.
-Their DICE Attestation Architecture~\cite{TCGAttestation2021} defines an X.509 extension that contains the TCIs.
-They continue to be referred to as FWIDs in the formal definition of this extension, while everywhere else they are referred to as TCIs.
-In personal correspondence with TCG, we have learned that this is due to backwards compatibility.
-The old term FWID is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term TCI in assets that can be updated more quickly, such as the specification text.
-Therefore, we will use the term TCI in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term FWID, just as it is common practice at the TCG\@.
-This ensures that the explanation of our implementation better matches the actual code, where FWID is the term as it is used by automatically generated code.
+However, \ac{TCG} has not fully adopted this terminology renaming.
+Their DICE Attestation Architecture~\cite{TCGAttestation2021} defines an X.509 extension that contains the \acp{TCI}.
+They continue to be referred to as \acp{FWID} in the machine-readable formal definition of this extension, while everywhere else they are referred to as \acp{TCI}.
+In personal correspondence with \ac{TCG}, we have learned that this is due to backwards compatibility.
+The old term \ac{FWID} is retained whenever it is used in something that is alive in the long term, like formal definitions, and the new term \ac{TCI} in assets that can be updated more quickly, such as the specification text.
+Therefore, we will use the term \ac{TCI} in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term \ac{FWID}, just as it is common practice at the \ac{TCG}\@.
+This ensures that the explanation of our implementation better matches the actual code, where \ac{FWID} is the term as it is used by automatically generated code.
 
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
@@ -26,17 +26,17 @@ This ensures that the explanation of our implementation better matches the actua
 \input{elements/figure_architecture.tex}
 
 The architecture of our proposed and later implemented system is illustrated in \autoref{fig:architecture}.
-As you might notice, it is similar to our overview picture of DICE (\autoref{fig:dice-layers}).
-This is to be expected, since our system uses DICE\@.
-We leverage the DICE as our static root of trust for measurements (S-RTM).
+As you might notice, it is similar to our overview picture of \ac{DICE} (\autoref{fig:dice-layers}).
+This is to be expected, since our system uses \ac{DICE}\@.
+We leverage the \ac{DICE} as our \ac{SRTM}.
 Static in this context means that it uses the trusted state that a device has at the always same point in time, here after switching on, for further measurements.
-This is in contrast to a dynamic RTM~(D-RTM), which is able to do this at any time, e.g., Intel SGX\@.
+This is in contrast to a \ac{DRTM}, which is able to do this at any time, e.g., Intel SGX\@.
 
-The boot process continues from here in the usual DICE manner until the firmware TPM is reached.
+The boot process continues from here in the usual \ac{DICE} manner until the firmware TPM is reached.
 The component that measures the fTPM is usually the trusted operating system running in EL1 in the secure world, as seen in \autoref{fig:arm_trustzone_arch}.
-Like any other DICE component, the fTPM receives its secret Compound Device Identifier (CDI) from its predecessor layer.
-Recall that the CDI is tied to the identity of the fTPM including the entire underlying firmware stack and the \ac{UDS}\@.
-Two values are derived from the CDI\@.
+Like any other \ac{DICE} component, the fTPM receives its secret \ac{CDI} from its predecessor layer.
+Recall that the \ac{CDI} is tied to the identity of the fTPM including the entire underlying firmware stack and the \ac{UDS}\@.
+Two values are derived from the \ac{CDI}\@.
 
 % Storage Key generation
 
