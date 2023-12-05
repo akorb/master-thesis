@@ -304,6 +304,10 @@ Each component is measured prior becoming active by the preceding component.
 Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent to prevent time-of-check to time-of-use attacks (TOCTTOU)~\cite{Hristozov2022, Carpent2018}.
 The union of all security-relevant components of a device form its \ac{TCB}.
 Their individual identities are called \ac{TCI}, which are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
+The TCI must also represent security-relevant configurations of a component.
+Compilation flag configurations are already inherently part of the TCI, as they affect the final binary and are therefore automatically measured as part of the measuring it.
+There are also configurations that are not part of the binary, which are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+They must be measured in conjunction with the corresponding binary file or represented by two separate \acp{TCI}.
 
 % Hardware requirements
 

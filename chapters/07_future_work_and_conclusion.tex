@@ -8,6 +8,7 @@
 The logical consequence is the implementation of our solution on real hardware instead of in a simulation environment such as FVP\@.
 This allows the interaction with the hardware to be verified, especially with an RPMB partition that requires hardware support.
 In addition, the impact of our solution on the performance of the system can then be measured in practice.
+This is especially interesting since we integrate another storage encryption.
 
 Although it makes sense to show our solution on Arm hardware first, we are, as mentioned, not limited to it.
 Therefore, a future work is to concretize the description of our implementation for TEE technologies other than Arm, e.g. Intel~SGX\@.
@@ -25,7 +26,6 @@ Furthermore, our solution does not protect against runtime attacks on the fTPM\@
 In general, trusted applications in a TEE are not resistant to security problems caused by programming errors, e.g., buffer overflow attacks.
 Therefore, remote attestation of the control flow integrity of the fTPM may be a desired function.
 Displaying the current state of the fTPM instead of its identity at boot time would be a useful extension to our solution.
-
 
 \section{Conclusion}
 
