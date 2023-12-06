@@ -44,3 +44,7 @@ We believe that our system is an important step towards the independence of the 
 Our system also creates a hardware root of trust for the firmware TPM which, as the name suggests, cannot be provided by the fTPM as it is a software component.
 In contrast, dedicated TPMs are capable of acting as a hardware root of trust.
 Our system closes this gap.
+
+% TODO: Write about removing 'TA_FTPM_ATTEST' and instead store the certificate chain in the NV indices provided by EK profile.
+% We didn't do it because it does not benefit the demonstration of our system, but requires much engineering effort. For example, tpm2_getekcertificate does not support that.
+% But it would greatly simplify our solution. But it also takes NV index storage space, which is now not taken. But the fTPM still takes more space.

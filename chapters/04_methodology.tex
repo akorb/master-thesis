@@ -18,6 +18,10 @@ The old term \ac{FWID} is retained whenever it is used in something that is aliv
 Therefore, we will use the term \ac{TCI} in this theoretical chapter, and in the implementation chapter (\autoref{chapter:implementation}) we will use the term \ac{FWID}, just as it is common practice at the \ac{TCG}\@.
 This ensures that the explanation of our implementation better matches the actual code, where \ac{FWID} is the term as it is used by automatically generated code.
 
+Occasionally, the name of an asymmetric key is suffixed with `priv', `pub' or `cert' to designate the private part, the public part, or the certificate, respectively.
+For example, EKpriv refers to the private portion of EK\@.
+And EKcert corresponds to the certificate with EKpub as its subject key.
+
 % Prover/Verifier (in many earlier papers) vs. Attester/Verifier/Relying Party (RFC)
 
 
@@ -176,11 +180,6 @@ We also do not want to restrict the permissible values of the working data of an
 % To summarize, attestation key provisioning must ensure that only valid attestation key material is established in Attesters [RFC 9334]
 
 \section{Attestation process}\label{sec:attestation_process}
-
-% Todo: Move to terminology section or explain on first usage
-EKpriv = private portion of EK
-EKpub = public portion of EK
-EKcert = certificate with EKpub as subject
 
 % Check also for revocation of manufacturer cert
 
