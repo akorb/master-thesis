@@ -65,7 +65,7 @@ However, since our concept is not tied to Arm processors and can also be applied
 % According to the Cambridge Dictionary an attestation is ``a formal statement that you make and officially say is true''.
 
 According to NIST SP 1800--19B~\cite{Bartock2022} an attestation is ``the process of providing a digital signature for a set of measurements securely stored in hardware, and then having the requester validate the signature and the set of measurements.''
-Specifically in our context, remote attestation is a mechanism for a prover to prove its software's identity to a remote party, i.e., the verifier.
+% Specifically in our context, remote attestation is a mechanism for a prover 
 % In the following, the two types are discussed.
 
 
@@ -85,19 +85,24 @@ Specifically in our context, remote attestation is a mechanism for a prover to p
 
 \input{elements/figure_remote_attestation.tex}
 
-In a remote attestation procedure, the measurement, usually called evidence, leaves the measuring machine, and is transmitted to a remote verifier.
-This involves cryptographic primitives to establish trust into this evidence which is generally transmitted through an untrusted network.
-
-Remote attestation is a challenge-response protocol.
+% It provides the ability for a prover to prove its software's identity to a remote party, i.e., the verifier.
+Remote attestation is a challenge-response protocol initiated by a remote party (called verifier) to verify that a target environment, i.e., the attested system, on the end-device (called prover) has not been tampered with~\cite{Menetrey2022, Coker2011}.
 \autoref{fig:ra} depicts a simplified overview of its data flow.
-The process is initiated by a remote trusted party (called ``verifier'') to verify that a target environment on the end-device (called ``prover'') has not been tampered with~\cite{Menetrey2022, Coker2011}.
-This challenge contains a nonce, enforcing a fresh response.
-The response must be an evidence of the challenged system that it is trustworthy.
+
+In a typical remote attestation procedure, the attester measures the attested system during its boot process.
+A verifier initiates the remote attestation protocol by sending a challenge with a nonce to the prover.
+The prover then signs the measurement data combined with the nonce, with the final data structure usually referred to as the evidence.
+The nonce forces a fresh response and thus prevents replay attacks on the evidence.
+The evidence is then transmitted to the remote verifier, where it is evaluated.
+
+% The response must be an evidence of the challenged system that it is trustworthy.
 % To build that, an attesting environment on the prover device generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, and (ii) its data has not been maliciously modified at runtime.
 
-The attesting environment acts a \ac{RTM}.
-It is required on the prover because at least one trusted component is necessary to conduct trusted measurement of the prover.
-Typically, the \ac{RTM} runs within the \ac{TEE}, as this isolates it from the target environment to be attested.
+The attester acts here as the \ac{RTM} for the verifier.
+Most importantly, it must be isolated from the attested system such that it cannot be compromised from the attested system.
+The verifier must be able to build trust to the attester through another channel, e.g., by getting to know the attester's manufacturer and the security properties that they guarantee for their attester.
+It is required on the prover because the verifier requires a trusted component on the prover's system whose statements it can trust.
+% Typically, the \ac{RTM} runs within the \ac{TEE}, as this isolates it from the target environment to be attested.
 
 Remote attestation commonly consists of two steps~\cite{McCune2008}.
 (i) The attestation, and (ii) the accompanying establishment of a secure channel.
@@ -203,8 +208,8 @@ TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over
 
 \input{elements/figure_pcr_types}
 
-There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}. They all offer the same functionality, but with different security guarantees and performance characteristics.
-
+There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}.
+They all offer the same functionality, but with different security guarantees and performance characteristics.
 
 
 \subsection{Discrete TPM}
