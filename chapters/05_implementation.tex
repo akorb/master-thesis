@@ -267,10 +267,10 @@ Hence, the OP-TEE specific code of the reference fTPM splits the memory size of 
 We consult the recommendations of the BSI~\cite{bsi-key-recommendations} to determine the encryption method.
 Therefore, we use AES-128 in GCM mode to protect the data's confidentiality and integrity with an initialization vector~(IV) and tags of length 96 bits.
 These are the recommended minimum sizes that we have chosen in order to spare resources.
-There is one IV and tag for each block, and a key of 128 bits which results in a storage overhead of 808 bytes as shown in \autoref{eq:memory_overhead}.
+There is one IV and tag for each block which results in a storage overhead of 792 bytes as shown in \autoref{eq:memory_overhead}.
 \begin{equation}
   \label{eq:memory_overhead}
-  \frac{33 \times (96 + 96)\ \text{bits} + 128\ \text{bits}}{8} = 808\ \text{bytes}
+  \frac{33 \times (96 + 96)\ \text{bits}}{8} = 792\ \text{bytes}
 \end{equation}
 
 The IVs are randomized on every write event.
