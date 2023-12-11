@@ -7,22 +7,39 @@
 
 \subsection{Dedicated TPM}
 
-The well-known `TPM Reset Attack' was independently described in~\cite{kauerBernhard,sparks2007}. It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground. This results in a reset signal for the TPM, yielding predictable values for the \ac{PCR} registers. This allows an attacker to replay the measurement log of a benign boot process to achieve valid \ac{PCR} values, even though a modified chain has been booted.
-Since TPM 1.2, TCG provides a mitigation specification for this reset attack~\cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
+The well-known `TPM Reset Attack' was independently described in~\cite{kauerBernhard,sparks2007}.
+It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground.
+The TPM understands this as a reset signal, yielding predictable values for the \ac{PCR} registers.
+This allows an attacker perform a boot process with malicious components, later resetting the \ac{PCR} values to a known value with the reset attack, and then replay the measurements of a benign boot process.
+Since TPM~1.2, TCG provides a mitigation specification for this reset attack~\cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
 % TODO: That's claimed by Winter2013 but that the mitigation works because the attacker cannot gain a valid measurement log is from me. But is measurement log really sensitive? Otherwise I'm not sure how the mitigation prevents the attack, since the spec only changes the behavior of the platform on reset, not the TPM on reset. And with the upper described attack, only the TPM is reset.
 However, this mitigation is still vulnerable to cold boot attacks~\cite{Halderman2009, Winter2013}.
 
 Winter and Dietrich~\cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
-Their approach, labeled `Active LPC frame hijacking', allows them to ``lift'' commands to a higher locality than the one they were originally sent with. This allows them to evolve the `TPM Reset attack' from being only usable for \ac{SRTM}, to also \ac{DRTM} systems.
-They also introduce a new approach of circumventing the TPM's measurement feature. Instead of resetting the TPM as previously described~\cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the user's device like a desktop PC while preventing the TPM from receiving the reset signal. This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs. While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
+Their approach, labeled `Active LPC frame hijacking', allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
+This allows them to evolve the `TPM Reset attack' from being only usable for \ac{SRTM}, to also \ac{DRTM} systems.
+They also introduce a new approach of circumventing the TPM's measurement feature.
+Instead of resetting the TPM as previously described~\cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the user's device like a desktop PC while preventing the TPM from receiving the reset signal.
+This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs.
+While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
 
-Seunghun Han et al.~\cite{aBadDream} report two attacks on discrete TPMs to reset the PCR registers. The first targets a gray area in the power management section of the TPM 2.0 specification. The TPM shall store its state into its non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up. However, the specification is missing a concrete description how to handle a lack of a stored state when waking up. Therefore, some implementations simply reset the state. Their second attack targets a \ac{DRTM}, namely an implementation flaw in tboot\footnote{\url{https://www.sourceforge.net/projects/tboot}}, the most widely used measured boot environment used with Intel's Trusted Execution Technology. However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
+Seunghun Han et al.~\cite{aBadDream} report two attacks on discrete TPMs to reset the PCR registers.
+The first targets a gray area in the power management section of the TPM~2.0 specification.
+The TPM shall store its state into its non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up.
+However, the specification is missing a concrete description how to handle a lack of a stored state when waking up.
+Therefore, some implementations simply reset the state.
+Their second attack targets a \ac{DRTM}, namely an implementation flaw in tboot\footnote{\url{https://www.sourceforge.net/projects/tboot}}, the most widely used measured boot environment used with Intel's Trusted Execution Technology.
+However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
 
 A time-based side-channel attack~\cite{Moghimi2019} during signature generation based on elliptic curves allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
 
-A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}. It is applicable to TPM 1.1 connected to an LPC bus. They observed that the data of some operations like unsealing are transmitted via the bus in plaintext. Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
+A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}.
+It is applicable to TPM 1.1 connected to an LPC bus.
+They observed that the data of some operations like unsealing are transmitted via the bus in plaintext.
+Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
 
-That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}. However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
+That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}.
+However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
 
 \subsection{Firmware TPM}
 
@@ -32,19 +49,27 @@ An fTPM circumvents this by being directly executed by the CPU within a \ac{TEE}
 Of course, there are also attacks against fTPMs.
 The previously mentioned side-channel attack~\cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
 
-Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP). Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms. To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data. They achieve this by using a voltage fault injection that bypasses the authenticity check in the host's boot process and allows them to boot their own firmware component that leaks the required information.
+Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP).
+Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms.
+To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data.
+They achieve this by using a voltage fault injection that bypasses the authenticity check in the host's boot process and allows them to boot their own firmware component that leaks the required information.
 
-Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}. They store a maliciously crafted payload---a certificate---on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
+Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}.
+They store a maliciously crafted payload---a certificate---on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
 
 \section{Hardening of TPMs}
 
 \subsection{Virtual TPMs}
 
-Because of the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused. The initially proposed design~\cite{268868} has a large trusted base, e.g., the operating system and the hypervisor need to be trusted.
+Because of the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused.
+The initially proposed design~\cite{268868} has a large trusted base, e.g., the operating system and the hypervisor need to be trusted.
 
-Wang et al.~\cite{Wang2019} bring the vTPM into the \ac{TEE}, namely Intel SGX, essentially creating an fTPM and vTPM hybrid. They launch each vTPM in a private hardware-protected enclave. This reduces the trusted computing base to the individual enclaves and SGX itself, enabling the host operating system and hypervisor to be untrusted.
+Wang et al.~\cite{Wang2019} bring the vTPM into the \ac{TEE}, namely Intel SGX, essentially creating an fTPM and vTPM hybrid.
+They launch each vTPM in a private hardware-protected enclave.
+This reduces the trusted computing base to the individual enclaves and SGX itself, enabling the host operating system and hypervisor to be untrusted.
 
-Pecholt and Wessel~\cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the host's operating system do not need to be trusted as well. This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
+Pecholt and Wessel~\cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the host's operating system do not need to be trusted as well.
+This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
 
 Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
@@ -62,12 +87,20 @@ However, they intentionally do not support persistent storage to preclude exfilt
 % Probable disadvantage: not TPMs common interfaces
 % and DICE certificate chain size grows linearly, PCR register size is fixed. However, event log also grows linearly, but less data (less information, but less storage overhead)
 
-In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach. They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
+In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach.
+They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
 
-One approach is to verify the code of fTPMs~\cite{Mukhamedov2013}. Here, the TPM 1.2 code is written in a functional programming language that enables automatic verification.
+One approach is to verify the code of fTPMs~\cite{Mukhamedov2013}.
+Here, the TPM 1.2 code is written in a functional programming language that enables automatic verification.
 
-There exist efforts to improve the security of TPM by introducing the concept of hybrid TPMs~\cite{Kim2019, Gross2021}. Kim and Kim~\cite{Kim2019} extend a hardware TPM with software support, which they name hTPM\@. This increases the defense of the TPM, e.g., circumventing side-channel attacks, and also enables more secure TPM functions, e.g., enabling true random number generation. Their hTPM implementation also shows significantly better performance due to the use of modern CPU features.
-Vice versa, Gross et al.~\cite{Gross2021} propose the reverse approach of backing an fTPM with hardware. While their implementation has similar properties to hTPM, it inherits some downsides of fTPMs. For example, their fTPM is still started later in the boot chain than a dTPM, which is not the case for hTPM\@. However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
+There exist efforts to improve the security of TPM by introducing the concept of hybrid TPMs~\cite{Kim2019, Gross2021}.
+Kim and Kim~\cite{Kim2019} extend a hardware TPM with software support, which they name hTPM\@.
+This increases the defense of the TPM, e.g., circumventing side-channel attacks, and also enables more secure TPM functions, e.g., enabling true random number generation.
+Their hTPM implementation also shows significantly better performance due to the use of modern CPU features.
+Vice versa, Gross et al.~\cite{Gross2021} propose the reverse approach of backing an fTPM with hardware.
+While their implementation has similar properties to hTPM, it inherits some downsides of fTPMs.
+For example, their fTPM is still started later in the boot chain than a dTPM, which is not the case for hTPM\@.
+However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
 % https://www.eurecom.fr/fr/publication/3536/download/rs-publi-3536.pdf
 
