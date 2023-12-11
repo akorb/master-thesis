@@ -15,20 +15,23 @@ This not only spoofs the attestation process, but also allows the attacker to ac
 \ac{TCG} mitigated this problem by introducing localities with TPM~1.2 by restricting the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{tpmResetMitigation}.
 
 Winter and Dietrich~\cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
-Their approach, labeled `Active LPC frame hijacking', allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
+Their approach---labeled `Active LPC frame hijacking'---allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
 This allows them to evolve the `TPM Reset attack' from being only usable for \ac{SRTM}, to also \ac{DRTM} systems.
 They also introduce a new approach of circumventing the TPM's measurement feature.
-Instead of resetting the TPM as previously described~\cite{kauerBernhard,sparks2007}, they reset the main device, i.e., the user's device like a desktop PC while preventing the TPM from receiving the reset signal.
-This keeps the state of the TPM, e.g., the valid \ac{PCR} values of the previous boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and valid PCRs.
-While its conceptually easier since the attacker does not need to know the measurement log since the valid \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
+Instead of resetting the TPM as previously described~\cite{kauerBernhard,sparks2007}, they reset the main device, e.g., a PC, while preventing the TPM from receiving the reset signal.
+This keeps the state of the TPM, i.e., the \ac{PCR} values of the previous benign boot procedure, and the attacker can hijack the boot procedure triggered by the platform's reset and boot a malicious operating system or firmware, while the TPM still stores the old and benign PCRs.
+While its conceptually easier since the attacker does not need to know the measurement log since the benign \ac{PCR} values are already in-place, it requires active manipulation of bus transmissions to shield the TPM from the reset signal.
 
 Seunghun Han et al.~\cite{aBadDream} report two attacks on discrete TPMs to reset the PCR registers.
 The first targets a gray area in the power management section of the TPM~2.0 specification.
-The TPM shall store its state into its non-volatile random access memory (NVRAM) before shutting down when the host platform goes to sleep, and restore it when it wakes up.
-However, the specification is missing a concrete description how to handle a lack of a stored state when waking up.
-Therefore, some implementations simply reset the state.
-Their second attack targets a \ac{DRTM}, namely an implementation flaw in tboot\footnote{\url{https://www.sourceforge.net/projects/tboot}}, the most widely used measured boot environment used with Intel's Trusted Execution Technology.
-However, in their work, they found that some mutable function pointers are not measured, which allows attacks.
+If the host platform goes into sleep mode, it can send a command to the TPM demanding it to store its current state including its PCRs in its non-volatile random access memory (NVRAM).
+When the host platform wakes up again, it can request that the saved state be restored with a corresponding command.
+However, the specification lacks a concrete description of the behavior if the TPM has not saved any state before going to sleep, but still receives the command to restore its ``saved'' state when waking up.
+It merely states that the TPM implementation is expected ``to take corrective action''.
+Hence, some implementations simply reset the TPM which resets the \acp{PCR} as well.
+This also applies to the latest version of the TPM specification at the time of writing~\cite{tpm20}.
+Their second attack targets a \ac{DRTM}, namely an implementation flaw in tboot\footnote{\url{https://www.sourceforge.net/projects/tboot}}, a widely used measured boot environment used with Intel's Trusted Execution Technology.
+They found that some mutable function pointers are not measured, which enables attacks.
 
 A time-based side-channel attack~\cite{Moghimi2019} during signature generation based on elliptic curves allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
 
@@ -37,7 +40,7 @@ It is applicable to TPM 1.1 connected to an LPC bus.
 They observed that the data of some operations like unsealing are transmitted via the bus in plaintext.
 Since TPM 1.2, however, the modules no longer send sensitive data unencrypted~\cite{Winter2013}.
 
-That invasive hardware attacks against dTPMs are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}.
+That invasive hardware attacks against \acp{dTPM} are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}.
 However, this requires a lot of time, knowledge and resources, i.e., hardware and money.
 
 \subsection{Firmware TPM}
@@ -45,7 +48,7 @@ However, this requires a lot of time, knowledge and resources, i.e., hardware an
 As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM is a typical attack vector.
 An fTPM circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
 
-Of course, there are also attacks against fTPMs.
+However, there are also attacks against fTPMs.
 The previously mentioned side-channel attack~\cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
 
 Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP).
