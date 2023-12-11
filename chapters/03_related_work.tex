@@ -7,13 +7,12 @@
 
 \subsection{Dedicated TPM}
 
-The well-known `TPM Reset Attack' was independently described in~\cite{kauerBernhard,sparks2007}.
+The well-known `TPM Reset Attack' on TPM~1.1 was described independently in~\cite{kauerBernhard,sparks2007}, whereby the state of the host computer and the TPM are decoupled.
 It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground.
 The TPM understands this as a reset signal, yielding predictable values for the \ac{PCR} registers.
 This allows an attacker perform a boot process with malicious components, later resetting the \ac{PCR} values to a known value with the reset attack, and then replay the measurements of a benign boot process.
-Since TPM~1.2, TCG provides a mitigation specification for this reset attack~\cite{tcgResetFix}, requiring the BIOS to overwrite sensitive data after each unexpected reset, preventing an attacker to gain a valid measurement log.
-% TODO: That's claimed by Winter2013 but that the mitigation works because the attacker cannot gain a valid measurement log is from me. But is measurement log really sensitive? Otherwise I'm not sure how the mitigation prevents the attack, since the spec only changes the behavior of the platform on reset, not the TPM on reset. And with the upper described attack, only the TPM is reset.
-However, this mitigation is still vulnerable to cold boot attacks~\cite{Halderman2009, Winter2013}.
+This not only spoofs the attestation process, but also allows the attacker to access secrets stored on the TPM, which is sealed to the benign state of the host machine.
+\ac{TCG} mitigated this problem by introducing localities with TPM~1.2 by restricting the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{tpmResetMitigation}.
 
 Winter and Dietrich~\cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
 Their approach, labeled `Active LPC frame hijacking', allows them to ``lift'' commands to a higher locality than the one they were originally sent with.

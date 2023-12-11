@@ -373,7 +373,7 @@ In our system it is about the DICE manufacturer referenced by the DeviceID certi
 The privacy \ac{CA} must then ensure that the AK provided by the prover comes from the same TPM as the EK of the just retrieved EKcert.
 In short, this works by the privacy \ac{CA} generating a challenge constructed with AKpub and encrypted with EKpub, which can only be solved by an entity who has control over AKpriv and EKpriv\@.
 This process also allows the privacy \ac{CA} to verify that the AK is restricted.
-The procedure is described in more detail in the TPM specification~\cite{tpm} under ``Attestation Key Identity Certification'' and ``Credential Protection.''
+The procedure is described in more detail in the TPM specification~\cite{tpm20} under ``Attestation Key Identity Certification'' and ``Credential Protection.''
 
 In addition, this privacy extension removes the need for a custom template of \ac{EK}, resetting it from a signing key to an encryption key, as signing with the EK can reveal the identity of the TPM\@.
 
@@ -401,7 +401,7 @@ One possible realization is for the privacy CA to add to its policy that it will
 However, this makes the verifier dependent on another entity that decides whether the TCIs provided are trustworthy or not, which we consider undesirable.
 
 We also want to highlight that the AK does not need to be a child of the EK, it does not even have to be part of the endorsement hierarchy.
-In fact, it should not be part of the endorsement or platform hierarchy, since the TPM behaves differently when signing a quote depending on the hierarchy of the signing key~\cite{tpm}.
+In fact, it should not be part of the endorsement or platform hierarchy, since the TPM behaves differently when signing a quote depending on the hierarchy of the signing key~\cite{tpm20}.
 If the signing key is part of the endorsement or platform hierarchy, the TPM assumes that privacy is irrelevant and embeds the TPM's firmware version, reset count, and restart count in plaintext in its generated quote.
 This tuple might identify the TPM\@.
 If the key is part of another hierarchy, this data is obfuscated by adding random offsets to each value, which is desirable if privacy is a concern.
