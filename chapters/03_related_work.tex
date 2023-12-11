@@ -46,20 +46,42 @@ However, this requires a lot of time, knowledge and resources, i.e., hardware an
 \subsection{Firmware TPM}
 
 As seen in the previous section about discrete TPMs, the bus between the CPU and a TPM is a typical attack vector.
-An fTPM circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
+An \ac{fTPM} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
 
-However, there are also attacks against fTPMs.
-The previously mentioned side-channel attack~\cite{Moghimi2019} against dTPMs, can also be applied to fTPMs.
+However, there are also attacks against \acp{fTPM}.
+The previously mentioned side-channel attack~\cite{Moghimi2019} against \acp{dTPM} can also be applied to \acp{fTPM}.
 
 Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP).
-Thereby, they can expose the full internal state of the fTPM bypassing any authentication mechanisms.
-To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the fTPMs non-volatile data.
+Thereby, they can expose the full internal state of the \ac{fTPM} bypassing any authentication mechanisms.
+To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the \acp{fTPM} non-volatile data.
 They achieve this by using a voltage fault injection that bypasses the authenticity check in the host's boot process and allows them to boot their own firmware component that leaks the required information.
 
-Cfir Cohen from Google's cloud security team has uncovered an attack on fTPMs that run within AMD-SP~\cite{cohen}.
-They store a maliciously crafted payload---a certificate---on the fTPM and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
+Cfir Cohen from the Google Cloud Security team also targets AMD's fTPM running AMD-SP (formerly known as AMD-PSP)~\cite{cohen}.
+They store a maliciously crafted payload---a certificate---on the \ac{fTPM} and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
+However, this bug seems to be limited to AMD's fTPM implementation and does not appear in TCG's reference code.
 
 \section{Hardening of TPMs}
+
+In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach.
+They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
+
+\subsection{Firmware TPMs}
+
+One approach is to formally verify the code of fTPMs towards specific security properties.
+Mukhamedov et al.~\cite{Mukhamedov2013} write portions of the TPM~1.2 code in a functional programming language---namely F\texttt{\#}---that enables automatic verification.
+
+Raj et al.~\cite{Raj2015} call for hardware entropy for a secure \ac{fTPM} implementation, but do not elaborate on how this can be achieved.
+Kim and Kim~\cite{Kim2019} propose an abstraction layer on top of a \ac{fTPM} and a \ac{dTPM}---the hybrid TPM~(hTPM).
+It makes it possible to switch between the hardware and software solution as required.
+They use the hTPM to combine the advantages of an \ac{fTPM} and a \ac{dTPM}, e.g., by making the dTPM the source for the hardware entropy of the fTPM\@.
+In addition, the hTPM performs significantly better in software mode than in hardware mode due to the use of modern CPU features.
+However, all this comes at the cost of increasing complexity.
+
+In contrast, Gross et al.~\cite{Gross2021} propose backing an \ac{fTPM} with hardware without requiring a \ac{dTPM}.
+For that, they provide cryptographic and entropy support through hardware.
+However, their implementation inherits the downsides of \acp{fTPM} which are not related to their hardware support, but to their software nature.
+For example, their \ac{fTPM} is still started later in the boot chain than a \ac{dTPM}, which is not the case for hTPM\@.
+However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
 \subsection{Virtual TPMs}
 
@@ -77,10 +99,6 @@ Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually es
 Ephemeral vTPMs support the remote attestation of virtual machines.
 However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
 
-\subsection{Firmware TPMs}
-
-% Also, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
-
 \section{Attestation schemes of TPMs}
 
 % Other defense concepts
@@ -88,21 +106,6 @@ However, they intentionally do not support persistent storage to preclude exfilt
 % Linux attested with DICE directly instead of TPM?
 % Probable disadvantage: not TPMs common interfaces
 % and DICE certificate chain size grows linearly, PCR register size is fixed. However, event log also grows linearly, but less data (less information, but less storage overhead)
-
-In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach.
-They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
-
-One approach is to verify the code of fTPMs~\cite{Mukhamedov2013}.
-Here, the TPM 1.2 code is written in a functional programming language that enables automatic verification.
-
-There exist efforts to improve the security of TPM by introducing the concept of hybrid TPMs~\cite{Kim2019, Gross2021}.
-Kim and Kim~\cite{Kim2019} extend a hardware TPM with software support, which they name hTPM\@.
-This increases the defense of the TPM, e.g., circumventing side-channel attacks, and also enables more secure TPM functions, e.g., enabling true random number generation.
-Their hTPM implementation also shows significantly better performance due to the use of modern CPU features.
-Vice versa, Gross et al.~\cite{Gross2021} propose the reverse approach of backing an fTPM with hardware.
-While their implementation has similar properties to hTPM, it inherits some downsides of fTPMs.
-For example, their fTPM is still started later in the boot chain than a dTPM, which is not the case for hTPM\@.
-However, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
 % https://www.eurecom.fr/fr/publication/3536/download/rs-publi-3536.pdf
 
