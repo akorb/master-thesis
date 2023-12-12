@@ -95,7 +95,7 @@ This reduces the trusted computing base to the individual enclaves and SGX itsel
 Pecholt and Wessel~\cite{Pecholt2022} describe a design named CoCoTPM where the hypervisor and the host's operating system do not need to be trusted as well.
 This is realized by establishing an integrity-protected secure channel with end-to-end encryption between the driver in the VM and the software TPM on the host.
 
-Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization (SEV) technology.
+Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization~(SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
 However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
 
@@ -108,6 +108,34 @@ However, they intentionally do not support persistent storage to preclude exfilt
 % and DICE certificate chain size grows linearly, PCR register size is fixed. However, event log also grows linearly, but less data (less information, but less storage overhead)
 
 % https://www.eurecom.fr/fr/publication/3536/download/rs-publi-3536.pdf
+The SMART attestation mechanism proposed by Defrawy et al.~\cite{EURECOM+3536} establishes a \ac{DRTM} with little hardware requirements.
+In fact, their hardware requirements and overall approach are similar to \ac{DICE}, i.e., they require a ROM containing a key (corresponding to DICE's \ac{UDS}), and that can only be accessed by SMART\@.
+Their secret key is directly used to sign attestation data, while for \ac{DICE} the \ac{UDS} acts as entropy to derive individual secrets from for each firmware component.
+This allows SMART to establish a \ac{DRTM}, in contrast to the \ac{SRTM} provided by \ac{DICE}.
+However, sealing data to the identity of a firmware component is not possible with SMART\@.
+Hence, while the sole remote attestation of an \ac{fTPM} is enabled with SMART, it cannot bind the fTPM's storage to the fTPM's identity.
+
+% DICE implementation
+
+Jäger, Petri, and Fuchs~\cite{Jaeger2017} describe how the remote attestation procedure described in the DICE specification can be put into practice by discussing implementation options.
+However, they complement our work by evaluating how to implement \ac{DICE}\@.
+Jäger and Petri continue their work later~\cite{Jaeger2020} because they observed a limitation in their initial implementation, allowing to jump into \ac{DICE} code possibly leaking the \ac{UDS}.
+Lorych and Jäger carried on exploring the design space of DICE~\cite{Lorych2022} later on.
+As with SMART, the goal of all these publications is not to attest an \ac{fTPM} and therefore do not describe how to combine the infrastructure of DICE and \acp{fTPM}.
+
+Bravi, Sisinni, and Lioy~\cite{Bravi2023} propose an implicit attestation system with DICE for IoT devices running with the RISC-V ISA without TEE\@.
+While we combine DICE with the TPM infrastructure, they combine it with the Manufacturer Usage Description (MUD).
+MUD allows a device to signal to the network what kind of access and network functionality it requires for further access control~\cite{Lear2019}.
+It also explains how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
+Their design is orthogonal to ours, and they are compatible.
+This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
+
+% TEE attestation
+
+% M{\'{e}}n{\'{e}}trey et al.~\cite{Menetrey2022} discuss attestation mechanisms for \acp{TEE}.
+% Our \ac{fTPM} is also running in a \ac{TEE}, and can thereby be attested with this approach.
+% However, it assumes that the entire TEE is trusted
+
 
 % Attacks which we would avoid (e.g., exchange/spoof EKcert)
 
