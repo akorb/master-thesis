@@ -99,7 +99,7 @@ Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually es
 Ephemeral vTPMs support the remote attestation of virtual machines.
 However, they intentionally do not support persistent storage to preclude exfiltration attacks on stored TPM state, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
 
-\section{Attestation schemes of TPMs}
+\section{Remote attestation schemes}
 
 % Other defense concepts
 
@@ -116,12 +116,17 @@ However, sealing data to the identity of a firmware component is not possible wi
 Hence, while the sole remote attestation of an \ac{fTPM} is enabled with SMART, it cannot bind the fTPM's storage to the fTPM's identity.
 
 % DICE implementation
+% TODO: Doesn't belong in this section? Does it even belong in my thesis?
 
 Jäger, Petri, and Fuchs~\cite{Jaeger2017} describe how the remote attestation procedure described in the DICE specification can be put into practice by discussing implementation options.
-However, they complement our work by evaluating how to implement \ac{DICE}\@.
+Thereby they complement our work by evaluating how to implement \ac{DICE}\@.
 Jäger and Petri continue their work later~\cite{Jaeger2020} because they observed a limitation in their initial implementation, allowing to jump into \ac{DICE} code possibly leaking the \ac{UDS}.
 Lorych and Jäger carried on exploring the design space of DICE~\cite{Lorych2022} later on.
 As with SMART, the goal of all these publications is not to attest an \ac{fTPM} and therefore do not describe how to combine the infrastructure of DICE and \acp{fTPM}.
+
+Just as we presented a paper proposing a formally verified \ac{fTPM} implementation, Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
+They focus on the software side of the first DICE layer and are agnostic to the actual hardware used.
+Therefore, it can be used together with the hardware designs from the previously listed works.
 
 % They claim it is implicit, but I believe they have another understanding of implicit and explicit as what I use in this thesis (the one from the DICE spec). So I just leave it, as it is only confusing and not of great importance.
 Bravi, Sisinni, and Lioy~\cite{Bravi2023} propose an attestation system with DICE for IoT devices running with the RISC-V ISA without TEE\@.
