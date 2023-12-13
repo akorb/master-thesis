@@ -12,7 +12,7 @@ It requires minimal hardware, precisely only a wire connecting the reset line of
 The TPM understands this as a reset signal, yielding predictable values for the \ac{PCR} registers.
 This allows an attacker perform a boot process with malicious components, later resetting the \ac{PCR} values to a known value with the reset attack, and then replay the measurements of a benign boot process.
 This not only spoofs the attestation process, but also allows the attacker to access secrets stored on the TPM, which is sealed to the benign state of the host machine.
-\ac{TCG} mitigated this problem by introducing localities with TPM~1.2 by restricting the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{tpmResetMitigation}.
+\Ac{TCG} mitigated this problem by introducing localities with TPM~1.2 by restricting the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{tpmResetMitigation}.
 
 Winter and Dietrich~\cite{Winter2013} demonstrate a bus modification attack at TPMs integrated with the LPC bus or the I\textsuperscript{2}C bus.
 Their approach---labeled `Active LPC frame hijacking'---allows them to ``lift'' commands to a higher locality than the one they were originally sent with.

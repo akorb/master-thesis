@@ -21,27 +21,26 @@ This is solved by remote attestation.
 In the simplest case, there is a prover and a verifier, as depicted in \autoref{fig:ra_simple}.
 The challenge is that the verifier observes nothing but bytes from the prover, and while a benign prover will tell the truth about its state, a compromised prover will lie about its state and claim a trustworthy one.
 Therefore, the verifier must establish trust to a helper component on the prover's side.
-This component must be independent of the rest of the prover's machine and immutable, so that it can be trusted by trusting its manufacturer.
-The manufacturer is commonly propagated by certificates stored on such helper components and signed by the corresponding manufacturer.
+This component must be manufacturer-controlled so that it cannot be modified without the involvement of the manufacturer, who identifies themselves to a verifier by signing and storing a certificate on the helper components supplied by them.
 Consequently, the component attests the state of the prover's machine, from which the verifier can deduce whether the prover can be considered trustworthy.
 
 \input{elements/figure_remote_attestation_process.tex}
 
 % TPMs become more important
 
-For example, this can be done with a \ac{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs~\cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021~\cite{win11req}.
+For example, this can be done with a \acf{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs~\cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021~\cite{win11req}.
 They provide remote attestation mechanisms of system states, and their applications are still expanding beyond their traditional use-cases. For example, they are used in anti-cheat software for games~\cite{valorant}.
 
 % Short intro why fTPMs were introduced (for weak devices, exactly our target platform)
 
-A dedicated hardware TPM (dTPM) increases cost and hardware complexity---especially for embedded platforms.
-Through \acp{TEE}, such as Arm TrustZone, a \ac{fTPM} can be used to provide similar security guarantees as a dTPM chip.
+A \acf{dTPM} increases cost and hardware complexity---especially for embedded platforms.
+\Acfp{fTPM} running in a \acp{TEE} can be used to provide similar security guarantees as a \ac{dTPM} chip.
 
 % Why establishing trust in an fTPM is harder than in a dTPM
 
-For a dTPM, which consists of an independent hardware unit manufactured by a single manufacturer and is directly activated by power, it is sufficient to identify its manufacturer and understand his provided guarantees.
+For a \ac{dTPM}, which consists of an independent hardware unit manufactured by a single manufacturer and is directly activated by power, it is sufficient to identify its manufacturer and understand their provided guarantees.
 In contrast, an \ac{fTPM} runs atop other firmware components and is started later in the boot chain, making its security dependent on the underlying firmware stack.
-As a result, the fTPM can only be trusted if the entire underlying firmware stack is also trusted, since the underlying firmware could modify, i.e., compromise, the fTPM component which is then not detected.
+Consequently, trust in an \ac{fTPM} depends on trusting the entire stack beneath it due to the possibility that its underlying firmware might alter or compromise the \ac{fTPM}.
 
 % What's the difficulty of establishing trust to an fTPM?
 
@@ -113,13 +112,13 @@ However, we assume that the attacker is only able to do this before or during th
 Hardware attacks, side-channel attacks, control-flow attacks, and denial-of-service attacks are out-of-scope.
 
 For the network, we assume the Dolev-Yao attacker model~\cite{Dolev1983}.
-That is, we consider an attacker who has the ability to perform any active or passive attacks on the network.
+That is, we consider an attacker who has the ability to perform any active or passive attack on the network.
 The attacker may also have control over parts or the entire network, e.g., all routers, switches, and connections.
 Last, they cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
 
 \section{Security goals}
 
-In this section, we want to formally describe the security goals of our solution so that we can later briefly discuss whether and how we have achieved the corresponding objectives.
+In this section, we want to formally describe the security goals of our solution so that we can later briefly discuss whether and how we achieve the corresponding objectives.
 
 \begin{itemize}
   \item{\textbf{Compromised fTPM cannot fake its identity}\\
@@ -136,7 +135,7 @@ In this section, we want to formally describe the security goals of our solution
   Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm20}.}
   This includes the protection against other trusted applications running in the same TEE\@.
   
-  \item{\textbf{Protect fTPM data from downgrade attack of the fTPM}\\
+  \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
   The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}
 
   \item{\textbf{Privacy of remote attestation process}\\
@@ -151,7 +150,7 @@ In the roughly 35 years of its existence, it rose to become the largest research
 
 \section{Outline}
 
-In the background, we provide knowledge that is necessary to understand the rest of the work.
-Afterwards, we discuss related work, i.e., attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
-Under methodology, we explain the concept of our solution and subsequently present our proof-of-concept implementation.
-Finally, we discuss our design and implementation, rounded off by future work and the conclusion.
+In the \hyperref[chapter:background]{Background}, we provide knowledge necessary for a better understanding of the subsequent parts of this thesis.
+Afterwards, we discuss \hyperref[chapter:related_work]{Related Work}, i.e., attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
+Under \hyperref[chapter:methodology]{Methodology}, we explain the concept of our solution and subsequently present our proof-of-concept \hyperref[chapter:implementation]{implementation}.
+Finally, we \hyperref[chapter:discussion]{discuss} our design and implementation, rounded off by \hyperref[chapter:future_work_and_conclusion]{Future Work and Conclusion}.
