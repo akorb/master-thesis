@@ -115,8 +115,29 @@ This allows SMART to establish a \ac{DRTM}, in contrast to the \ac{SRTM} provide
 However, sealing data to the identity of a firmware component is not possible with SMART\@.
 Hence, while the sole remote attestation of an \ac{fTPM} is enabled with SMART, it cannot bind the fTPM's storage to the fTPM's identity.
 
-% DICE implementation
-% TODO: Doesn't belong in this section? Does it even belong in my thesis?
+\ac{TCG} offers an adaption of \ac{DICE} with symmetric cryptography which conducts implicit attestation~\cite{dice-symmetric-arch}.
+There, the final symmetric key---also called alias key here---derived from the compound identity of the whole firmware and its UDS represent the prover's identity, without propagating the individual identities of each firmware layer like the \acp{TCI} do.
+If this alias key is leaked, trust into the system breaks unrecoverable since the same key is generated on each boot.
+DICE+ proposed by Jia et al.~\cite{Jia2020} solves this by equipping the prover with a monotonic counter, which is incremented on each reboot.
+This counter influences the alias key, which consequently alters the attestation result derived from it after each reboot as well.
+The verifier can calculate the expected attestation data by combining the used counter value, the UDS, and the expected firmware identity.
+DICE+ assumes that there is only a single verifier who knows the received values of all previously conducted remote attestations, and can therefore detect replay attacks.
+The verifier and the prover must have shared secrets due to the nature of attestation based on symmetric cryptography.
+DICE+ shares the prover's UDS and also the initial monotonic counter with the verifier during the prover's provisioning in an out-of-band manner.
+While their approach is practical for low-end devices that are not capable of asymmetric cryptography, we are targeting machines with a processor with a \ac{TEE}, which implies a certain amount of computation power.
+We also do not want to require pre-shared secrets between the verifier and the prover.
+In addition, the TPM's infrastructure demands asymmetric cryptography for signing the EK certificate, and the monotonic counter would change the TPM's identity on each reboot, effectively hindering the binding of the fTPM's data to its identity.
+Hence, we use DICE with asymmetric cryptography instead.
+
+% They claim it is implicit, but I believe they have another understanding of implicit and explicit as what I use in this thesis (the one from the DICE spec). So I just leave it, as it is only confusing and not of great importance.
+Bravi, Sisinni, and Lioy~\cite{Bravi2023} propose an attestation system with DICE for IoT devices running with the RISC-V ISA without TEE\@.
+While we combine DICE with the TPM infrastructure, they combine it with the Manufacturer Usage Description (MUD).
+MUD allows a device to signal to the network what kind of access and network functionality it requires for further access control~\cite{Lear2019}.
+It also explains how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
+Their design is orthogonal to ours, and they are compatible.
+This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
+
+\section{DICE implementation}
 
 Jäger, Petri, and Fuchs~\cite{Jaeger2017} describe how the remote attestation procedure described in the DICE specification can be put into practice by discussing implementation options.
 Thereby they complement our work by evaluating how to implement \ac{DICE}\@.
@@ -127,14 +148,6 @@ As with SMART, the goal of all these publications is not to attest an \ac{fTPM} 
 Just as we presented a paper proposing a formally verified \ac{fTPM} implementation, Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
 They focus on the software side of the first DICE layer and are agnostic to the actual hardware used.
 Therefore, it can be used together with the hardware designs from the previously listed works.
-
-% They claim it is implicit, but I believe they have another understanding of implicit and explicit as what I use in this thesis (the one from the DICE spec). So I just leave it, as it is only confusing and not of great importance.
-Bravi, Sisinni, and Lioy~\cite{Bravi2023} propose an attestation system with DICE for IoT devices running with the RISC-V ISA without TEE\@.
-While we combine DICE with the TPM infrastructure, they combine it with the Manufacturer Usage Description (MUD).
-MUD allows a device to signal to the network what kind of access and network functionality it requires for further access control~\cite{Lear2019}.
-It also explains how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
-Their design is orthogonal to ours, and they are compatible.
-This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
 
 % TEE attestation
 
