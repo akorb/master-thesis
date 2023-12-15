@@ -189,7 +189,7 @@ The TPM can contain a template for an EK key, which shall be the template with w
 This is necessary to be able to reproduce the EK contained in the EK certificate so that the TPM can prove that this EK certificate corresponds to it by being able to generate the corresponding private key.
 
 A TPM can save an EK template, but is not obliged to do so.
-Then, the default template defined by TCG~\cite{tcg-ek} is used, dictating the \ac{EK} to be a restricted encryption key, since it is privacy-sensitive, and that it must be an RSA~2048 key.
+Then, the default template defined by TCG~\cite{tcg-ek} is used, dictating the \ac{EK} to be a restricted encryption key, since it is privacy-sensitive, and that it must be an RSA-2048 key.
 As this is fitting for most TPM's, the definition of the default template removes the burden of most TPM's to provide the template.
 It is then the duty of the entity communicating with the TPM to provide the default EK template, since it is unknown to the TPM itself.
 Though, we extended our firmware TPM to be able to generate the default and our custom EK template within code, such that it can create the EK which it forwards to the OP-TEE~OS to create the EK certificate.
@@ -206,8 +206,8 @@ This also requires to specify a (ii)~signature scheme where we selected RSASSA-P
 
 % We create this EK template within the firmware TPM in code on its first launch after any reset.
 This template will be generated within the TPM after each manufacturer reset, so it will be preserved even after an identity change and a subsequent reset of the \ac{fTPM}\@.
-Thus, it is always present and stored in the NV index \texttt{0x01c00004} as defined by the TPM EK specification~\cite{tcg-ek} for RSA 2048 EK templates.
-We set the attributes for this NV index as defined by the TPM PC Client specification~\cite{tcgPcClient}. % 4.5.2.1
+Thus, it is always present and stored in the NV index \texttt{0x01c00004} as defined by the TPM EK specification~\cite{tcg-ek} for RSA-2048 EK templates.
+We set the attributes for this NV index as defined by the TPM PC Client specification~\cite{tcgPcClientTpmProfile}. % 4.5.2.1
 Thereby, the EK template in the NV can only be written or deleted if a specific policy is fulfilled.
 However, the policy is empty, which can never be fulfilled.
 This results in a non-deletable EK template.

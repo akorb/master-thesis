@@ -37,20 +37,23 @@ This results from the observation that the attack surface of a rich OS is much l
 
 \input{elements/figure_tee_motivation.tex}
 
-\subsection{Arm TrustZone}
+% \subsection{Arm TrustZone}
 
+\paragraph{Arm TrustZone}
 One such \ac{TEE} is Arm's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
 While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own assigned resources.
-Since Arm is the dominant processor architectures for IoT devices with a market share of 86\,\%~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
-Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM\@.
+Since Arm is the dominant processor architectures for Internet of Things (IoT) devices with a market share of 86\,\% as of 2022~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
+% Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM\@.
+
+% However, our design is not limited to Arm TrustZone.
+Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and Arm Confidential Computing Architecture~(CCA).
 
 \input{elements/figure_arm_trustzone_arch.tex}
 
-\subsection{Further TEE technologies}
+% \subsection{Further TEE technologies}
 
-Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and Arm Confidential Computing Architecture~(CCA).
-Since we focus on the implementation of our concept with Arm TrustZone, we do not go into detail about these other technologies here.
-However, since our concept is not tied to Arm processors and can also be applied to others, they are mentioned for the sake of completeness.
+
+% However, our concept is not tied to Arm processors and can also be applied to these others, and are mentioned for the sake of completeness.
 
 % TrustZone, Trusted applications are not isolated -> they need to trust each other
 
@@ -86,7 +89,7 @@ According to NIST SP 1800--19B~\cite{Bartock2022} an attestation is ``the proces
 \input{elements/figure_remote_attestation.tex}
 
 % It provides the ability for a prover to prove its software's identity to a remote party, i.e., the verifier.
-Remote attestation is a challenge-response protocol initiated by a remote party (called verifier) to verify that a target environment, i.e., the attested system, on the end-device (called prover) has not been tampered with~\cite{Menetrey2022, Coker2011}.
+Remote attestation is a challenge-response protocol initiated by a remote party---the verifier---to verify that a target environment, i.e., the attested system, on the end-device---the prover---has not been tampered with~\cite{Menetrey2022, Coker2011}.
 \autoref{fig:ra} depicts a simplified overview of its data flow.
 
 In a typical remote attestation procedure, the attester measures the attested system during its boot process.
@@ -99,17 +102,18 @@ The evidence is then transmitted to the remote verifier, where it is evaluated.
 % To build that, an attesting environment on the prover device generally inspects the following properties of a program: (i) its code and data has been correctly loaded into memory for execution, and (ii) its data has not been maliciously modified at runtime.
 
 The attester acts here as the \ac{RTM} for the verifier.
-Most importantly, it must be isolated from the attested system such that it cannot be compromised from the attested system.
-The verifier must be able to build trust to the attester through another channel, e.g., by getting to know the attester's manufacturer and the security properties that they guarantee for their attester.
-It is required on the prover because the verifier requires a trusted component on the prover's system whose statements it can trust.
+Most importantly, it must be isolated from the attested system such that it cannot be compromised by it.
+The verifier establishes trust to the attester by getting to know its manufacturer and the security properties that they guarantee.
+Consequently, the verifier can trust the statements the attester conducts about the attested system.
+% It is required because the verifier requires a trusted component on the prover's system whose statements it can trust.
 % Typically, the \ac{RTM} runs within the \ac{TEE}, as this isolates it from the target environment to be attested.
 
 Remote attestation commonly consists of two steps~\cite{McCune2008}.
 (i) The attestation, and (ii) the accompanying establishment of a secure channel.
 In this work, we focus on the first step.
 
-A remote attestation procedure can also be divided into two categories, implicit and explicit attestation~\cite{dice-layering-arch}.
-In implicit attestation, the state of the prover is implicitly inferred from the fact that it has control over a signing key that is only accessible if it is in a known state.
+A remote attestation procedure can further be divided into two categories---implicit and explicit attestation~\cite{dice-layering-arch}.
+In implicit attestation, the state of the prover is implicitly inferred from the fact that it has control over a signing key that is only accessible if the prover is in a known state.
 That is, the sole ability to create the evidence defines the properties of trustworthiness.
 With explicit attestation, the state of the device is explicitly described in the evidence.
 The solution we propose carries out an explicit attestation.
@@ -120,7 +124,7 @@ The \ac{TCG}\footnote{\url{https://trustedcomputinggroup.org/}} published the fi
 % First v2.0 version was much earlier
 It describes a cryptographic coprocessor that increases trust in the host platform.
 Specifically, this means that the TPM exhibits the expected behavior and that this behavior can be trusted.
-For that, the TPM maintains a separated state from the host platform, which enables the TPM to take measurements of the host platform.
+For that, the TPM maintains a separate state from the host platform, which enables the TPM to take measurements of the host platform.
 It is also a passive device, meaning it only does something when prompted.
 \autoref{tab:tpm_use_cases} summarizes the main features of TPMs.
 
@@ -158,10 +162,9 @@ A TPM derives keys from two parameters, a source of object entropy and a key tem
 The object entropy for a primary key comes from the according primary seed, for an ordinary key from the parent key, as depicted in \autoref{fig:tpm-hierarchies}.
 Note that the number of children and the hierarchy depth in this figure are exemplary and there are no technical restrictions for this in the TPM specification.
 
-A template contains metadata of the key, such as the type of key, e.g., RSA, and the object attributes, e.g., whether the key can be used for encryption or signing.
-Keys can also be restricted, which restricts the key to be used with data generated by the TPM~\cite{tpm20}.
-For signing keys, this prohibits the TPM to sign data that seems to be generated by the TPM, but is actually not.
-This prevents an attacker from asking the TPM to sign an artificially constructed quote.
+A template contains metadata of the key, such as the type of the key like RSA-2048, and the object attributes, for example, whether the key can be used for encryption or signing.
+Keys can be \texttt{restricted}, which limits the key to be used with data generated by the TPM~\cite{tpm20}.
+For signing keys, this prevents an attacker from asking the TPM to sign an artificially constructed quote.
 Analogously, restricted encryption keys can only be used to encrypt data generated by the TPM, e.g., other keys created on the TPM\@.
 
 % \autoref{eq:ek}.
@@ -170,19 +173,19 @@ Analogously, restricted encryption keys can only be used to encrypt data generat
 %     key = KDF(entropy\_source,\ key_{template})
 % \end{equation}
 
-The \acp{PCR} are the fundament for the remote system attestation. They are one-way registers, which values can never be written to an exact value, but only be extended.
-This operation is known as `hash extend'~\cite{Arthur2015}.
+The \acp{PCR} are the fundament for the remote system attestation
+They are one-way registers, which values can never be written explicitly, but only be extended; this operation is known as \emph{hash extend}~\cite{Arthur2015}.
 Its design prohibits the removal of extensions, which would cause the TPM to forget a measurement, and the arbitrary writing of values, which would overwrite any previously conducted measurements.
 A PCR value holds a hash representing the platform state.
-Thereby, a remote verifier can request a so-called `quote' from the TPM on the host in question.
+Thereby, a remote verifier can request a so-called \emph{quote} from the TPM on the host in question.
 A quote contains the hash of all requested PCR values and is digitally signed.
-Typically, a TPM contains 24 PCR registers, as defined as the minimum by~\cite{tcgPcClient}, with the lower PCR values representing the system boot process and the higher ones representing the events after the kernel is booted~\cite{Arthur2015}.
-%\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification~\cite{tcgPcClient}.
+Typically, a TPM~2.0 contains 24 PCR registers, as defined as the minimum by~\cite{tcgPcClientTpmProfile}, with the first eight representing the firmware boot process and the higher ones representing the OS or applications~\cite{tcgPcClientFirmwareProfile}.
+%\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification~\cite{tcgPcClientFirmwareProfile}.
 The fixed length of the \ac{PCR} values is important for the memory-constrained nature of TPMs~\cite{Arthur2015}.
 
 The PCR value at index \(i\) can only be modified, i.e., extended, by adding together the currently contained hash value and the new hash, as depicted in \autoref{eq:pcr_extend}~\cite{tpm20}.
 For the sake of correctness, it should be noted that not every PCR is initialized with zero, as stated in the equation.
-For example, the TPM PC Client Platform specification~\cite{tcgPcClient} defines that PCRs 1--15 are initialized with all bits set to 0, while PCRs 17--22 are initialized with all bits set to 1.
+For example, the TPM PC Client Platform specification~\cite{tcgPcClientTpmProfile} defines that PCRs 1--16, 23 are initialized with all bits set to 0, while PCRs 17--22 are initialized with all bits set to 1.
 \begin{equation}
   \label{eq:pcr_extend}
 PCR(i)_{t=0} \coloneqq 0,\quad PCR(i)_{t+1} \coloneqq hash(PCR(i)_t\ \Vert\ new\ value)
@@ -201,15 +204,16 @@ Although the SHA-1 uses in TPM~1.2 were analyzed to be not affected~\cite{sha1tp
 In reaction, TPM~2.0 offers crypto-agility and allows newer algorithms such as SHA-256.
 % In general, TPM~2.0 is more flexible, and is always turned on, while a TPM~1.2 needed to be turned on manually.
 Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
-TPM~2.0 is the focused version nowadays, e.g., Microsoft recommends TPM~2.0 over TPM~1.2 because of security advantages~\cite{micrec}, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers~\cite{win11req}.
+% Nowadays, TPM~2.0 is the focused version due to its security advantages.
+Therefore, Microsoft recommends TPM~2.0 over TPM~1.2~\cite{micrec} due to its security advantages, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers~\cite{win11req}.
 
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
 
 \input{elements/figure_pcr_types}
 
-There are three types of TPMs, as illustrated in \autoref{fig:tpm_types}.
-They all offer the same functionality, but with different security guarantees and performance characteristics.
+There are three types of \acp{TPM}---\aclp{dTPM}, \aclp{fTPM}, and virtual TPMs---as illustrated in \autoref{fig:tpm_types}.
+They all offer the same functionality, but with different security guarantees and performance characteristics, explained in the following sections.
 
 
 \subsection{Discrete TPM}
@@ -218,7 +222,7 @@ This is the classical form of a TPM\@.
 It is a dedicated piece of hardware, connected to the CPU via a bus.
 They have their own processor, memory, and storage so that they are completely isolated from the host system and can only be accessed via the bus system.
 % It is designed and manufactured to be highly temper-resistant against hardware attacks.
-The TPM specifications~\cite{tpm20, tcgPcClient} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
+The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
 
 
 \subsection{Firmware TPM}
@@ -296,7 +300,7 @@ Secure Boot and Measured Boot are often used in conjunction.
 \section{Device Identifier Composition Engine}
 
 % Primer
-\Ac{DICE} was originally proposed by Microsoft as part of their Robust Internet-of-Things (RIoT) architecture~\cite{England2016}.
+\Ac{DICE} was originally proposed by Microsoft as part of their Robust IoT (RIoT) architecture~\cite{England2016}.
 In 2017, the DICE specification was published by \ac{TCG}~\cite{tcg-microsoft-tpm}, of which Microsoft is a member.
 Its purposes are to detect firmware tampering and enable device identification for a remote party, while its main attribute is its low hardware requirements.
 
