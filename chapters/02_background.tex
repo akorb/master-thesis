@@ -216,7 +216,7 @@ There are three types of \acp{TPM}---\aclp{dTPM}, \aclp{fTPM}, and virtual TPMs-
 They all offer the same functionality, but with different security guarantees and performance characteristics, explained in the following sections.
 
 
-\subsection{Discrete TPM}
+\subsection{\Acl{dTPM}}
 
 This is the classical form of a TPM\@.
 It is a dedicated piece of hardware, connected to the CPU via a bus.
@@ -225,7 +225,7 @@ They have their own processor, memory, and storage so that they are completely i
 The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
 
 
-\subsection{Firmware TPM}
+\subsection{\Acl{fTPM}}
 
 % Generally more secure? According to https://arxiv.org/pdf/2304.14717.pdf, yes
 % But TEEs are also tamper-resistant, aren't they? Maybe not as much as dTPMs.
@@ -236,9 +236,10 @@ An fTPM~\cite{Raj2015, 197213} is executed directly by the host CPU within a \ac
 This isolates it from the \ac{REE}, which means that even the operating system in the REE cannot arbitrarily access the memory of the fTPM\@.
 The \ac{REE} can only send commands to the fTPM via controlled interfaces.
 These commands are piggybacked by calls from the \ac{REE} to the fTPM in the \ac{TEE}.
+
 The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}.
 % As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too.
-Common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with Arm's TrustZone~\cite{Khalid2020}.
+Common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with TrustZone~\cite{Khalid2020}.
 
 % Disadvantages
 
@@ -247,8 +248,8 @@ A disadvantage is that running on the same processor as the rest of the system m
 % Also, \acp{fTPM} cannot provide true RNG, since hardware is required for that~\cite{Stipcevic2014}.
 % Well, they can if the fTPM RNG is connected to a hardware RNG. I think I even remember that in some paper they tried to harden fTPMs just by doing exactly this.
 Furthermore, they are started later in the host's boot chain than a \ac{dTPM} that is accessible from the beginning.
-This has the consequence that the measurements of the components booted before the fTPM have to be cached and later be forwarded to the \ac{fTPM} as soon as it is available.
-Arm's Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}---which is the Arm's reference implementation of software in the \ac{TEE}---protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot}, i.e., memory which is only accessible in the \ac{TEE}. 
+Consequently, the measurements of the components booted before the fTPM have to be cached and later forwarded to the \ac{fTPM} once it is available.
+Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}---which is Arm's reference implementation of the boot software in the \ac{TEE}---protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot} only accessible by the \ac{TEE}.
 Last, fTPMs depend on more components for its security than single-component \acp{dTPM}, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
 
 % Advantages
@@ -277,23 +278,32 @@ Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently conclu
 
 A vTPM is a software-based TPM provided by a hypervisor for one of its managed virtual machines~\cite{268868}.
 The vTPMs can be realized fully in software~\cite{268868}, or backed by dTPMs~\cite{Liu2010}.
-The hypervisor can provide a (theoretically) unlimited number of vTPMs.
+The hypervisor can provide an arbitrary number of vTPMs.
 For the virtual machines it seems that they have exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
 A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine.
 Virtual TPMs support this as well.
-Note that a vTPM does not inherently have its own security properties, but that these depend entirely on the vTPM implementation of the hypervisor.
+Note that a vTPM does not inherently have its own security properties as these depend entirely on the vTPM implementation of the hypervisor.
 
 
 \section{Secure Boot and Measured Boot}
 
-When the system is started, the root component, e.g., from ROM, is executed. This subsequently launches the next component, and so forth. This boot structure is called the boot chain. Typically, the first component turns on the memory, the second stage initializes the platform, and finally, the last stage boots the operating system~\cite{Yao2020}.
+% When the system is started, the first component is executed from ROM\@.
+% This subsequently launches the next component, and so forth.
+% This boot structure is called the boot chain.
+% Typically, the first component turns on the memory, the second stage initializes the platform, and the last stage boots the operating system~\cite{Yao2020}.
 
-Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is verifying components of the boot chain directly at boot-time. For that, the boot component is equipped with a public key. With that, they verify the digital signature of the respective subsequent component, before handing over the execution. This ensures the authenticity of the boot components. Alternatively, merely the hashes of the components can be measured and compared with known values, which only ensures integrity and not authenticity. The first boot component, usually stored in ROM, needs to be trusted without verification, i.e., it acts as the root of trust. However, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}. Hence, further defenses like Measured Boot have been designed.
+Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is a security system that verifies components of the boot chain directly at boot-time.
+For that, the boot component is equipped with a public key that is used to verify the digital signature of the respective subsequent component, before handing over the execution.
+This ensures the authenticity of the boot components.
+Alternatively, merely the hashes of the components can be measured and compared with known values, which only ensures integrity and not authenticity.
+The first boot component stored in ROM needs to be trusted without verification, and therefore forms the root of trust.
+However, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
+Hence, further defenses like Measured Boot have been designed.
 
 % Secure Boot is a concept of UEFI~\cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
 % For this purpose, boot chain binaries are first signed and then, deployed universally. Hence, the binaries are not bound to the platform and can be considered portable in this context.
 
-Measured Boot~\cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM\@. It allows remote attestation to a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote verifier to verify the state of the software on the system. The goal is to detect manipulated system configurations.
+Measured Boot~\cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM\@. It allows remote attestation at a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote verifier to verify the state of the software on the system. The goal is to detect manipulated system configurations.
 
 Secure Boot and Measured Boot are often used in conjunction.
 
@@ -308,21 +318,22 @@ Its purposes are to detect firmware tampering and enable device identification f
 
 DICE operates on a boot process layered into components~\cite{dice-layering-arch}.
 Each layer must only assume the lower layers to be trustworthy.
-Later components are typically more feature rich and complex than earlier ones.
+Later components typically include more features and are more complex than earlier ones.
 Each component is measured prior becoming active by the preceding component.
 Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent to prevent time-of-check to time-of-use attacks (TOCTTOU)~\cite{Hristozov2022, Carpent2018}.
 The union of all security-relevant components of a device form its \ac{TCB}.
 Their individual identities are called \ac{TCI}, which are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
 The TCI must also represent security-relevant configurations of a component.
-Compilation flag configurations are already inherently part of the TCI, as they affect the final binary and are therefore automatically measured as part of the measuring it.
-There are also configurations that are not part of the binary, which are usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+Compilation flag configurations affect the binary file and are therefore inherently included in its TCI\@.
+There are also configurations that are not part of the binary usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
 They must be measured in conjunction with the corresponding binary file or represented by two separate \acp{TCI}.
 
 % Hardware requirements
 
 % The first component is the DICE itself, which consists of software and hardware.
 The DICE layer is the first to be booted.
-Its specification~\cite{dice-hardware-reqs} states three hardware requirements, the DICE layer 
+Its specification~\cite{dice-hardware-reqs} states three hardware requirements.
+The DICE layer 
 \begin{enumerate}
   \item has to store a read-only \ac{UDS},
   \item has exclusive access to the \ac{UDS},
@@ -331,15 +342,15 @@ Its specification~\cite{dice-hardware-reqs} states three hardware requirements, 
 These requirements can be justified intuitively.
 (1)~The \ac{UDS} must be read-only and unique to the device to provide a basis for long-term identification and derivation of the device's own secrets.
 (2)~The DICE layer reads and uses the \ac{UDS}, and then needs to erase the \ac{UDS} from memory while preventing other components from retrieving this secret during the power-on time.
-Otherwise, other entities can forge measurement or identification values. This lock mechanism can, for example, be realized with eFuses~\cite{dice-hardware-reqs}.
-(3)~Moreover, the misbehavior of the DICE layer cannot be detected since it is not preceded by anything that could measure it, i.e., it is the root of trust.
-Therefore, it must be immutable so that it remains in the trusted state in which the manufacturer provided it.
+Otherwise, other entities can forge measurement or identification values. This lock mechanism can be realized with eFuses~\cite{dice-hardware-reqs}, for example.
+(3)~Moreover, the misbehavior of the DICE layer cannot be detected since it is the root of trust meaning it is not preceded by anything that could measure it.
+Therefore, it must be immutable to ensure that it remains in the trusted state in which the manufacturer provided it.
 
 % What is the CDI, and what is it derived from?
 
-While the \ac{UDS} is exclusive to the DICE layer, each later component retrieves a \ac{CDI} from its previous component.
+While the \ac{UDS} is exclusive to the DICE layer, each later component retrieves a \ac{CDI} from its predecessor.
 The \ac{CDI} of each layer depends on two variables combined in a one-way function (OWF).
-(i) The own TCI, binding the \ac{CDI} to the current layer's identity, i.e., the hash of itself, and (ii) the \ac{CDI} of the previous layer, making each \ac{CDI} depending on the identities of all previous component identities.
+(i) The own \ac{TCI}, binding the \ac{CDI} to the current layer's identity, i.e., the hash of itself, and (ii) the \ac{CDI} of the previous layer, making each \ac{CDI} depending on the identities of all previous components.
 Therefore, if any component is modified, this reflects in the permutation of the \acp{CDI} of all subsequent components, as implied by \autoref{eq:dice_cdi}.
 
 % CDI protection and further uses
@@ -357,15 +368,15 @@ The layers can derive further secrets using their \ac{CDI} as a seed, such as th
   \label{eq:dice_alias}
   Alias\_KeyPair_n  &= KDF(CDI_n)
 \end{align}
-where \(a \circ b = OWF(a,\,b)\), \(\circ\) being a left-associated operator, and \(KDF\) being a key derivation function.
+where \(a \circ b = OWF(a,\,b)\), \(\circ\) denotes a left-associated operator, and \(KDF\) is a key derivation function.
 \end{minipage}
 \vskip0.4\baselineskip
 
 % Certificate chain
 
-The end result of a boot process using \ac{DICE} is a certificate chain, which can be also seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
-Here, each certificate represents a layer by embedding the identity of the layer, i.e., its \ac{TCI}\@.
-The certificate chain is built up step by step during the boot process, with the first two certificates (manufacturer certificate and DeviceID certificate) being static and stored on the device, and the remaining alias certificates being generated during boot time.
+The end result of a boot process using \ac{DICE} is a certificate chain, which can be seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
+Here, each certificate represents a layer by embedding the \ac{TCI} of the layer.
+The certificate chain is built up progressively during the boot process, with the first two certificates---the manufacturer and DeviceID certificate---being static and stored on the device, and the remaining alias certificates being generated during boot time.
 \begin{equation}
   \label{eq:cert_chain}
   Manufacturer\ Cert \rightarrow DeviceID\ Cert \rightarrow Alias\ Cert\ [\rightarrow Alias\ Cert]^*
@@ -385,12 +396,12 @@ This links the DICE implementation to a manufacturer, which is important to retr
 % Hence, during provisioning, the manufacturer must ensure to only sign a DeviceID certificate containing a TCI matching the actual TCI of layer 0.
 This certificate also represents the long term identity of the device.
 The \ac{UDS} alone cannot be used for this because it is kept strictly secret, whereas the DeviceID certificate is public.
-Since thereby the identification relies on asymmetric cryptography, the manufacturer does not need to maintain a database of \ac{UDS} values, but only needs to keep and protect its private key.
+Since the identification relies on asymmetric cryptography, the manufacturer does not need to maintain a database of \ac{UDS} values, but only needs to keep and protect its private key.
 
 % How the trust chain is continued
 
-While the DeviceID's public key is publicly stored on the device as part of the DeviceID certificate, the corresponding private key still must be generated during the boot process.
-Only if the matching private key can be generated, which is only possible if the identity of layer~0 did not change, the certificate chain can be continued.
+While the DeviceID's public key is openly stored on the device as part of the DeviceID certificate, the corresponding private key still must be generated during the boot process.
+It can only be generated if the identity of layer~0 remains unaltered, which allows the certificate chain to be continued.
 
 % AliasCert
 
@@ -399,17 +410,17 @@ They contain the measured \ac{TCI} of layer~\( n \) and are signed with the priv
 
 % The graph
 
-The generation of the \ac{CDI} values and certificates are shown in \autoref{fig:dice-layers}.
-There, the \acp{CDI} and certificates are drawn where they are eventually used or what they represent, not where they are created.
+The generation of the \ac{CDI} values and certificates is shown in \autoref{fig:dice-layers}.
+There, the \acp{CDI} and certificates are associated with their ultimate usage or the entities they represent, rather than the layer of their creation.
 E.g., CDI\textsubscript{\(n\)} and AliasCert\textsubscript{\(n\)} are both created by layer~\( n-1 \), but passed to and used by layer~\( n \).
 
 % How attestation works
 
 For remote attestation, the prover forwards this DICE certificate chain to the verifier.
-The verifier must understand the manufacturer part of the DeviceID certificate from DICE and decide whether to trust it.
+The verifier must understand the manufacturer part of the DeviceID certificate from DICE and decide whether it is trustworthy.
 If this is the case and the signatures of the certificate chain can be verified with the corresponding public keys, the verifier can derive the running software of the prover from the \acp{TCI} part of the certificates.
-Finally, he can decide whether he considers this list of \acp{TCI} to be trustworthy.
+Finally, they can decide whether this list of \acp{TCI} is trustworthy.
 
 % Security statement
 
-To the best of our knowledge, \ac{DICE} is so far considered a secure concept apart from physical attacks, only implementation problems can bear security problems~\cite{Jaeger2020, Hristozov2022}.
+To the best of our knowledge, \ac{DICE} is so far considered secure apart from physical attacks, only implementation problems can bear security problems~\cite{Jaeger2020, Hristozov2022}.
