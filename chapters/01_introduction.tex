@@ -50,13 +50,13 @@ However, while a TPM-compliant component provides an infrastructure with which t
 
 Currently, this is solved by the manufacturer providing not only the fTPM, but also the entire underlying firmware stack.
 Consequently, by establishing trust to the manufacturer of the fTPM, one can implicitly trust the underlying firmware as well by assuming they also originate from this manufacturer.
-This is possible since in the most general sense, one can derive from an endorsement certificate the endorser, i.e., manufacturer, and if the attester trusts the manufacturer and the guarantees he provides, trust is established to his provided components.
+This is possible since in the most general sense, one can derive from an endorsement certificate the endorser, i.e., manufacturer, and if the attester trusts the manufacturer and its provided guarantees, trust is established to its provided components.
 
 \input{elements/figure_current_state.tex}
 
 This process is illustrated in figure \autoref{fig:current_state}.
 The prover's box shows its boot chain, the verifier's box shows how it evaluates the trustworthiness against the prover's boot chain.
-The verifier trusts the entire firmware chain if he trusts the manufacturer of each individual component.
+The verifier trusts the entire firmware chain if it trusts the manufacturer of each individual component.
 Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM\@.
 To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
 

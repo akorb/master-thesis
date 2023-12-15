@@ -75,7 +75,7 @@ However, OP-TEE OS does not implement DICE\@.
 
 We use the Mbed TLS library\footnote{\url{https://mbed-tls.readthedocs.io/en/latest/}} providing cryptographic primitives for the derivation of the secrets, and also to build X.509 certificates.
 Mbed TLS is already part of OP-TEE, and its functionality is modular and allows certain functionality to be activated or deactivated at a fine granular level.
-Since the target machines are embedded devices with limited resources, the user should only activate the functions that he really needs.
+Since the target machines are embedded devices with limited resources, the user should only activate functions that are needed.
 We therefore had to activate some functions.
 
 The formulas which derive secrets directly from the CDI (\autoref{eq:storage_key_formula}, \autoref{eq:eps_formula}) use a keyed-hash message authentication code~(HMAC) function.
