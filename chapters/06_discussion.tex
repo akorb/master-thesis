@@ -32,7 +32,7 @@ Here, we return to the security goals defined in the introduction and describe h
     % It can therefore be remotely verified whether it is trusted, meaning that it does not abuse its privileges.
     If the trusted OS or any other preceding component is modified, e.g., to leak the fTPM's data, the CDI of the fTPM changes, consequently its storage key and its old data cannot be accessed anymore.}
 
-    \item{\textbf{Protect fTPM data from downgrade attack of the fTPM}\\
+    \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
     The binding of the TPM data to the identity of the fTPM described for the storage isolation also protects against downgrade attacks.
     Whether an fTPM is updated, downgraded or otherwise changed with malicious intent is reflected in its CDI, so that the old storage key cannot be restored.
     }
