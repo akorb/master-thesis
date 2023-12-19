@@ -24,7 +24,7 @@ It requires minimal hardware, precisely only a wire connecting the reset line of
 The TPM understands this as a reset signal, yielding predictable values for the \ac{PCR} registers.
 This allows an attacker to perform a boot process with malicious components, later resetting the \ac{PCR} values to a known value with the reset attack, and then replay the measurements of a benign boot process.
 This not only spoofs the attestation process, but also allows the attacker to access secrets stored on the TPM, which is sealed to the benign state of the host machine.
-\Ac{TCG} mitigated this problem by introducing localities with TPM~1.2 which restrict the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{tpmResetMitigation}.
+\Ac{TCG} mitigated this problem by introducing localities with TPM~1.2 which restrict the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{Proskurin2016}.
 
 Winter and Dietrich~\cite{Winter2013} circumvent this counter measurement with an attack on \acp{dTPM} integrated with the LPC bus or the I\textsuperscript{2}C bus.
 Their approach---labeled `Active LPC frame hijacking'---allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
@@ -35,9 +35,8 @@ This keeps the benign measurements stored by the TPM, while the attacker can com
 % While this is conceptually easier since the attacker does not need to know the measurement log since the benign \ac{PCR} values are already in-place, 
 However, it requires active manipulation of bus transmissions to shield the \ac{TPM} from the reset signal.
 The original work is from 2013 and therefore focuses on TPM~1.2.
-Despite only having access to TPM~2.0 emulators in 2015, Winter mentions in his master's thesis that initial tests indicate that these attacks also apply to TPM~2.0.
+Despite only having access to TPM~2.0 emulators in 2014, Winter mentions in his master's thesis that initial tests indicate that these attacks also apply to TPM~2.0~\cite{winterMA2014}.
 To the best of our knowledge, this is the only statement done about these attacks for TPM~2.0.
-
 
 % A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}.
 % It is applicable to TPM~1.1 connected to an LPC bus.
