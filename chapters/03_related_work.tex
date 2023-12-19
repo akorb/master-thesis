@@ -11,7 +11,7 @@ For each, we provide a brief overview, how they are connected to our work, and w
 Attacks on \acp{dTPM} are relevant as they motivate \acp{fTPM}.
 We also introduce attacks on \acp{fTPM} to show that updates and measuring the exact version of them are important to understand which known vulnerabilities are patched and which are not.
 
-\subsection{Dedicated TPM}
+\subsection{\Acl{dTPM}}
 
 The well-known `TPM Reset Attack' on TPM~1.1 is described independently in~\cite{kauerBernhard,sparks2007}, whereby the state of the host computer and the TPM are decoupled.
 It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground.
@@ -49,7 +49,7 @@ Since TPM~1.2 the modules no longer send sensitive data unencrypted~\cite{Winter
 That invasive hardware attacks against \acp{dTPM} are possible was already shown by Tarnovsky in 2010~\cite{tarnovsky}.
 Nevertheless, this requires a lot of time, knowledge and resources, i.e., hardware and money.
 
-\subsection{Firmware TPM}
+\subsection{\Acl{fTPM}}
 
 As seen in the previous section, the bus between the CPU and a TPM is a typical attack vector.
 An \ac{fTPM} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
