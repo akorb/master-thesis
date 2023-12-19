@@ -293,17 +293,22 @@ Note that a vTPM does not inherently have its own security properties as these d
 % Typically, the first component turns on the memory, the second stage initializes the platform, and the last stage boots the operating system~\cite{Yao2020}.
 
 Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is a security system that verifies components of the boot chain directly at boot-time.
-For that, the boot component is equipped with a public key that is used to verify the digital signature of the respective subsequent component, before handing over the execution.
-This ensures the authenticity of the boot components.
-Alternatively, merely the hashes of the components can be measured and compared with known values, which only ensures integrity and not authenticity.
+For that, the system is equipped with a public key that is used to verify the digital signatures of the boot components ensuring their authenticity.
+Alternatively, merely the hashes of the components can be measured and compared with benign references values, which only ensures integrity and not authenticity.
 The first boot component stored in ROM needs to be trusted without verification, and therefore forms the root of trust.
-However, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
-Hence, further defenses like Measured Boot have been designed.
+Nonetheless, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
+% Hence, further defenses like Measured Boot have been designed.
 
 % Secure Boot is a concept of UEFI~\cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
 % For this purpose, boot chain binaries are first signed and then, deployed universally. Hence, the binaries are not bound to the platform and can be considered portable in this context.
 
-Measured Boot~\cite{tcgMeasuredBoot} is a concept that is implemented in interplay with a TPM\@. It allows remote attestation at a later time. Just as with Secure Boot, each boot component hashes the subsequent component. However, instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value. As described in \autoref{sec:tpm}, these values can be used by a remote verifier to verify the state of the software on the system. The goal is to detect manipulated system configurations.
+In contrast, Measured Boot conducts precise measurements of the booted software for retrospective evaluations~\cite{tcgMeasuredBoot}.
+This allows a verifier to learn about the exact software booted during a remote attestation process.
+It is a concept that is implemented in interplay with a TPM\@.
+Just as with Secure Boot, each boot component hashes the subsequent component.
+Instead of directly locally verifying the measured value, the hash value is passed to the TPM to extend a \ac{PCR} value.
+Consequently, as described in \autoref{sec:tpm}, the TPM can create a quote propagating the state of the measured system.
+% The goal is to detect manipulated system configurations.
 
 Secure Boot and Measured Boot are often used in conjunction.
 
