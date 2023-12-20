@@ -9,7 +9,8 @@ For each, we provide a brief overview and how they are connected to our work.
 \section{Attacks on TPMs}
 
 Generally, attacks on \acp{TPM} target one of two goals.
-Either to decouple the host system's actual state and the state measured by the \ac{TPM}, or to reveal secrets stored on the TPM\@.
+Either to reveal secrets stored on the TPM, or to decouple the host system's actual state and the state measured by the \ac{TPM}\@.
+From now on, the latter will be referred to as \emph{state decoupling}.
 
 
 % Attacks on \acp{dTPM} are relevant as they motivate \acp{fTPM}.
@@ -19,7 +20,7 @@ Either to decouple the host system's actual state and the state measured by the 
 
 \paragraph{\Acl{dTPM}}
 
-The `TPM Reset Attack' on TPM~1.1 is described independently in~\cite{kauerBernhard,sparks2007}, whereby the state of the host computer and the TPM are decoupled.
+The \emph{TPM Reset Attack} on TPM~1.1 is described independently in~\cite{kauerBernhard,sparks2007} conducting state decoupling.
 It requires minimal hardware, precisely only a wire connecting the reset line of the LPC bus~\cite{lpc} to ground.
 The TPM understands this as a reset signal, yielding predictable values for the \ac{PCR} registers.
 This allows an attacker to perform a boot process with malicious components, later resetting the \ac{PCR} values to a known value with the reset attack, and then replay the measurements of a benign boot process.
@@ -27,10 +28,10 @@ This not only spoofs the attestation process, but also allows the attacker to ac
 \Ac{TCG} mitigated this problem by introducing localities with TPM~1.2 which restrict the extension of specific \acp{PCR} to special hardware modes that are no longer accessible in the later boot process~\cite{Proskurin2016}.
 
 Winter and Dietrich~\cite{Winter2013} circumvent this counter measurement with an attack on \acp{dTPM} integrated with the LPC bus or the I\textsuperscript{2}C bus.
-Their approach---labeled `Active LPC frame hijacking'---allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
-% This allows them to evolve the `TPM Reset attack' from being only usable for \ac{SRTM}, to also \ac{DRTM} systems.
-They also introduce a new approach to disconnect the \ac{TPM}'s measured state and the systems actual state.
-Vice versa to the `TPM Reset Attack', they reset the main device, e.g., a personal computer, while preventing the TPM from receiving the reset signal.
+Their method---labeled \emph{Active LPC frame hijacking}---allows them to ``lift'' commands to a higher locality than the one they were originally sent with.
+% This allows them to evolve the \emph{TPM Reset Attack} from being only usable for \ac{SRTM}, to also \ac{DRTM} systems.
+In addition, they introduce a new approach for state decoupling.
+Vice versa to the \emph{TPM Reset Attack}, they reset the main device, e.g., a personal computer, while preventing the TPM from receiving the reset signal.
 This keeps the benign measurements stored by the TPM, while the attacker can compromise the newly booting system without being measured.
 % While this is conceptually easier since the attacker does not need to know the measurement log since the benign \ac{PCR} values are already in-place, 
 However, it requires active manipulation of bus transmissions to shield the \ac{TPM} from the reset signal.
@@ -51,30 +52,34 @@ To the best of our knowledge, this is the only statement done about these attack
 
 As seen in the previous section, the bus between the CPU and a \ac{dTPM} is a typical attack vector throughout their history.
 An \ac{fTPM} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
+Nevertheless, there are also attacks against \acp{fTPM}.
 
-Despite that, there are also attacks against \acp{fTPM}.
 Moghimi et al.~\cite{Moghimi2019} demonstrate a time-based side-channel attack.
 It applies to Intel's \ac{fTPM} before the corresponding software patch in November 2019, and allows an attacker to recover 256-bit private keys for ECDSA and ECSchnorr signatures.
 % STM published a solution, but this involves a hardware update and not just a software update.
 
-Seunghun Han et al.~\cite{aBadDream} report two attacks on \acp{TPM} to reset the PCR registers.
+Seunghun Han et al.~\cite{aBadDream} report two further state decoupling attacks.
 The first targets a gray area in the power management section of the TPM~2.0 specification.
-If the host platform goes into sleep mode, it can send a command to the TPM demanding it to store its current state including its PCRs in its non-volatile random access memory.
+If the host platform goes into sleep mode, it can send a command to the \ac{TPM} demanding it to store its current state including its \acp{PCR} in its non-volatile RAM\@.
 When the host platform wakes up again, it can request that the saved state be restored with a corresponding command.
-Nonetheless, the specification lacks a concrete description of the behavior if the TPM has not saved any state before going to sleep, but still receives the command to restore its saved state when waking up.
-It merely states that the TPM implementation is expected ``to take corrective action.''
-Hence, some implementations simply reset the TPM which resets the \acp{PCR} as well, which also applies to the latest version of the TPM specification at the time of writing~\cite{tpm20}.
+Yet, the specification lacks a concrete description of the behavior if the \ac{TPM} has not saved any state before going to sleep, but still receives the command to restore its saved state when waking up.
+It merely states that the \ac{TPM} implementation is expected ``to take corrective action'' which also applies to the latest version of the \ac{TPM} specification at the time of writing~\cite{tpm20}.
+Hence, some implementations simply reset the \ac{TPM} which resets its \acp{PCR}.
+Software updates from the manufacturers are required to close this vulnerability in their implementation.
 Their second attack targets an \ac{fTPM} running with Intel's Trusted Execution Technology.
-They exploit that some mutable function pointers are not measured in its measuring boot environment.
+They exploit that some mutable function pointers are not measured in its measuring boot environment allowing arbitrary code execution.
+Thereby, the \acp{PCR} can be reset.
+The authors fixed this issue upstream with a software patch.
 
 Jacob et al.~\cite{Jacob2023} target proprietary AMD fTPMs by attacking their \ac{TEE}, namely the AMD Secure Processor~(AMD-SP).
-Thereby, they can expose the full internal state of the \ac{fTPM} bypassing any authentication mechanisms.
+By that, they can expose the full internal state of the \ac{fTPM} bypassing any authentication mechanisms.
 To do so, they leak the secret key from the BIOS flash chip which is used to derive the encryption and signature keys for the \acp{fTPM} non-volatile data.
 They achieve this by using a voltage fault injection that bypasses the authenticity check in the host's boot process and allows them to boot their own firmware component that leaks the required information.
 
 Cohen from the Google Cloud Security team also targets AMD's fTPM running with the AMD-SP~\cite{cohen}.
 They store a maliciously crafted payload---a certificate---on the \ac{fTPM} and trigger a function with a stack-based overflow error that accesses this payload, giving them full control over the program counter.
 According to the author, this bug is limited to vendors that diverge from the \ac{TPM} specification, as this issue does not appear in \ac{TCG}'s reference code.
+AMD resolves this issue with a software patch.
 
 These attacks on \acp{fTPM} show that they need to be updatable to respond to the disclosure of future vulnerabilities.
 They should also be measured to understand which known vulnerabilities are patched and which are not.
