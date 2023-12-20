@@ -92,12 +92,11 @@ They all have in common that they offer no way for a third party to ensure that 
 \subsection{Firmware TPMs}
 
 One approach is to formally verify the code of fTPMs towards specific security properties.
-Mukhamedov et al.~\cite{Mukhamedov2013} write portions of the TPM~1.2 code in a functional programming language---namely F\texttt{\#}---that enables automatic verification.
+Mukhamedov et al.~\cite{Mukhamedov2013} demonstrate this on TPM~1.2 code written in a functional programming language---namely F\texttt{\#}.
 
 Raj et al.~\cite{Raj2015} call for hardware entropy for a secure \ac{fTPM} implementation, but do not elaborate on how this can be achieved.
 Kim and Kim~\cite{Kim2019} propose an abstraction layer on top of an \ac{fTPM} and a \ac{dTPM}---the hybrid TPM~(hTPM), which enables switching between the hardware and software module as required.
-They aim to combine their advantages, e.g., by making the dTPM the source for the hardware entropy of the fTPM\@.
-In addition, the hTPM performs significantly better in software mode than in hardware mode due to the use of modern CPU features.
+They aim to combine their advantages, e.g., by making the dTPM the source for the hardware entropy, and by using the significantly better performance in software mode due to the use of modern CPU features.
 But for all that this comes at the cost of increasing complexity.
 
 In contrast, Gross et al.~\cite{Gross2021} propose backing an \ac{fTPM} with hardware without requiring a \ac{dTPM}.
@@ -120,7 +119,7 @@ This is realized by establishing an integrity-protected secure channel with end-
 
 Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization~(SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
-On the other hand, they intentionally do not support persistent storage to preclude exfiltration attacks on the TPM's data-at-rest, which has the disadvantage that persistent keys or nonvolatile indexes cannot be stored.
+On the other hand, they intentionally do not support persistent storage to preclude exfiltration attacks on the TPM's data-at-rest, which has the disadvantage that persistent keys or other non-volatile data cannot persist across reboots.
 
 \section{Remote attestation schemes}
 
@@ -158,6 +157,11 @@ MUD allows a device to signal to the network what kind of access and network fun
 It also explains how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
 Their design is orthogonal to ours, and they are compatible.
 This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
+
+An abstract design similar to ours was proposed by \ac{TCG} back in 2014~\cite{tcgTpmMobile}.
+The lack of an update since then suggests that it has not been adopted much. 
+Perhaps also because they do not make any suggestions for a concrete implementation.
+DICE could not be used as it was proposed a year later in 2015.
 
 \section{DICE implementation}
 
