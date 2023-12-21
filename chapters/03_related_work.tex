@@ -50,7 +50,7 @@ To the best of our knowledge, this is the only statement done about these attack
 % \subsection{\Acl{fTPM}}
 \paragraph{\Acl{fTPM}}
 
-As seen in the previous section, the bus between the CPU and a \ac{dTPM} is a typical attack vector throughout their history.
+As seen in the previous section, the bus between a CPU and a \ac{dTPM} is a typical attack vector on \acp{dTPM} throughout their history.
 An \ac{fTPM} circumvents this by being directly executed by the CPU within a \ac{TEE}, revealing no easily accessible bus.
 Nevertheless, there are also attacks against \acp{fTPM}.
 
@@ -82,30 +82,92 @@ According to the author, this bug is limited to vendors that diverge from the \a
 AMD resolves this issue with a software patch.
 
 These attacks on \acp{fTPM} show that they need to be updatable to respond to the disclosure of future vulnerabilities.
-They should also be measured to understand which known vulnerabilities are patched and which are not.
+They should also be measured to understand for a remote relying party which known vulnerabilities are patched and which are not.
 
-\section{Hardening of TPMs}
+\section{Remote attestation schemes}
 
-In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach.
-They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
+% Other defense concepts
 
-\subsection{Firmware TPMs}
+% Linux attested with DICE directly instead of TPM?
+% Probable disadvantage: not TPMs common interfaces
+% and DICE certificate chain size grows linearly, PCR register size is fixed. However, event log also grows linearly, but less data (less information, but less storage overhead)
 
-One approach is to formally verify the code of fTPMs towards specific security properties.
-Mukhamedov et al.~\cite{Mukhamedov2013} demonstrate this on TPM~1.2 code written in a functional programming language---namely F\texttt{\#}.
+% https://www.eurecom.fr/fr/publication/3536/download/rs-publi-3536.pdf
+The SMART attestation mechanism proposed by Defrawy et al.~\cite{EURECOM+3536} is similar to \ac{DICE}.
+Their only hardware requirement is a ROM containing a secret key only be accessible by SMART, which corresponds to DICE's \ac{UDS}.
+This key is directly used to sign attestation data, while for \ac{DICE} the \ac{UDS} acts as entropy to derive firmware-specific secrets.
+% SMART thus provides a \ac{DRTM} in contrast to the \ac{SRTM} provided by \ac{DICE} enabling the remote attestation of an \ac{fTPM}.
+Therefore, it does not allow data to be bound to the identity of a firmware component, as the only key is intended for signing instead of encryption, and covers the entire device instead of being individual for each firmware component.
 
-Raj et al.~\cite{Raj2015} call for hardware entropy for a secure \ac{fTPM} implementation, but do not elaborate on how this can be achieved.
-Kim and Kim~\cite{Kim2019} propose an abstraction layer on top of an \ac{fTPM} and a \ac{dTPM}---the hybrid TPM~(hTPM), which enables switching between the hardware and software module as required.
-They aim to combine their advantages, e.g., by making the dTPM the source for the hardware entropy, and by using the significantly better performance in software mode due to the use of modern CPU features.
-But for all that this comes at the cost of increasing complexity.
+An abstract design similar to ours was proposed by \ac{TCG} back in 2014~\cite{tcgTpmMobile}.
+The lack of an update since then suggests that it has not been adopted much. 
+Perhaps also because they do not make any suggestions for a concrete implementation.
+\Ac{DICE} could not be used as it was proposed a year later in 2015.
 
-In contrast, Gross et al.~\cite{Gross2021} propose backing an \ac{fTPM} with hardware without requiring a \ac{dTPM}.
+\Ac{TCG} offers an adaption of \ac{DICE} with symmetric cryptography which conducts implicit attestation~\cite{dice-symmetric-arch}.
+There, the final symmetric key---also called alias key here---derived from the compound identity of the whole firmware and its \ac{UDS} represent the prover's identity, without propagating the individual identities of each firmware layer like the \acp{TCI} do.
+The verifier and the prover must have shared secrets due to the nature of attestation based on symmetric cryptography.
+Depending on the desired flexibility of the verifier, the \ac{UDS}, the \ac{CDI}, or the alias key have to be shared.
+If the alias key is leaked, trust into the system breaks unrecoverable since the same key is generated on each boot, provided no changes have been made.
+
+DICE+ proposed by Jia et al.~\cite{Jia2020} solves this by equipping the prover with a monotonic counter, which is incremented on each reboot.
+The prover shares its UDS and also the initial value of its counter with the verifier during provisioning in an out-of-band manner.
+The counter influences the alias key, which consequently alters the attestation result derived from it after each reboot as well.
+The verifier can calculate the expected attestation data by combining the original shared secrets, and the expected firmware identity.
+Replay protection is achieved by requiring that there is only a single verifier, who knows the received values of all previously conducted remote attestations, and can therefore detect replay attacks.
+While their approach is practical for low-end devices that are not capable of asymmetric cryptography, we are targeting machines with a processor with a \ac{TEE}, which implies a certain amount of computation power.
+We also do not want to require pre-shared secrets between the verifier and the prover.
+In addition, the TPM's infrastructure demands asymmetric cryptography for signing the EK certificate, and the monotonic counter would change the TPM's identity on each reboot, effectively hindering the binding of the fTPM's data to its identity.
+Hence, we use DICE with asymmetric cryptography instead.
+
+% They claim it is implicit, but I believe they have another understanding of implicit and explicit as what I use in this thesis (the one from the DICE spec). So I just leave it, as it is only confusing and not of great importance.
+\Citeauthor*{Bravi2023}~\cite{Bravi2023} propose an attestation system with DICE without TEE\@.
+While we combine DICE with the TPM infrastructure, they combine it with the Manufacturer Usage Description (MUD).
+This allows a device to signal to the network what kind of access and network functionality it requires for access control~\cite{Lear2019}.
+Their design is orthogonal to ours, in that they do not integrate any data binding to software identities.
+% This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
+
+\section{DICE implementation}
+
+Jäger, Petri, and Fuchs~\cite{Jaeger2017} describe how the remote attestation procedure described in the DICE specification can be put into practice by discussing implementation options.
+Thereby they complement our work by evaluating how to implement \ac{DICE}\@.
+Jäger and Petri continue their work later~\cite{Jaeger2020} because they observed a limitation in their initial implementation, allowing to jump into \ac{DICE} code possibly leaking the \ac{UDS}.
+Lorych and Jäger carried on exploring the design space of DICE~\cite{Lorych2022} later on.
+As with SMART, the goal of all these publications is not to attest an \ac{fTPM} and therefore do not describe how to combine the infrastructure of DICE and \acp{fTPM}.
+
+Just as we presented a paper proposing a formally verified \ac{fTPM} implementation, Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
+They focus on the software side of the first DICE layer and are agnostic to the actual hardware used.
+Therefore, it can be used together with the hardware designs from the previously listed works.
+
+\Citeauthor{Bravi2023}~\cite{Bravi2023} explain how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
+
+\section{Software \acsp{TPM} implementation}
+
+% In the following, we describe defense mechanisms for fTPMs that can be seen as complementary to our approach.
+% They all have in common that they offer no way for a third party to ensure that the hardened fTPM is actually running on the device under test, which is exactly what our work aims to cover.
+
+% One approach is to formally verify the code of fTPMs towards specific security properties.
+% Mukhamedov et al.~\cite{Mukhamedov2013} demonstrate this on TPM~1.2 code written in a functional programming language---namely F\texttt{\#}.
+
+\paragraph{\Acl{fTPM}}
+
+The official \ac{TCG} reference implementation of the TPM~2.0 specification is provided by Microsoft.\footnote{\url{https://github.com/microsoft/ms-tpm-20-ref}}
+Raj et al.~\cite{Raj2015} wrap it with code attaching it to the interfaces required for Arm's TrustZone, yielding an \ac{fTPM}.\footnote{In the directory \texttt{Samples/ARM32-FirmwareTPM}.}
+It is the implementation we base our work on.
+In their analysis they call for hardware entropy for a secure \ac{fTPM} implementation, but do not elaborate on how this can be achieved.
+
+Gross et al.~\cite{Gross2021} propose backing an \ac{fTPM} with hardware without requiring a \ac{dTPM}.
 For that, they provide cryptographic and entropy support through hardware.
 This inherits the downsides of \acp{fTPM} which are not related to a lack of hardware, but to the nature of software.
-For example, their \ac{fTPM} is still started later in the boot chain than a \ac{dTPM}, which is not the case for an hTPM\@.
+For example, the resulting \ac{fTPM} is still started later in the boot chain than a \ac{dTPM}\@.
 Despite that, it is easier to update than hTPM since the lack of a dTPM, and the overall design is simpler.
 
-\subsection{Virtual TPMs}
+In contrast, Kim and Kim~\cite{Kim2019} propose an abstraction layer on top of an \ac{fTPM} and a \ac{dTPM}---the hybrid TPM~(hTPM)---which enables switching between the hardware and software module as required.
+They aim to combine their advantages, e.g., by making the dTPM the source for the hardware entropy, and by using the significantly better performance in \ac{fTPM} mode due to the use of modern CPU features.
+In addition, due to the availability of the \ac{dTPM}, it as available as soon as the system launches, while an \ac{fTPM} is booted later on.
+But for all that this comes at the cost of increasing complexity.
+
+\paragraph{Virtual TPM}
 
 % Due to the increasing popularity of cloud computing, the research of vTPMs focuses less on specific attacks, and more on reducing the trusted computing base, i.e., privacy-focused.
 The initially proposed design of virtual \acp{TPM} requires the operating system and the hypervisor to be trusted~\cite{268868}.
@@ -120,60 +182,6 @@ This is realized by establishing an integrity-protected secure channel with end-
 Stateless ephemeral vTPMs~\cite{Narayanan2023} eliminate the need of manually establishing a secure channel by leveraging the confidential VM memory encryption provided by AMD's SEV-SNP, a variant of AMD secure encrypted virtualization~(SEV) technology.
 Ephemeral vTPMs support the remote attestation of virtual machines.
 On the other hand, they intentionally do not support persistent storage to preclude exfiltration attacks on the TPM's data-at-rest, which has the disadvantage that persistent keys or other non-volatile data cannot persist across reboots.
-
-\section{Remote attestation schemes}
-
-% Other defense concepts
-
-% Linux attested with DICE directly instead of TPM?
-% Probable disadvantage: not TPMs common interfaces
-% and DICE certificate chain size grows linearly, PCR register size is fixed. However, event log also grows linearly, but less data (less information, but less storage overhead)
-
-% https://www.eurecom.fr/fr/publication/3536/download/rs-publi-3536.pdf
-The SMART attestation mechanism proposed by Defrawy et al.~\cite{EURECOM+3536} establishes a \ac{DRTM}.
-Since their overall approach is similar to \ac{DICE}, they only hardware requirement is a ROM containing a key (corresponding to DICE's \ac{UDS}), and that can only be accessed by SMART\@.
-Their secret key is directly used to sign attestation data, while for \ac{DICE} the \ac{UDS} acts as entropy to derive individual secrets from for each firmware component.
-SMART thus provides a \ac{DRTM} in contrast to the \ac{SRTM} provided by \ac{DICE} enabling the remote attestation of an \ac{fTPM}.
-However, it does not allow data to be bound to the identity of a firmware component.
-
-\ac{TCG} offers an adaption of \ac{DICE} with symmetric cryptography which conducts implicit attestation~\cite{dice-symmetric-arch}.
-There, the final symmetric key---also called alias key here---derived from the compound identity of the whole firmware and its UDS represent the prover's identity, without propagating the individual identities of each firmware layer like the \acp{TCI} do.
-If this alias key is leaked, trust into the system breaks unrecoverable since the same key is generated on each boot.
-DICE+ proposed by Jia et al.~\cite{Jia2020} solves this by equipping the prover with a monotonic counter, which is incremented on each reboot.
-This counter influences the alias key, which consequently alters the attestation result derived from it after each reboot as well.
-The verifier can calculate the expected attestation data by combining the used counter value, the UDS, and the expected firmware identity.
-DICE+ assumes that there is only a single verifier who knows the received values of all previously conducted remote attestations, and can therefore detect replay attacks.
-The verifier and the prover must have shared secrets due to the nature of attestation based on symmetric cryptography.
-DICE+ shares the prover's UDS and also the initial monotonic counter with the verifier during the prover's provisioning in an out-of-band manner.
-While their approach is practical for low-end devices that are not capable of asymmetric cryptography, we are targeting machines with a processor with a \ac{TEE}, which implies a certain amount of computation power.
-We also do not want to require pre-shared secrets between the verifier and the prover.
-In addition, the TPM's infrastructure demands asymmetric cryptography for signing the EK certificate, and the monotonic counter would change the TPM's identity on each reboot, effectively hindering the binding of the fTPM's data to its identity.
-Hence, we use DICE with asymmetric cryptography instead.
-
-% They claim it is implicit, but I believe they have another understanding of implicit and explicit as what I use in this thesis (the one from the DICE spec). So I just leave it, as it is only confusing and not of great importance.
-Bravi, Sisinni, and Lioy~\cite{Bravi2023} propose an attestation system with DICE for IoT devices running with the RISC-V ISA without TEE\@.
-While we combine DICE with the TPM infrastructure, they combine it with the Manufacturer Usage Description (MUD).
-MUD allows a device to signal to the network what kind of access and network functionality it requires for further access control~\cite{Lear2019}.
-It also explains how DICE can be implemented with the novel RISC-V technology Physical Memory Protection~(PMP).
-Their design is orthogonal to ours, and they are compatible.
-This is because we are not limited to a specific DICE implementation and their support for MUD is integrated via an X.509 certificate extension that can trivially be added to our system as well.
-
-An abstract design similar to ours was proposed by \ac{TCG} back in 2014~\cite{tcgTpmMobile}.
-The lack of an update since then suggests that it has not been adopted much. 
-Perhaps also because they do not make any suggestions for a concrete implementation.
-DICE could not be used as it was proposed a year later in 2015.
-
-\section{DICE implementation}
-
-Jäger, Petri, and Fuchs~\cite{Jaeger2017} describe how the remote attestation procedure described in the DICE specification can be put into practice by discussing implementation options.
-Thereby they complement our work by evaluating how to implement \ac{DICE}\@.
-Jäger and Petri continue their work later~\cite{Jaeger2020} because they observed a limitation in their initial implementation, allowing to jump into \ac{DICE} code possibly leaking the \ac{UDS}.
-Lorych and Jäger carried on exploring the design space of DICE~\cite{Lorych2022} later on.
-As with SMART, the goal of all these publications is not to attest an \ac{fTPM} and therefore do not describe how to combine the infrastructure of DICE and \acp{fTPM}.
-
-Just as we presented a paper proposing a formally verified \ac{fTPM} implementation, Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
-They focus on the software side of the first DICE layer and are agnostic to the actual hardware used.
-Therefore, it can be used together with the hardware designs from the previously listed works.
 
 % TEE attestation
 

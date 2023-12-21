@@ -256,7 +256,7 @@ Last, fTPMs depend on more components for its security than single-component \ac
 
 However, since they require only a \ac{TEE} which is mostly already available at currently used processors, they are cheaper for manufacturers as they require less extra hardware.
 In addition, TPM processors are weak~\cite{Goh2013, Raj2015}.
-Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently concluded that firmware TPMs executed on main processors are generally much faster than \acp{dTPM}.
+Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently conclude that firmware TPMs executed on main processors are generally much faster than \acp{dTPM}.
 \Acp{fTPM} are also a viable option for adding \ac{TPM} functionality to older devices through software updates rather than hardware replacements, which is particularly valuable in times like the recent chip supply shortage~\cite{Voas2021, casper2021}.
 
 
@@ -277,12 +277,12 @@ Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently conclu
 \subsection{Virtual TPM}
 
 A vTPM is a software-based TPM provided by a virtual machine manager~(VMM) for one or many of its managed VM's~\cite{268868}.
-The vTPMs can be realized fully in software~\cite{268868}, or backed by dTPMs~\cite{Liu2010}.
-The hypervisor can provide an arbitrary number of vTPMs.
-For the virtual machines it seems that they have exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
+They can be realized purely in software~\cite{268868}, or backed by dTPMs~\cite{Liu2010}.
+% The hypervisor can provide an arbitrary number of vTPMs.
+% For the VM's it seems that they have exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
 A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine.
-Virtual TPMs support this as well.
-Note that a vTPM does not inherently have its own security properties as these depend entirely on the vTPM implementation of the hypervisor.
+% Virtual TPMs support this as well.
+vTPMs do not inherently have their own security properties as these depend entirely on the vTPM implementation of the hypervisor.
 
 
 \section{Secure Boot and Measured Boot}
