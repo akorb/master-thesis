@@ -66,7 +66,7 @@ Although the verifier can still decide for itself whether it considers the \ac{f
 % In contrast, \acp{dTPM} are capable of acting as a hardware root of trust.
 % Our system closes this gap.
 
-\section{Closing thoughts}
+\section{Significance and closing thoughts}\label{sec:significance}
 
 We started this work based on the observation that commodity \acp{fTPM} are part of a monolithic, proprietary environment.
 Assuming the entire firmware of these CPUs comes from the same manufacturer, understanding and trusting the manufacturer of an \ac{fTPM} can be extended to trusting the entire firmware.
@@ -83,6 +83,8 @@ Our system closes this gap by adding an independent hardware root of trust to wh
 
 We believe that this work is an important step towards the independence of the manufacturer of the \ac{fTPM} and its upstream firmware. %, whereas today verifiers trust a single manufacturer who is assumed to have provided all these components.
 Despite not considering this problem relevant for vendors like AMD and Intel whose products are fully single-sourced, we believe this work is of value for open ecosystems, e.g., systems based on RISC-V\@.
+Recently, in 2021, an \ac{fTPM} for RISC-V systems was described~\cite{Boubakri2021}, and for the same a \ac{DICE} implementation was proposed in 2023~\cite{Bravi2023}.
+This indicates that this ecosystem will continue to evolve and take center stage.
 
 \textbf{In the spirit of zero trust, our system measures, instead of assumes.}
 
@@ -94,11 +96,12 @@ In addition, the impact of our solution on the performance of the system can the
 This is especially interesting since we integrate another storage encryption.
 
 Although it makes sense to show our solution on Arm hardware first, we are, as mentioned, not limited to it.
-Therefore, a future work is to concretize the description of our implementation for TEE technologies other than Arm, e.g. Intel~SGX\@.
+Therefore, a future work is to concretize the description of our implementation for TEE technologies other than Arm, e.g., Intel~SGX\@.
+As described in \autoref{sec:significance}, the recent research of \ac{fTPM} and \ac{DICE} within the RISC-V ecosystem can also be synthesized with our design.
 
-The system we propose can also be transferred from the DICE architecture to other technologies that also perform firmware measurements.
-A new technological framework that generalizes DICE is Caliptra~\cite{caliptra}.
-It is based on the concept of DICE, but is not limited to it.
+The system we propose can also be transferred from the \ac{DICE} architecture to other technologies that also perform firmware measurements.
+A new technological framework that generalizes \ac{DICE} is Caliptra~\cite{caliptra}.
+It is based on the concept of \ac{DICE}, but is not limited to it.
 
 As mentioned in \autoref{sec:arch_overview}, RPMB's rollback protection only protects against attacks from outside the TEE\@.
 We would like to establish a design that tightens the rollback protection from the trust of the entire TEE to the identity of the fTPM\@.
@@ -106,7 +109,7 @@ This can probably be achieved by encrypting the metadata stored on the RPMB with
 This must be implemented in the trusted operating system and not in the fTPM TA, as the trusted operating system normally manages the metadata.
 
 Furthermore, our solution does not protect against runtime attacks on the fTPM\@.
-In general, \acp{TA} in a TEE are not resistant to security problems caused by programming errors, e.g., buffer overflow attacks.
+In general, \acp{TA} in a \ac{TEE} are not resistant to security problems caused by programming errors, e.g., buffer overflow attacks.
 Therefore, remote attestation of the control flow integrity of the fTPM may be a desired function.
 Displaying the current state of the fTPM instead of its identity at boot time would be a useful extension to our solution.
 
