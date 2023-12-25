@@ -347,9 +347,9 @@ First, we elaborate what reveals the identity of the device when conducting a re
 
 In an ordinary remote attestation process with our system as described in \autoref{sec:attestation_process}, the verifier retrieves the certificate chain and a TPM quote.
 After the root certificate, the certificate chain is continued with the DeviceID certificate, whose subject key provides the long-term identity of the device.
-It then continues with alias certificates, each of which contains subject keys that represent the identity of the hardware and the firmware components that have already been executed.
+It then continues with alias certificates, each of which contains subject keys that represent the identity of the hardware and the firmware components executed up to that point.
 The closing EK certificate of the chain contains the key representing the identity of the fTPM\@.
-The quote's signature is also relevant to the prover's privacy, as the signature is generated with a unique EKpriv.
+The quote's signature is also relevant to the prover's privacy, as it is generated with a unique EKpriv.
 Consequently, all these keys have to be hidden to preserve privacy, and the signature of the quote must be generated with a key that does not represent a long-term identity.
 
 % Therefore, the usual procedure is to create a short-lived \ac{AK} on the TPM\@.
