@@ -9,43 +9,39 @@
 
 Here, we return to the security goals defined in the introduction and describe how we fulfil them.
 
-\begin{itemize}
-    \item{\textbf{Compromised fTPM cannot fake its identity}\\
-    The predecessor component of the fTPM, i.e., the trusted OS, performs the measurement of the fTPM, embeds it in the alias certificate representing the fTPM and signs it with its private alias key.
-    As long as the trusted OS behaves correctly, the fTPM has no access to the trusted OS's private alias key.
-    Therefore, the alias certificate representing the fTPM can be trusted if the TCI of the trusted OS is trustworthy since it presents the trusted OS's behavior, as then the fTPM cannot fake the certificate containing its identity.
-    Actually, all TCIs of the preceding components must be trusted for that.
-    In general, each component of the fTPM firmware stack must not have access to the private alias key of the component preceding it.}
+\paragraph{\ref{sg:1}: Compromised fTPM cannot fake its identity}
+The predecessor component of the fTPM, i.e., the trusted OS, performs the measurement of the fTPM, embeds it in the alias certificate representing the fTPM and signs it with its private alias key.
+As long as the trusted OS behaves correctly, the fTPM has no access to the trusted OS's private alias key.
+Therefore, the alias certificate representing the fTPM can be trusted if the TCI of the trusted OS is trustworthy since it presents the trusted OS's behavior, as then the fTPM cannot fake the certificate containing its identity.
+Actually, all TCIs of the preceding components must be trusted for that.
+In general, each component of the fTPM firmware stack must not have access to the private alias key of the component preceding it.
 
-    \item{\textbf{Small root of trust}\\
-    We base the trust in our system on the design and guarantees of the DICE architecture.
-    Its root of trust consists of the \ac{UDS} and its protection mechanisms.
-    The \ac{UDS} may only be read once per operating time of the implementing device and only by DICE\@.
-    As the actual secret is a single integer value that represents a statistically unique value, we consider the root of trust to be small.}
+\paragraph{\ref{sg:2}: Small root of trust}
+We base the trust in our system on the design and guarantees of the DICE architecture.
+Its root of trust consists of the \ac{UDS} and its protection mechanisms.
+The \ac{UDS} may only be read once per operating time of the implementing device and only by DICE\@.
+As the actual secret is a single integer value that represents a statistically unique value, we consider the root of trust to be small.
 
-    \item{\textbf{Isolation of fTPM storage}\\
-    The problem originates from the fact that the File Encryption Key~(FEK) for the data of a TA is derived by a TEE-wide secret and the TA's UUID, with the latter being public.
-    Hence, any TA can potentially derive the FEK of any other TA within the same TEE\@.
-    However, they cannot know the other TA's CDI, since TA's cannot measure each other.
-    Consequently, this prevents other TA's from generating the fTPM's storage key of our solution.
-    % The trusted OS calculates the CDI of the fTPM to pass it to the fTPM when the execution is handed over, but the trusted OS is also measured as part of our certificate chain.
-    % It can therefore be remotely verified whether it is trusted, meaning that it does not abuse its privileges.
-    If the trusted OS or any other preceding component is modified, e.g., to leak the fTPM's data, the CDI of the fTPM changes, consequently its storage key and its old data cannot be accessed anymore.}
+\paragraph{\ref{sg:3}: Isolation of fTPM storage}
+The problem originates from the fact that the File Encryption Key~(FEK) for the data of a TA is derived by a TEE-wide secret and the TA's UUID, with the latter being public.
+Hence, any TA can potentially derive the FEK of any other TA within the same TEE\@.
+However, they cannot know the other TA's CDI, since \acp{TA} cannot measure each other.
+Consequently, this prevents other \acp{TA} from generating the fTPM's storage key of our solution.
+% The trusted OS calculates the CDI of the fTPM to pass it to the fTPM when the execution is handed over, but the trusted OS is also measured as part of our certificate chain.
+% It can therefore be remotely verified whether it is trusted, meaning that it does not abuse its privileges.
+If the trusted OS or any other preceding component is modified, e.g., to leak the fTPM's data, the CDI of the fTPM changes, consequently its storage key and its old data cannot be accessed anymore.
 
-    \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
-    The binding of the TPM data to the identity of the fTPM described for the storage isolation also protects against downgrade attacks.
-    Whether an fTPM is updated, downgraded or otherwise changed with malicious intent is reflected in its CDI, so that the old storage key cannot be restored.
-    }
+\paragraph{\ref{sg:4}: Protect fTPM data against downgrade attacks on the fTPM}
+The binding of the TPM data to the identity of the fTPM described for the storage isolation also protects against downgrade attacks.
+Whether an fTPM is updated, downgraded or otherwise changed with malicious intent is reflected in its CDI, so that the old storage key cannot be restored.
 
-    \item{\textbf{Privacy of remote attestation process}\\
-    We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
-    For this purpose, we introduce a proxy, the so-called privacy CA, between the verifier and the prover.
-    In this process, the prover sends its certificate chain to the privacy CA, which must verify that the prover is benign, and then packages the information in a way that preserves privacy by leaving behind information that reveals the prover's identity to the verifier.
-    For example, the privacy CA must verify that the verifier's DICE implementation is authentic with its DeviceID certificate and that the fTPM is actually running within the TEE\@.
-    This requires information about the prover's hardware, which must not be disclosed to the verifier if data protection is a concern for the prover.
-    If privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
-    }
-\end{itemize}
+\paragraph{\ref{sg:5}: Privacy of remote attestation process}
+We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
+For this purpose, we introduce a proxy, the so-called privacy CA, between the verifier and the prover.
+In this process, the prover sends its certificate chain to the privacy CA, which must verify that the prover is benign, and then packages the information in a way that preserves privacy by leaving behind information that reveals the prover's identity to the verifier.
+For example, the privacy CA must verify that the verifier's DICE implementation is authentic with its DeviceID certificate and that the fTPM is actually running within the TEE\@.
+This requires information about the prover's hardware, which must not be disclosed to the verifier if data protection is a concern for the prover.
+If privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
 
 \subsection{Attestation process requirements}
 
@@ -155,7 +151,7 @@ Thereof, a hardware fuse, a secure entropy source, and a TEE are commonly part o
 An RPMB partition is required to protect the fTPM's storage from access outside the TEE, and prevent rollback attacks.
 Rollback attacks of the fTPM's data or the fTPM itself are not prevented by our introduction of the storage key.
 So, we also recommend using a trusted OS implementing secure storage on a RPMB partition, which involves the additional hardware requirement of an RPMB which is not necessary for \acp{dTPM}.
-However, storage has to present anyway, and a RPMB partition is supported  by storage technologies commonly used in embedded devices, e.g., eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+However, storage has to be present anyway, and a RPMB partition is supported  by storage technologies commonly used in embedded devices, e.g., eMMC~\cite{eMMC} and UFS~\cite{UFS}.
 
 % With DICE hardware RoT we establish a binding of the fTPM's data to the fTPM's identity, without needing to trust all remaining components in the TEE\@.
 % This is also not accomplished with RPMB\@.

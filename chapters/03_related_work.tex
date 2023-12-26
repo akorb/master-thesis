@@ -36,7 +36,7 @@ This keeps the benign measurements stored by the TPM, while the attacker can com
 % While this is conceptually easier since the attacker does not need to know the measurement log since the benign \ac{PCR} values are already in-place, 
 However, it requires active manipulation of bus transmissions to shield the \ac{TPM} from the reset signal.
 The original work is from 2013 and therefore focuses on TPM~1.2.
-Despite only having access to TPM~2.0 emulators in 2014, Winter mentions in his master's thesis that initial tests indicate that these attacks also apply to TPM~2.0~\cite{winterMA2014}.
+Despite only having access to TPM~2.0 emulators in 2014 instead of real hardware, Winter mentions in his master's thesis that initial tests indicate that these attacks also apply to TPM~2.0~\cite{winterMA2014}.
 To the best of our knowledge, this is the only statement done about these attacks for TPM~2.0.
 
 % A passive sniffing attack is shown in~\cite{Kursawe2005AnalyzingTP}.
@@ -135,7 +135,8 @@ Jäger and Petri continue their work later~\cite{Jaeger2020} because they observ
 Lorych and Jäger carried on exploring the design space of DICE~\cite{Lorych2022} later on.
 As with SMART, the goal of all these publications is not to attest an \ac{fTPM} and therefore do not describe how to combine the infrastructure of DICE and \acp{fTPM}.
 
-Just as we presented a paper proposing a formally verified \ac{fTPM} implementation, Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
+% Just as we presented a paper proposing a formally verified \ac{fTPM} implementation,
+Tao et al.~\cite{272306} propose a formally verified \ac{DICE} implementation called DICE\( ^* \).
 They focus on the software side of the first DICE layer and are agnostic to the actual hardware used.
 Therefore, it can be used together with the hardware designs from the previously listed works.
 

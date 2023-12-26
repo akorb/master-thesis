@@ -14,7 +14,7 @@ One of the core security concepts of operating systems are the privilege levels 
 
 % What TEE's are
 
-The \acf{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
+The \ac{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
 The \ac{REE} runs commodity software, e.g., a Linux-based operating system with user applications.
 The \ac{TEE} is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
 Since a \ac{TEE} is integrated into the processor, there is no separate chip required.
@@ -42,7 +42,7 @@ This results from the observation that the attack surface of a rich OS is much l
 \paragraph{Arm TrustZone}
 One such \ac{TEE} is Arm's TrustZone~\cite{ARM09, Ngabonziza2016}. It partitions all software and hardware resources of the containing system into the \ac{NW} and the \ac{SW}, as shown in \autoref{fig:arm_trustzone_arch}. The secure monitor is triggered by the dedicated instruction Secure Monitor Call (SMC), which then manages the context switches between the \ac{NW} and the \ac{SW}.
 While the \ac{SW} can access the resources of the \ac{SW} and the \ac{NW}, the \ac{NW} is restricted to its own assigned resources.
-Since Arm is the dominant processor architectures for Internet of Things (IoT) devices with a market share of 86\,\% as of 2022~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
+Since Arm is the dominant processor architecture for Internet of Things (IoT) devices with a market share of 86\,\% as of 2022~\cite{eclipse}, many of the approaches in this field of research use Arm TrustZone~\cite{Valadares2021}.
 % Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM\@.
 
 % However, our design is not limited to Arm TrustZone.
@@ -173,7 +173,7 @@ Analogously, restricted encryption keys can only be used to encrypt data generat
 %     key = KDF(entropy\_source,\ key_{template})
 % \end{equation}
 
-The \acp{PCR} are the fundament for the remote system attestation
+The \acp{PCR} are the fundament for the remote system attestation.
 They are one-way registers, which values can never be written explicitly, but only be extended; this operation is known as \emph{hash extend}~\cite{Arthur2015}.
 Its design prohibits the removal of extensions, which would cause the TPM to forget a measurement, and the arbitrary writing of values, which would overwrite any previously conducted measurements.
 A PCR value holds a hash representing the platform state.
@@ -324,7 +324,7 @@ Its purposes are to detect firmware tampering and enable device identification f
 DICE operates on a boot process layered into components~\cite{dice-layering-arch}.
 Each layer must only assume the lower layers to be trustworthy.
 Later components typically include more features and are more complex than earlier ones.
-Each component is measured prior becoming active by the preceding component.
+Each component is measured prior to being activated by the preceding component.
 Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent to prevent time-of-check to time-of-use attacks (TOCTTOU)~\cite{Hristozov2022, Carpent2018}.
 The union of all security-relevant components of a device form its \ac{TCB}.
 Their individual identities are called \ac{TCI}, which are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.

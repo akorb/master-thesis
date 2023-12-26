@@ -46,7 +46,10 @@ We derive two values from the \ac{CDI}\@.
 
 % Storage Key generation
 
-While the trusted OS within the \ac{TEE} might already encrypt data before it is sent to the storage device, this only binds the data to the \ac{TEE}, but not the identity to the \ac{fTPM}.
+A TPM-compliant component can store persistent data, such as key material or other secrets.
+\Acp{fTPM} can leverage storage functionality of the underlying trusted OS\@.
+Despite the fact that, depending on the actual implementation, the data is thereby already encrypted before it is sent to the storage device, this only binds the data to the \ac{TEE}, but not the identity to the \ac{fTPM}.
+
 For this purpose, we first derive a storage key from the \ac{CDI}.
 This is a symmetric encryption key that is used to encrypt the \ac{fTPM} storage space in RAM before it is written to a persistent storage space such as a hard disk drive~(HDD).
 At no time does the HDD see plaintext data (\autoref{fig:storage-encryption}).
@@ -113,7 +116,7 @@ It is therefore good practice to extract long-term secrets from the short-term s
 
 The \ac{EK} of a \ac{dTPM} represents the long-term identity of its host device as long as the \ac{TPM} is not soldered or plugged away.
 Our \ac{EK} does not do this because an \ac{fTPM} is software-based and changes every time the \ac{fTPM} or the underlying firmware is modified, without the host device changing.
-Instead, we use the DICE for this, which is hardware-based.
+Instead, we use \ac{DICE} for this, which is hardware-based.
 Its DeviceID key, as the name suggests, represents the device identity.
 Note that the DeviceID contains the identity of layer 0 of the boot chain, i.e., the first mutable code.
 This can also be seen in \autoref{eq:dice_deviceID}.

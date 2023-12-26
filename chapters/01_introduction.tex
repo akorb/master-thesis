@@ -28,17 +28,17 @@ Consequently, the component attests the state of the prover's machine, from whic
 
 % TPMs become more important
 
-For example, this can be done with a \acf{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encourages the adoption of TPMs~\cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021~\cite{win11req}.
+For example, this can be done with a \ac{TPM} on the prover's side. They rise in their deployments and importance, e.g., in 2013 the President's Council of Advisors on Science and Technology encouraged the adoption of TPMs~\cite{usa}, and Microsoft publicized that they require a TPM module for Windows~11 in 2021~\cite{win11req}.
 They provide remote attestation mechanisms of system states, and their applications are still expanding beyond their traditional use-cases. For example, they are used in anti-cheat software for games~\cite{valorant}.
 
 % Short intro why fTPMs were introduced (for weak devices, exactly our target platform)
 
-A \acf{dTPM} increases cost and hardware complexity---especially for embedded platforms.
-\Acfp{fTPM} running in a \acp{TEE} can be used to provide similar security guarantees as a \ac{dTPM} chip.
+A \ac{dTPM} increases cost and hardware complexity---especially for embedded platforms.
+\Acp{fTPM} running in a \acp{TEE} can be used to provide similar security guarantees as a \ac{dTPM} chip.
 
 % Why establishing trust in an fTPM is harder than in a dTPM
 
-For a \ac{dTPM}, which consists of an independent hardware unit manufactured by a single manufacturer and is directly activated by power, it is sufficient to identify its manufacturer and understand their provided guarantees.
+For a \ac{dTPM}, which consists of an independent hardware unit manufactured by a single manufacturer, it is sufficient to identify its manufacturer and understand their provided guarantees.
 In contrast, an \ac{fTPM} runs atop other firmware components and is started later in the boot chain, making its security dependent on the underlying firmware stack.
 Consequently, trust in an \ac{fTPM} depends on trusting the entire stack beneath it due to the possibility that its underlying firmware might alter or compromise the \ac{fTPM}.
 
@@ -58,7 +58,7 @@ This process is illustrated in figure \autoref{fig:current_state}.
 The prover's box shows its boot chain, the verifier's box shows how it evaluates the trustworthiness against the prover's boot chain.
 The verifier trusts the entire firmware chain if it trusts the manufacturer of each individual component.
 Note how the verifier must assume that the manufacturer of the firmware components is the same as the manufacturer of the fTPM\@.
-To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert.
+To the best of our knowledge, this is what manufacturers like Intel and AMD implement for their \acp{fTPM}, as confidence in their \acp{fTPM} is also only established through an EKcert~\cite{Ruan2014}.
 
 % Summary with limitations
 
@@ -68,7 +68,7 @@ This approach is limited, as with this mechanism, independent verifiers have to 
 
 \section{Goal}
 
-We establish an independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a zero trust environment with little hardware requirements and no compromising on security.
+We establish an independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a Zero Trust environment with little hardware requirements and no compromising on security.
 The goal of this approach is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on their manufacturer.
 Instead, it is sufficient to trust the independent manufacturer of the hardware root of trust, which in contrast requires no assumptions.
 
@@ -88,12 +88,12 @@ This enables a verifier to establish trust in an \ac{fTPM} if the underlying fir
 %The final concept should provide a comprehensive guideline to implement an fTPM, which accounts for such an environment and reflect any relevant information through remote attestation.
 
 The research questions we aim to answer are listed below.
-\begin{itemize}
-  \item What constitutes the identity of an fTPM\@? %(e.g., hash, configuration, boot chain)
-  \item How to combine the DICE and TPM infrastructure? %(e.g., AliasCert $\cup$ EKcert)
-  \item How to manage an fTPM's persistent data securely? %(e.g., flush data on update)
-  \item How to enable privacy for this attestation mechanism?
-\end{itemize}
+\begin{enumerate}[label=\textbf{RQ-\arabic*}]
+  \item What constitutes the identity of an fTPM\@?\label{rq:1-tpm-identity} %(e.g., hash, configuration, boot chain)
+  \item How to combine the DICE and TPM infrastructure?\label{rq:2-combine-infrastructure} %(e.g., AliasCert $\cup$ EKcert)
+  \item How to manage an fTPM's persistent data securely?\label{rq:3-secure-data} %(e.g., flush data on update)
+  \item How to enable privacy for this attestation mechanism?\label{rq:4-privacy}
+\end{enumerate}
 
 % Prover and verifier can take both roles for mutual attestation
 
@@ -120,27 +120,27 @@ Last, they cannot break cryptographic primitives, e.g., encryption, signing, and
 
 In this section, we want to formally describe the security goals of our solution so that we can later briefly discuss whether and how we achieve the corresponding objectives.
 
-\begin{itemize}
+\begin{enumerate}[label=\textbf{SG-\arabic*}]
   \item{\textbf{Compromised fTPM cannot fake its identity}\\
   A compromised fTPM must not be able to lie to the verifier about its identity.
-  It is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}
+  It is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}\label{sg:1}
   % Does not have access to OP-TEE's private key, code in user mode does not have access to data in kernel mode
 
   \item{\textbf{Small root of trust}\\
   A root of trust of small size, e.g., in the means of code size, hardware size, and complexity, yields a small attack surface~\cite{Singaravelu2006}.
-  This is due to the fact that a small component yields less potential implementation errors, and its approaches to guarantee specific security properties are more manageable.}
+  This is due to the fact that a small component yields less potential implementation errors, and its approaches to guarantee specific security properties are more manageable.}\label{sg:2}
   % DICE, its design, not concrete HW, its protection of the \ac{UDS}
   
   \item{\textbf{Isolation of fTPM storage}\\
-  Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm20}.}
-  This includes the protection against other trusted applications running in the same TEE\@.
+  Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm20}.
+  This includes the protection against other trusted applications running in the same \ac{TEE}\@.}\label{sg:3}
   
   \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
-  The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}
+  The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}\label{sg:4}
 
   \item{\textbf{Privacy of remote attestation process}\\
-  The verifier should be able to establish trust to an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}
-\end{itemize}
+  The verifier should be able to establish trust to an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}\label{sg:5}
+\end{enumerate}
 
 \section{Outline}
 
