@@ -3,7 +3,49 @@
 
 \chapter{Discussion}\label{chapter:discussion}
 
+In this chapter, we discuss our findings, limitations, and recommendations.
+Furthermore, we answer previously stated requirements and questions.
+
 \section{Assessment of the fulfillment of requirements}
+
+Here, we revisit and evaluate the research questions, security goals, and the requirements for an attestation process.
+
+\subsection{Research questions}
+
+% In the \nameref{chapter:introduction} we listed our research questions.
+
+\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM}}
+The first question asked is what constitutes the identity of an fTPM\@.
+We found that it is important for its identity to include its entire underlying software stack.
+This is due to the reason that each predecessor directly affects the security of an \ac{fTPM}.
+Despite that, it is still not unique.
+Therefore, it must also depend on a unique value, which we integrate by involving the \ac{UDS}.
+Only by that, its identity can represent uniquely an \ac{fTPM}.
+
+\paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM}}
+Next, we provide a design to combine the infrastructures of \ac{DICE} and \ac{TPM}.
+Here, the most important point is where the both infrastructures meet.
+While \ac{DICE} measures and derives thereon dependent secrets from the start of the device, the \ac{fTPM} is launched later in the boot chain.
+When it is eventually executed, it retrieves its \ac{CDI} from \ac{DICE}, which represents the fTPM's identity as understood previously from the perspective of \ac{DICE}.
+Based on that, the \ac{fTPM} derives its \ac{EPS}, which is the root seed for its \ac{EK}, which represents its identity from the perspective of \acp{TPM}.
+In short, the infrastructures meet and are combined at the step from the \ac{CDI} (DICE) to the \ac{EPS} (TPM).
+
+\paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely}
+Another important question to take care of is what involves managing the fTPM's data securely.
+The underlying question is what \emph{securely} means in this context.
+On the one hand, you want to make the data from the fTPM as widely available as possible; on the other hand, the data should be linked as closely as possible to the fTPM\@.
+We thereby choose to bind the data to an fTPM as long as its security relevant factors to not change, whether for the better or for the worse.
+This matches with our definition of the fTPM's identity, which is constant as long as the underlying firmware does not change, which directly affects the fTPM's security.
+Hence, we derive a storage key from the fTPM's \ac{CDI}, with which we protect the confidentiality and integrity of its data.
+
+\paragraph{\ref{rq:4-privacy}: Privacy}
+Remote attestation without involving privacy has the benefit of being straightforward, and requiring only the expected parties---verifier and prover.
+Despite that, privacy can still be a higher prioritized criteria, such that we also explain an approach to integrate it into our solution.
+The short answer to the according research question is that we need a third party \ac{CA} standing between the verifier and the prover.
+To elaborate, the prover forwards its \ac{DICE} certificates containing the exact identity of the prover's \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
+It then lets the verifier know that the TPM is authentic, without revealing its identity.
+Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
+Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage of this approach is the required privacy \ac{CA} that must be trusted by the verifier to have correctly assessed the authenticity of the \ac{fTPM}.
 
 \subsection{Security goals}
 
