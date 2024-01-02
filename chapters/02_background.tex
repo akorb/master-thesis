@@ -232,12 +232,13 @@ The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a speci
 
 % https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/msr-tr-2015-84.pdf talks about differences in security
 
-An fTPM~\cite{Raj2015, 197213} is executed directly by the host CPU within a \ac{TEE}.
-This isolates it from the \ac{REE}, which means that even the operating system in the REE cannot arbitrarily access the memory of the fTPM\@.
-The \ac{REE} can only send commands to the fTPM via controlled interfaces.
-These commands are piggybacked by calls from the \ac{REE} to the fTPM in the \ac{TEE}.
+\Acp{fTPM}~\cite{Raj2015, 197213} are executed in the environment of the host CPU\@.
+In other words, they share hardware resources such as memory and execution units with other software, while \acp{dTPM} do not.
+A typical environment for \acp{fTPM} are \acp{TEE} isolating them from the \ac{REE}, which means that even the OS in the REE cannot arbitrarily access the memory of the fTPM, but must adhere to the \ac{fTPM}'s and \ac{TEE}'s provided interfaces.
+% The \ac{REE} can only send commands to the fTPM via controlled interfaces.
+% These commands are piggybacked by calls from the \ac{REE} to the fTPM in the \ac{TEE}.
 
-The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring an fTPM to the RISC-V processor family~\cite{Boubakri2021}.
+The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring them to the RISC-V processor family~\cite{Boubakri2021}.
 % As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too.
 Common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with TrustZone~\cite{Khalid2020}.
 
@@ -249,7 +250,7 @@ A disadvantage is that running on the same processor as the rest of the system m
 % Well, they can if the fTPM RNG is connected to a hardware RNG. I think I even remember that in some paper they tried to harden fTPMs just by doing exactly this.
 Furthermore, they are started later in the host's boot chain than a \ac{dTPM} that is accessible from the beginning.
 Consequently, the measurements of the components booted before the fTPM have to be cached and later forwarded to the \ac{fTPM} once it is available.
-Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}---which is Arm's reference implementation of the boot software in the \ac{TEE}---protects this cached event log by keeping it in secure memory~\cite{tf-a-measured-boot} only accessible by the \ac{TEE}.
+Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}---which is Arm's reference implementation of the boot software in the \ac{TEE}---protects this cached event log by keeping it in secure memory only accessible by the \ac{TEE}~\cite{tf-a-measured-boot}.
 Last, fTPMs depend on more components for its security than single-component \acp{dTPM}, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
 
 % Advantages
@@ -296,7 +297,7 @@ Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is a security system that v
 For that, the system is equipped with a public key that is used to verify the digital signatures of the boot components ensuring their authenticity.
 Alternatively, merely the hashes of the components can be measured and compared with benign references values, which only ensures integrity and not authenticity.
 The first boot component stored in ROM needs to be trusted without verification, and therefore forms the root of trust.
-Nonetheless, Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
+Nonetheless, plain Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
 % Hence, further defenses like Measured Boot have been designed.
 
 % Secure Boot is a concept of UEFI~\cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.

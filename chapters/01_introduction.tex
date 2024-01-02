@@ -21,7 +21,8 @@ This is solved by remote attestation.
 In the simplest case, there is a prover and a verifier, as depicted in \autoref{fig:ra_simple}.
 The challenge is that the verifier observes nothing but bytes from the prover, and while a benign prover will tell the truth about its state, a compromised prover will lie about its state and claim a trustworthy one.
 Therefore, the verifier must establish trust to a helper component on the prover's side.
-This component must be manufacturer-controlled so that it cannot be modified without the involvement of the manufacturer, who identifies themselves to a verifier by signing and storing a certificate on the helper components supplied by them.
+In a typical setup, this component is immutable without the involvement of its manufacturer that reveals itself to a verifier by signing and storing a certificate on the helper components supplied by it.
+This allows the verifier to establish trust to the helper component by knowing its manufacturer.
 Consequently, the component attests the state of the prover's machine, from which the verifier can deduce whether the prover can be considered trustworthy.
 
 \input{elements/figure_remote_attestation_process.tex}
@@ -70,7 +71,7 @@ This approach is limited, as with this mechanism, independent verifiers have to 
 
 We establish an independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a Zero Trust environment with little hardware requirements and no compromising on security.
 The goal of this approach is to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer, by providing the exact firmware component identities to the verifier, such that it can decide for itself whether they are trustworthy without relying on their manufacturer.
-Instead, it is sufficient to trust the independent manufacturer of the hardware root of trust, which in contrast requires no assumptions.
+Instead, it is sufficient to trust the independent manufacturer of the hardware root of trust, which in contrast requires minimal assumptions, such as the absence of side-channel vulnerabilities.
 
 % Short introduction to DICE
 
