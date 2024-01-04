@@ -72,7 +72,7 @@ This must be implemented in the trusted operating system and not in the fTPM TA,
 
 Furthermore, our solution does not protect against runtime attacks on the fTPM\@.
 In general, \acp{TA} in a \ac{TEE} are not resistant to security problems caused by programming errors, e.g., buffer overflow attacks.
-Therefore, remote attestation of the control flow integrity of the fTPM may be a desired function.
+Therefore, remote attestation of the control-flow integrity of the fTPM may be a desired function.
 Displaying the current state of the fTPM instead of its identity at boot time would be a useful extension to our solution.
 
 % We described in \autoref{sec:impl_ftpm_attestation} the new fTPM TA command \texttt{TA\_FTPM\_ATTEST}.
