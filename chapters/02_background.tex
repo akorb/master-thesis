@@ -7,20 +7,27 @@ This chapter discusses the relevant background knowledge required to understand 
 
 \section{Trusted execution environment}
 
-% Motiviation for TEE's
+% Motivation for TEE's
 
-One of the core security concepts of operating systems are the privilege levels of processes~\cite{Linden1976}. Thereby, processes are protected against other processes with the same or lower privilege level. However, they are not protected against more privileged processes~\cite{Bratus2009}. This bears problems for example for cloud computing and edge computing. In cloud computing, other services, the hypervisor, or the cloud provider could potentially access sensitive data of the cloud tenant~\cite{Nimgaonkar2012}. In edge computing, the edge applications deal with plaintext data, while they are potentially running on insecure edge devices~\cite{Ning2018}. Hence, protection against more privileged processes is desired.
+Privilege levels of processes are a core security concept of operating systems~\cite{Linden1976}.
+Thereby, processes are protected against other processes with the same or lower privilege level.
+However, they are not protected against more privileged processes~\cite{Bratus2009}, causing problems for cloud and edge computing.
+In cloud computing, other services, the hypervisor, or the cloud provider could potentially access sensitive data of the cloud tenant~\cite{Nimgaonkar2012}.
+In edge computing, the edge applications deal with plaintext data while potentially running on insecure edge devices~\cite{Ning2018}.
+Hence, protection against more privileged processes is desired.
 
 
 % What TEE's are
 
-The \ac{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors. By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
+The \ac{TEE} is a technology defined by GlobalPlatform\footnote{\url{https://globalplatform.org/}} as an integrated hardware extension to processors.
+By that, the execution environment is separated into the \ac{REE} and the \ac{TEE} by hardware.
 The \ac{REE} runs commodity software, e.g., a Linux-based operating system with user applications.
-The \ac{TEE} is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code, and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
-Since a \ac{TEE} is integrated into the processor, there is no separate chip required.
+The \ac{TEE} is an isolated tamper-resistant execution environment that guarantees the authenticity of the executed code and the integrity of runtime states, e.g., memory~\cite{Sabt2015}.
+No separate chip is required since a \ac{TEE} is integrated into the processor.
 % The TEE allows code to be executed and memory separately to be used on a device in a hardware-protected manner that ensures a high level of confidentiality and integrity.
-Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS\@. The kernel space is running a trusted OS, and the user space is running the trusted applications~(TAs). 
-It focuses on resisting software-based attacks generated in the \ac{REE}, however, also protects against some hardware attacks~\cite{GPSysArch}.
+Moreover, the \ac{TEE} commonly follows the same user and kernel space separation as a rich OS\@.
+The kernel space runs a trusted OS, and the user space runs the trusted applications~(TAs). 
+It focuses on resisting software-based attacks generated in the \ac{REE} but also protects against some hardware attacks~\cite{GPSysArch}.
 
 
 % Differences to previous technologies
@@ -31,9 +38,10 @@ Previous, mostly software-based technologies ensure confidentiality and integrit
 % Figure explanation
 
 \autoref{fig:tee_motivation} illustrates the motivation of a \ac{TEE}\@.
-In the traditional architecture, i.e., without a \ac{TEE}, if an attacker compromises the \ac{REE} the full system is affected.
+In a traditional architecture without a \ac{TEE}, the complete system is affected if an attacker compromises it.
 With a \ac{TEE}, the attacker is limited to the \ac{REE}, while the \ac{TEE} continues to protect the secure assets, such as encryption keys.
-This results from the observation that the attack surface of a rich OS is much larger than that of a trusted OS, e.g., due to its network connectivity and the high dynamics of software installations, while the attack surface of a trusted OS is rather small and has tightly controlled interfaces.
+This results from the observation that the attack surface of a rich OS is much larger than that of a trusted OS, e.g., due to its network connectivity and the high dynamics of software installations.
+In contrast, the attack surface of a trusted OS is relatively small and has tightly controlled interfaces.
 
 \input{elements/figure_tee_motivation.tex}
 
@@ -46,7 +54,7 @@ Since Arm is the dominant processor architecture for Internet of Things (IoT) de
 % Our implementation also leverages TrustZone to enable the execution and the remote attestation of an fTPM\@.
 
 % However, our design is not limited to Arm TrustZone.
-Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD Secure Encrypted Virtualization~(SEV), in the future also Intel Trusted Domain Extensions~(TDX), and Arm Confidential Computing Architecture~(CCA).
+Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX) and AMD Secure Encrypted Virtualization~(SEV), and in the future, also Intel Trusted Domain Extensions~(TDX) and Arm Confidential Computing Architecture~(CCA).
 
 \input{elements/figure_arm_trustzone_arch.tex}
 
@@ -67,7 +75,7 @@ Other \ac{TEE} technologies are Intel Software Guard Extensions~(SGX), and AMD S
 
 % According to the Cambridge Dictionary an attestation is ``a formal statement that you make and officially say is true''.
 
-According to NIST SP 1800--19B~\cite{Bartock2022} an attestation is ``the process of providing a digital signature for a set of measurements securely stored in hardware, and then having the requester validate the signature and the set of measurements.''
+According to NIST SP 1800--19B~\cite{Bartock2022}, an attestation is ``the process of providing a digital signature for a set of measurements securely stored in hardware, and then having the requester validate the signature and the set of measurements.''
 % Specifically in our context, remote attestation is a mechanism for a prover 
 % In the following, the two types are discussed.
 
@@ -103,19 +111,19 @@ The evidence is then transmitted to the remote verifier, where it is evaluated.
 
 The attester acts here as the \ac{RTM} for the verifier.
 Most importantly, it must be isolated from the attested system such that it cannot be compromised by it.
-The verifier establishes trust to the attester by getting to know its manufacturer and the security properties that they guarantee.
+The verifier establishes trust in the attester by getting to know its manufacturer and the security properties that it guarantees.
 Consequently, the verifier can trust the statements the attester conducts about the attested system.
 % It is required because the verifier requires a trusted component on the prover's system whose statements it can trust.
 % Typically, the \ac{RTM} runs within the \ac{TEE}, as this isolates it from the target environment to be attested.
 
 Remote attestation commonly consists of two steps~\cite{McCune2008}.
-(i) The attestation, and (ii) the accompanying establishment of a secure channel.
+(i) The attestation, and (ii) establishing a secure channel.
 In this work, we focus on the first step.
 
-A remote attestation procedure can further be divided into two categories---implicit and explicit attestation~\cite{dice-layering-arch}.
-In implicit attestation, the state of the prover is implicitly inferred from the fact that it has control over a signing key that is only accessible if the prover is in a known state.
+A remote attestation procedure can be divided into two categories---implicit and explicit attestation~\cite{dice-layering-arch}.
+In implicit attestation, the prover's state is implicitly inferred from the prover having control over a signing key, which is only possible if it is in a known state.
 That is, the sole ability to create the evidence defines the properties of trustworthiness.
-With explicit attestation, the state of the device is explicitly described in the evidence.
+With explicit attestation, the device's state is explicitly described in the evidence.
 The solution we propose carries out an explicit attestation.
 
 \section{Trusted Platform Module}\label{sec:tpm}
@@ -145,26 +153,27 @@ The following list shows the official names of the hierarchies as defined in the
   For example, the UEFI can store its configurations under this hierarchy.}
 
   \item{\textbf{Null hierarchy (ephemeral hierarchy)}\\
-  Used for temporary keys, e.g., when the TPM is being used as a cryptographic coprocessor.
-  Keys in this hierarchy are discarded when the TPM is restarted.}
+  Used for temporary keys, e.g., when the \ac{TPM} is used as a cryptographic coprocessor.
+  Keys in this hierarchy are discarded when the \ac{TPM} is restarted.}
 
 \end{itemize}
 
 
-The hierarchies are separated in order to provide actors with finely granular access to the TPM\@.
+The hierarchies are separated to provide actors granular access to the \ac{TPM}\@.
 For example, a privacy administrator can only have access to the endorsement hierarchy, while the end user only has access to the owner hierarchy.
 They possess different behaviors as well.
-The Null hierarchy, for example, cannot be restricted, while the Platform hierarchy is unlocked each time the TPM is restarted, i.e., has an empty password, and is intended to be locked by the early boot code by setting a password only known to the early boot code.
+The Null hierarchy cannot be restricted.
+The Platform hierarchy is initialized with an empty password on each restart of the \ac{TPM} and is intended to be locked by the early boot code by setting a password only known to the early boot code.
 
 \input{elements/figure_tpm_hierarchies.tex}
-
-A TPM derives keys from two parameters, a source of object entropy and a key template.
+ 
+A \ac{TPM} derives keys from two parameters: a source of object entropy and a key template.
 The object entropy for a primary key comes from the according primary seed, for an ordinary key from the parent key, as depicted in \autoref{fig:tpm-hierarchies}.
-Note that the number of children and the hierarchy depth in this figure are exemplary and there are no technical restrictions for this in the TPM specification.
+Note that the number of children and the hierarchy depth in this figure are exemplary, and there are no technical restrictions for this in the \ac{TPM} specification.
 
-A template contains metadata of the key, such as the type of the key like RSA-2048, and the object attributes, for example, whether the key can be used for encryption or signing.
+A template contains metadata of the key, such as its type like RSA-2048, and the object attributes, for example, whether the key can be used for encryption or signing.
 Keys can be \texttt{restricted}, which limits the key to be used with data generated by the TPM~\cite{tpm20}.
-For signing keys, this prevents an attacker from asking the TPM to sign an artificially constructed quote.
+This prevents an attacker from asking the TPM to sign an artificially constructed quote for signing keys.
 Analogously, restricted encryption keys can only be used to encrypt data generated by the TPM, e.g., other keys created on the TPM\@.
 
 % \autoref{eq:ek}.
@@ -174,14 +183,14 @@ Analogously, restricted encryption keys can only be used to encrypt data generat
 % \end{equation}
 
 The \acp{PCR} are the fundament for the remote system attestation.
-They are one-way registers, which values can never be written explicitly, but only be extended; this operation is known as \emph{hash extend}~\cite{Arthur2015}.
+They are one-way registers in which values can never be explicitly written but only extended; this operation is known as \emph{hash extend}~\cite{Arthur2015}.
 Its design prohibits the removal of extensions, which would cause the TPM to forget a measurement, and the arbitrary writing of values, which would overwrite any previously conducted measurements.
 A PCR value holds a hash representing the platform state.
 Thereby, a remote verifier can request a so-called \emph{quote} from the TPM on the host in question.
 A quote contains the hash of all requested PCR values and is digitally signed.
 Typically, a TPM~2.0 contains 24 PCR registers, as defined as the minimum by~\cite{tcgPcClientTpmProfile}, with the first eight representing the firmware boot process and the higher ones representing the OS or applications~\cite{tcgPcClientFirmwareProfile}.
 %\autoref{tab:pcr_usages} shows the components each PCR value represents as specified by the TPM PC Client specification~\cite{tcgPcClientFirmwareProfile}.
-The fixed length of the \ac{PCR} values is important for the memory-constrained nature of TPMs~\cite{Arthur2015}.
+The fixed length of the \ac{PCR} values is essential for the memory-constrained nature of TPMs~\cite{Arthur2015}.
 
 The PCR value at index \(i\) can only be modified, i.e., extended, by adding together the currently contained hash value and the new hash, as depicted in \autoref{eq:pcr_extend}~\cite{tpm20}.
 For the sake of correctness, it should be noted that not every PCR is initialized with zero, as stated in the equation.
@@ -205,7 +214,7 @@ In reaction, TPM~2.0 offers crypto-agility and allows newer algorithms such as S
 % In general, TPM~2.0 is more flexible, and is always turned on, while a TPM~1.2 needed to be turned on manually.
 Also, TPM~2.0 is more consistent across different implementations because of broader specifications.
 % Nowadays, TPM~2.0 is the focused version due to its security advantages.
-Therefore, Microsoft recommends TPM~2.0 over TPM~1.2~\cite{micrec} due to its security advantages, and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers~\cite{win11req}.
+Therefore, Microsoft recommends TPM~2.0 over TPM~1.2~\cite{micrec} due to its security advantages and also requires TPM~2.0 for Windows~11 with SHA-256 PCR registers~\cite{win11req}.
 
 % SRTM (from the beginning, what we use)
 % DRTM (at any point of time, established by HW extensions, root of trust is e.g. Intel microcode/Hardware)
@@ -213,16 +222,16 @@ Therefore, Microsoft recommends TPM~2.0 over TPM~1.2~\cite{micrec} due to its se
 \input{elements/figure_pcr_types}
 
 There are three types of \acp{TPM}---\aclp{dTPM}, \aclp{fTPM}, and virtual TPMs---as illustrated in \autoref{fig:tpm_types}.
-They all offer the same functionality, but with different security guarantees and performance characteristics, explained in the following sections.
+They all offer the same functionality but have different security guarantees and performance characteristics, as explained in the following sections.
 
 
 \subsection{\Acl{dTPM}}
 
 This is the classical form of a TPM\@.
-It is a dedicated piece of hardware, connected to the CPU via a bus.
-They have their own processor, memory, and storage so that they are completely isolated from the host system and can only be accessed via the bus system.
+It is a dedicated piece of hardware connected to the CPU via a bus.
+They have their own processor, memory, and storage, so they are entirely isolated from the host system and can only be accessed via the bus system.
 % It is designed and manufactured to be highly temper-resistant against hardware attacks.
-The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a specific bus system, however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
+The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a specific bus system; however, they define the interfaces between the TPM and the following bus systems: LPC, I\textsuperscript{2}C, and SPI\@.
 
 
 \subsection{\Acl{fTPM}}
@@ -234,13 +243,13 @@ The TPM specifications~\cite{tpm20, tcgPcClientTpmProfile} do not demand a speci
 
 \Acp{fTPM}~\cite{Raj2015, 197213} are executed in the environment of the host CPU\@.
 In other words, they share hardware resources such as memory and execution units with other software, while \acp{dTPM} do not.
-A typical environment for \acp{fTPM} are \acp{TEE} isolating them from the \ac{REE}, which means that even the OS in the REE cannot arbitrarily access the memory of the fTPM, but must adhere to the \ac{fTPM}'s and \ac{TEE}'s provided interfaces.
+A typical environment for \acp{fTPM} are \acp{TEE} isolating them from the \ac{REE}, which means that even the OS in the REE cannot arbitrarily access the memory of the \ac{fTPM} but must adhere to the \ac{fTPM}'s and \ac{TEE}'s provided interfaces.
 % The \ac{REE} can only send commands to the fTPM via controlled interfaces.
 % These commands are piggybacked by calls from the \ac{REE} to the fTPM in the \ac{TEE}.
 
 The trend is moving towards fTPMs, which can also be seen by the increasing efforts to bring them to the RISC-V processor family~\cite{Boubakri2021}.
 % As of now, a fTPM is strictly bound to the processor manufacturer, such that you can trust the underlying firmware as well which is provisioned by the manufacturer, e.g., Intel, too.
-Common implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with TrustZone~\cite{Khalid2020}.
+Typical implementations are the Intel® Platform Trust Technology~(Intel PTT)~\cite{intelProcessorSecurity}, and AMD's Secure Processor~(AMD-SP), with the latter being an Arm-based coprocessor on the die with TrustZone~\cite{Khalid2020}.
 
 % Disadvantages
 
@@ -251,11 +260,11 @@ A disadvantage is that running on the same processor as the rest of the system m
 Furthermore, they are started later in the host's boot chain than a \ac{dTPM} that is accessible from the beginning.
 Consequently, the measurements of the components booted before the fTPM have to be cached and later forwarded to the \ac{fTPM} once it is available.
 Trusted Firmware-A\footnote{\url{https://www.trustedfirmware.org/}}---which is Arm's reference implementation of the boot software in the \ac{TEE}---protects this cached event log by keeping it in secure memory only accessible by the \ac{TEE}~\cite{tf-a-measured-boot}.
-Last, fTPMs depend on more components for its security than single-component \acp{dTPM}, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
+Last, \acp{fTPM} depend on more components for their security than single-component \acp{dTPM}, e.g., the hardware-provided isolation between the \ac{REE} and the \ac{TEE}, and the boot chain.
 
 % Advantages
 
-However, since they require only a \ac{TEE} which is mostly already available at currently used processors, they are cheaper for manufacturers as they require less extra hardware.
+However, since they require only a \ac{TEE}, which is mostly already available at currently used processors, they are cheaper for manufacturers as they need less extra hardware.
 In addition, TPM processors are weak~\cite{Goh2013, Raj2015}.
 Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently conclude that firmware TPMs executed on main processors are generally much faster than \acp{dTPM}.
 \Acp{fTPM} are also a viable option for adding \ac{TPM} functionality to older devices through software updates rather than hardware replacements, which is particularly valuable in times like the recent chip supply shortage~\cite{Voas2021, casper2021}.
@@ -277,13 +286,13 @@ Raj et al.~\cite{Raj2015} and Cheng et al.~\cite{Cheng2020} independently conclu
 
 \subsection{Virtual TPM}
 
-A vTPM is a software-based TPM provided by a virtual machine manager~(VMM) for one or many of its managed VM's~\cite{268868}.
-They can be realized purely in software~\cite{268868}, or backed by dTPMs~\cite{Liu2010}.
+A vTPM is a software-based TPM provided by a virtual machine manager~(VMM) for one or many of its managed VMs~\cite{268868}.
+They can be realized purely in software~\cite{268868} or backed by dTPMs~\cite{Liu2010}.
 % The hypervisor can provide an arbitrary number of vTPMs.
-% For the VM's it seems that they have exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
-A characteristic feature of virtual resources are their migration capabilities, i.e., they can be suspended and later continued on another machine.
+% For the VMs it seems that they have exclusive access to their own private TPM, even though all vTPMs are managed by the same hypervisor.
+A characteristic feature of virtual resources is their migration capabilities, i.e., they can be suspended and later continued on another machine.
 % Virtual TPMs support this as well.
-vTPMs do not inherently have their own security properties as these depend entirely on the vTPM implementation of the hypervisor.
+vTPMs do not have their own security properties, as these depend entirely on the vTPM implementation of the hypervisor.
 
 
 \section{Secure Boot and Measured Boot}
@@ -294,10 +303,10 @@ vTPMs do not inherently have their own security properties as these depend entir
 % Typically, the first component turns on the memory, the second stage initializes the platform, and the last stage boots the operating system~\cite{Yao2020}.
 
 Secure Boot~\cite{Hendricks2004, UEFI, Frazelle2020} is a security system that verifies components of the boot chain directly at boot-time.
-For that, the system is equipped with a public key that is used to verify the digital signatures of the boot components ensuring their authenticity.
-Alternatively, merely the hashes of the components can be measured and compared with benign references values, which only ensures integrity and not authenticity.
-The first boot component stored in ROM needs to be trusted without verification, and therefore forms the root of trust.
-Nonetheless, plain Secure Boot does not prevent downgrade attacks, since only the authenticity, but not the concrete versions of boot components are verified~\cite{272306}.
+For that, the system is equipped with a public key to verify the boot components' digital signatures, ensuring their authenticity.
+Alternatively, merely the hashes of the components can be measured and compared with benign reference values, ensuring integrity and not authenticity.
+The first boot component stored in ROM must be trusted without verification, forming the root of trust.
+Nonetheless, plain Secure Boot does not prevent downgrade attacks since only the authenticity, not the concrete versions of boot components, are verified~\cite{272306}.
 % Hence, further defenses like Measured Boot have been designed.
 
 % Secure Boot is a concept of UEFI~\cite{UEFI, Frazelle2020} doing local attestation of components of the boot chain directly at boot-time. Each stage measures the subsequent component before handing over the execution, and compares it with the expected value. This expected value is signed, i.e., a signature, and each boot binary contains its own signature. Providing a signature verifies not only the integrity, but also the authenticity of the component's source. The boot process is canceled as soon as deviations are detected.
@@ -316,7 +325,7 @@ Secure Boot and Measured Boot are often used in conjunction.
 \section{Device Identifier Composition Engine}
 
 % Primer
-\Ac{DICE} was originally proposed by Microsoft as part of their Robust IoT (RIoT) architecture~\cite{England2016}.
+\Ac{DICE} was initially proposed by Microsoft as part of their Robust IoT (RIoT) architecture~\cite{England2016}.
 In 2017, the DICE specification was published by \ac{TCG}~\cite{tcg-microsoft-tpm}, of which Microsoft is a member.
 Its purposes are to detect firmware tampering and enable device identification for a remote party, while its main attribute is its low hardware requirements.
 
@@ -325,14 +334,14 @@ Its purposes are to detect firmware tampering and enable device identification f
 DICE operates on a boot process layered into components~\cite{dice-layering-arch}.
 Each layer must only assume the lower layers to be trustworthy.
 Later components typically include more features and are more complex than earlier ones.
-Each component is measured prior to being activated by the preceding component.
+Each component measures the subsequent component before handing over the execution.
 Great care must be taken to ensure that the identity of the measured and thereafter executed component is consistent to prevent time-of-check to time-of-use attacks (TOCTTOU)~\cite{Hristozov2022, Carpent2018}.
 The union of all security-relevant components of a device form its \ac{TCB}.
-Their individual identities are called \ac{TCI}, which are usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
+Their individual identities are called \ac{TCI}, usually the hashes of the according firmware binary, but could also consist of a hardware product identifier.
 The TCI must also represent security-relevant configurations of a component.
 Compilation flag configurations affect the binary file and are therefore inherently included in its TCI\@.
-There are also configurations that are not part of the binary usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
-They must be measured in conjunction with the corresponding binary file or represented by two separate \acp{TCI}.
+Some configurations are not part of the binary usually provided in well-known formats such as \texttt{json} or \texttt{xml}.
+They must be measured with the corresponding binary file or represented by two separate \acp{TCI}.
 
 % Hardware requirements
 
@@ -346,22 +355,23 @@ The DICE layer
   \item and is immutable.
 \end{enumerate}
 These requirements can be justified intuitively.
-(1)~The \ac{UDS} must be read-only and unique to the device to provide a basis for long-term identification and derivation of the device's own secrets.
-(2)~The DICE layer reads and uses the \ac{UDS}, and then needs to erase the \ac{UDS} from memory while preventing other components from retrieving this secret during the power-on time.
-Otherwise, other entities can forge measurement or identification values. This lock mechanism can be realized with eFuses~\cite{dice-hardware-reqs}, for example.
-(3)~Moreover, the misbehavior of the DICE layer cannot be detected since it is the root of trust meaning it is not preceded by anything that could measure it.
-Therefore, it must be immutable to ensure that it remains in the trusted state in which the manufacturer provided it.
+(1)~The \ac{UDS} must be read-only and unique to the device to provide a basis for long-term identification and derivation of the device's secrets.
+(2)~The DICE layer reads and uses the \ac{UDS} and then needs to erase the \ac{UDS} from memory while preventing other components from retrieving this secret during the power-on time.
+Otherwise, other entities can forge measurement or identification values.
+For example, this lock mechanism can be realized with eFuses~\cite{dice-hardware-reqs}.
+(3)~Moreover, the misbehavior of the DICE layer cannot be detected since it is the root of trust, meaning it is not preceded by anything that could measure it.
+Therefore, it must be immutable to ensure that it remains in the trusted state the manufacturer provided.
 
 % What is the CDI, and what is it derived from?
 
 While the \ac{UDS} is exclusive to the DICE layer, each later component retrieves a \ac{CDI} from its predecessor.
-The \ac{CDI} of each layer depends on two variables combined in a one-way function (OWF).
+Each layer's \ac{CDI} depends on two variables combined in a one-way function (OWF).
 (i) The own \ac{TCI}, binding the \ac{CDI} to the current layer's identity, i.e., the hash of itself, and (ii) the \ac{CDI} of the previous layer, making each \ac{CDI} depending on the identities of all previous components.
 Therefore, if any component is modified, this reflects in the permutation of the \acp{CDI} of all subsequent components, as implied by \autoref{eq:dice_cdi}.
 
 % CDI protection and further uses
 
-Just as the DICE layer must ensure to have exclusive access to the \ac{UDS}, each later layer must ensure no subsequent layer has access to its \ac{CDI}\@.
+Just as the DICE layer must ensure exclusive access to the \ac{UDS}, each later layer must ensure no subsequent layer has access to its \ac{CDI}\@.
 The layers can derive further secrets using their \ac{CDI} as a seed, such as the Device ID key pair (\autoref{eq:dice_deviceID}) or an alias key pair (\autoref{eq:dice_alias}).
 
 \noindent
@@ -380,9 +390,9 @@ where \(a \circ b = OWF(a,\,b)\), \(\circ\) denotes a left-associated operator, 
 
 % Certificate chain
 
-The end result of a boot process using \ac{DICE} is a certificate chain, which can be seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
+The result of a boot process using \ac{DICE} is a certificate chain, which can be seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
 Here, each certificate represents a layer by embedding the \ac{TCI} of the layer.
-The certificate chain is built up progressively during the boot process, with the first two certificates---the manufacturer and DeviceID certificate---being static and stored on the device, and the remaining alias certificates being generated during boot time.
+The certificate chain is built up progressively during the boot process, with the first two certificates---the manufacturer and DeviceID certificate---being static and stored on the device and the remaining alias certificates being generated during boot time.
 \begin{equation}
   \label{eq:cert_chain}
   Manufacturer\ Cert \rightarrow DeviceID\ Cert \rightarrow Alias\ Cert\ [\rightarrow Alias\ Cert]^*
@@ -395,14 +405,14 @@ It is either provided by the device or can be retrieved from the manufacturer it
 
 % DeviceID certificate
 
-The next certificate is the DeviceID certificate.
-It is generated during device provisioning by the manufacturer, and signed by the manufacturer's private key.
-This links the DICE implementation to a manufacturer, which is important to retrieve the guarantees the manufacturer conducts for its DICE implementation to protect its \ac{UDS} value, which is the hardware root of trust.
+The following certificate is the DeviceID certificate.
+It is generated during device provisioning by the manufacturer and signed using the manufacturer's private key.
+This links the \ac{DICE} implementation to a manufacturer, which is essential to retrieve the guarantees the manufacturer conducts for its \ac{DICE} implementation to protect its \ac{UDS} value, which is the hardware root of trust.
 % The DeviceID certificate also contains the TCI of layer~0.
 % Hence, during provisioning, the manufacturer must ensure to only sign a DeviceID certificate containing a TCI matching the actual TCI of layer 0.
-This certificate also represents the long term identity of the device.
+This certificate also represents the long-term identity of the device.
 The \ac{UDS} alone cannot be used for this because it is kept strictly secret, whereas the DeviceID certificate is public.
-Since the identification relies on asymmetric cryptography, the manufacturer does not need to maintain a database of \ac{UDS} values, but only needs to keep and protect its private key.
+Since the identification relies on asymmetric cryptography, the manufacturer does not need to maintain a database of \ac{UDS} values but only keeps and protects its private key.
 
 % How the trust chain is continued
 
@@ -417,16 +427,16 @@ They contain the measured \ac{TCI} of layer~\( n \) and are signed with the priv
 % The graph
 
 The generation of the \ac{CDI} values and certificates is shown in \autoref{fig:dice-layers}.
-There, the \acp{CDI} and certificates are associated with their ultimate usage or the entities they represent, rather than the layer of their creation.
+There, the \acp{CDI} and certificates are associated with their ultimate usage or the entities they represent rather than the layer of their creation.
 E.g., CDI\textsubscript{\(n\)} and AliasCert\textsubscript{\(n\)} are both created by layer~\( n-1 \), but passed to and used by layer~\( n \).
 
 % How attestation works
 
-For remote attestation, the prover forwards this DICE certificate chain to the verifier.
+The prover forwards this DICE certificate chain to the verifier for remote attestation.
 The verifier must understand the manufacturer part of the DeviceID certificate from DICE and decide whether it is trustworthy.
 If this is the case and the signatures of the certificate chain can be verified with the corresponding public keys, the verifier can derive the running software of the prover from the \acp{TCI} part of the certificates.
-Finally, they can decide whether this list of \acp{TCI} is trustworthy.
+Finally, they can decide whether this \ac{TCI} list is trustworthy.
 
 % Security statement
 
-To the best of our knowledge, \ac{DICE} is so far considered secure apart from physical attacks, only implementation problems can bear security problems~\cite{Jaeger2020, Hristozov2022}.
+To our knowledge, \ac{DICE} is so far considered secure apart from physical attacks; only implementation problems can bear security problems~\cite{Jaeger2020, Hristozov2022}.
