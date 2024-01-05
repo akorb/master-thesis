@@ -3,15 +3,15 @@
 Zero Trust is a cybersecurity paradigm in which a network, e.g., an enterprise network, is considered compromised.
 Therefore, each device of every service request must be verified before the request is served.
 This is made possible by remote attestation, which is enabled by \acp{TPM}, for example.
-To do this, they are authenticated by retrieving their individual endorsement certificate, which links the \ac{TPM} to its manufacturer.
-And this manufacturer guarantees that it complies with the \ac{TPM} specification to ensure its security properties.
-While this approach is sufficient for hardware TPMs as they are standalone chips, for \acp{fTPM} it is assumed that the manufacturer of the \ac{fTPM} is the same as that of all firmware components that were booted before the \ac{fTPM}\@.
-This is due to the fact that any previous firmware component can compromise the \ac{fTPM} during loading.
-The verifier in the remote attestation procedure lacks the ability of verifying the entire boot chain up to the \ac{fTPM}\@.
-We propose a remote attestation system that provides the verifier with this possibility.
+To do this, they are authenticated by retrieving their endorsement certificate, which links the \ac{TPM} to its manufacturer.
+This manufacturer guarantees that it complies with the \ac{TPM} specification to ensure its security properties.
+While this approach is sufficient for hardware TPMs as they are standalone chips, for \acp{fTPM}, any preceding firmware component can compromise the later loaded \ac{fTPM}.
+Therefore, it must be assumed that the manufacturer of the \ac{fTPM} is the same as that of all firmware components booted before the \ac{fTPM} to establish trust in them.
+The underlying problem is that the verifier in the remote attestation procedure cannot verify the entire boot chain up to the \ac{fTPM}\@.
+We propose a remote attestation system that provides the verifier with this capability.
 To compensate for the lack of a hardware root of trust of an \ac{fTPM} compared to a hardware TPM, we introduce \ac{DICE} as the hardware root of trust.
 The verifier only needs to trust the manufacturer of \ac{DICE}, while every firmware component beyond is explicitly attested by passing their identities to the verifier.
-The three benefits of our solution are that (i) the manufacturer of the \ac{fTPM} and its preceding firmware components can be independent of each other, (ii) detection of modification of \ac{fTPM} by remote verifier, and (iii) protection of the \ac{fTPM}'s data-at-rest.
+The three benefits of our solution are that (i) the manufacturer of the \ac{fTPM} and its preceding firmware components can be independent of each other, (ii) detection of modification of the \ac{fTPM} by a remote verifier, and (iii) protection of the \ac{fTPM}'s data-at-rest.
 % Explain (ii)
 \ac{DICE} measures the first firmware component, which is then repeated up to the \ac{fTPM}\@.
 These measurements are forwarded to the remote verifier, which can then detect potentially malicious changes to each measured component.
