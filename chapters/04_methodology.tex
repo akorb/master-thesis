@@ -367,12 +367,12 @@ Hence, the prover can generate any number of \acp{AK} at any time, e.g., for eac
 This prevents the correlation of signatures, i.e., the proof that multiple signatures originate from the same TPM\@.
 However, the AK must also be certified to originate from an authentic TPM like the EK\@.
 In contrast to certifying \acp{EK}, manufacturers cannot be called upon to vouch for \acp{AK}.
-This is because if a manufacturer is referenced in the certificate of an AK, it is disclosed to the verifier, which means that privacy-relevant information is revealed.
+If AKcert references the issuing manufacturer, it is eventually disclosed to the verifier, revealing private information.
 Instead, we rely on a third-party \ac{CA}, commonly called privacy \ac{CA}\@.
 
 The privacy \ac{CA} replaces the DICE manufacturer as the root of trust for the verifier.
 For this purpose, this \ac{CA} first retrieves the original certificate chain and an AK from the prover.
-In a pure TPM system, the privacy \ac{CA} must verify that the EKcert represents an authentic TPM by verifying the certificate chain and retrieving the manufacturer from the EKcert.
+In a pure TPM system, the privacy \ac{CA} must verify that the EKcert represents an authentic TPM by evaluating the guarantees of the issuing manufacturer.
 In our system, it is about the DICE manufacturer referenced by the DeviceID certificate.
 The privacy \ac{CA} must then ensure that the AK provided by the prover comes from the same TPM as the EK of the just retrieved EKcert.
 In short, this works by the privacy \ac{CA} generating a challenge constructed with AKpub and encrypted with EKpub, which can only be solved by an entity with control over AKpriv and EKpriv\@.

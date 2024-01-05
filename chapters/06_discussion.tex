@@ -8,106 +8,106 @@ Furthermore, we answer previously stated requirements and questions.
 
 \section{Assessment of the fulfillment of requirements}
 
-Here, we revisit and evaluate the research questions, security goals, and the requirements for an attestation process.
+Here, we revisit and evaluate the research questions, security goals, and requirements for an attestation process.
 
 \subsection{Research questions}
 
 % In the \nameref{chapter:introduction} we listed our research questions.
 
-\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM}}
+\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM}}\label{par:identity}
 The first question asked is what constitutes the identity of an fTPM\@.
-We found that it is important for its identity to include its entire underlying software stack.
-This is due to the reason that each predecessor directly affects the security of an \ac{fTPM}.
+We found that it is essential for its identity to include its entire underlying software stack because each predecessor directly affects the security of an \ac{fTPM}.
 Despite that, it is still not unique.
 Therefore, it must also depend on a unique value, which we integrate by involving the \ac{UDS}.
 Only by that, its identity can represent uniquely an \ac{fTPM}.
+The \ac{DICE}'s component-specific \ac{CDI} represents this definition of identity.
 
 \paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM}}
 Next, we provide a design to combine the infrastructures of \ac{DICE} and \ac{TPM}.
-Here, the most important point is where the both infrastructures meet.
+Here, the crucial point is where both infrastructures meet.
 While \ac{DICE} measures and derives thereon dependent secrets from the start of the device, the \ac{fTPM} is launched later in the boot chain.
 When it is eventually executed, it retrieves its \ac{CDI} from \ac{DICE}, which represents the fTPM's identity as understood previously from the perspective of \ac{DICE}.
 Based on that, the \ac{fTPM} derives its \ac{EPS}, which is the root seed for its \ac{EK}, which represents its identity from the perspective of \acp{TPM}.
 In short, the infrastructures meet and are combined at the step from the \ac{CDI} (DICE) to the \ac{EPS} (TPM).
 
 \paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely}
-Another important question to take care of is what involves managing the fTPM's data securely.
+Another important aspect to take care of is managing the fTPM's data securely.
 The underlying question is what \emph{securely} means in this context.
 On the one hand, you want to make the data from the fTPM as widely available as possible; on the other hand, the data should be linked as closely as possible to the fTPM\@.
-We thereby choose to bind the data to an fTPM as long as its security relevant factors to not change, whether for the better or for the worse.
-This matches with our definition of the fTPM's identity, which is constant as long as the underlying firmware does not change, which directly affects the fTPM's security.
-Hence, we derive a storage key from the fTPM's \ac{CDI}, with which we protect the confidentiality and integrity of its data.
+We choose to bind the data to an fTPM's identity, which only changes when the security properties of the fTPM change.
+%, which is constant as long as the underlying firmware does not change, directly affecting the fTPM's security.
+As described in~\hyperref[par:identity]{\ref*{rq:1-tpm-identity}}, the fTPM's \ac{CDI} represents this identity.
+Hence, we derive a storage key from it to protect the confidentiality and integrity of the fTPM's data.
 
 \paragraph{\ref{rq:4-privacy}: Privacy}
-Remote attestation without involving privacy has the benefit of being straightforward, and requiring only the expected parties---verifier and prover.
-Despite that, privacy can still be a higher prioritized criteria, such that we also explain an approach to integrate it into our solution.
-The short answer to the according research question is that we need a third party \ac{CA} standing between the verifier and the prover.
+Remote attestation without involving privacy has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
+Despite that, privacy can still be a higher prioritized criterion, such that we also explain an approach to integrate it into our solution.
+The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.
 To elaborate, the prover forwards its \ac{DICE} certificates containing the exact identity of the prover's \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
-It then lets the verifier know that the TPM is authentic, without revealing its identity.
+It then lets the verifier know that the TPM is authentic without revealing its identity.
 Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
-Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage of this approach is the required privacy \ac{CA} that must be trusted by the verifier to have correctly assessed the authenticity of the \ac{fTPM}.
+Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage is the verifier must trust the privacy \ac{CA} to have correctly assessed the authenticity of the \ac{fTPM}.
 
 \subsection{Security goals}
 
-Here, we return to the security goals defined in the introduction and describe how we fulfil them.
+Here, we return to the security goals defined in the introduction and describe how we fulfill them.
 
 \paragraph{\ref{sg:1}: Compromised fTPM cannot fake its identity}
-The predecessor component of the fTPM, i.e., the trusted OS, performs the measurement of the fTPM, embeds it in the alias certificate representing the fTPM and signs it with its private alias key.
-As long as the trusted OS behaves correctly, the fTPM has no access to the trusted OS's private alias key.
-Therefore, the alias certificate representing the fTPM can be trusted if the TCI of the trusted OS is trustworthy since it presents the trusted OS's behavior, as then the fTPM cannot fake the certificate containing its identity.
-Actually, all TCIs of the preceding components must be trusted for that.
-In general, each component of the fTPM firmware stack must not have access to the private alias key of the component preceding it.
+The predecessor component of the fTPM, i.e., the trusted OS, performs the measurement of the fTPM, embeds it in the alias certificate representing the fTPM, and signs it with its private alias key.
+If the trusted OS behaves correctly, the fTPM cannot access its private alias key, preventing it from faking its measurements or corresponding alias certificate.
+The verifier establishes trust in the trusted OS's behavior by examining its \ac{TCI}\@.
+In fact, it needs to trust all TCIs of the preceding components for that.
+In general, each DICE layer must not have access to the private alias key of the preceding layer.
 
 \paragraph{\ref{sg:2}: Small root of trust}
-We base the trust in our system on the design and guarantees of the DICE architecture.
+We base our system's security on the DICE architecture's design and guarantees.
 Its root of trust consists of the \ac{UDS} and its protection mechanisms.
 The \ac{UDS} may only be read once per operating time of the implementing device and only by DICE\@.
-As the actual secret is a single integer value that represents a statistically unique value, we consider the root of trust to be small.
+As a single integer value representing a statistically unique value, we consider the root of trust small.
 
 \paragraph{\ref{sg:3}: Isolation of fTPM storage}
 The problem originates from the fact that the File Encryption Key~(FEK) for the data of a TA is derived by a TEE-wide secret and the TA's UUID, with the latter being public.
-Hence, any TA can potentially derive the FEK of any other TA within the same TEE\@.
-However, they cannot know the other TA's CDI, since \acp{TA} cannot measure each other.
-Consequently, this prevents other \acp{TA} from generating the fTPM's storage key of our solution.
+Hence, any TA can derive the FEK of any other TA within the same TEE\@.
+However, they cannot know the other TAs CDI since they cannot measure each other.
+Consequently, this prevents other \acp{TA} from generating our solution's fTPM's storage key.
 % The trusted OS calculates the CDI of the fTPM to pass it to the fTPM when the execution is handed over, but the trusted OS is also measured as part of our certificate chain.
 % It can therefore be remotely verified whether it is trusted, meaning that it does not abuse its privileges.
-If the trusted OS or any other preceding component is modified, e.g., to leak the fTPM's data, the CDI of the fTPM changes, consequently its storage key and its old data cannot be accessed anymore.
+If the trusted OS or any other preceding component is modified, e.g., to leak the fTPM's data, the CDI of the fTPM changes; consequently, its storage key and its old data cannot be accessed anymore.
 
 \paragraph{\ref{sg:4}: Protect fTPM data against downgrade attacks on the fTPM}
 The binding of the TPM data to the identity of the fTPM described for the storage isolation also protects against downgrade attacks.
-Whether an fTPM is updated, downgraded or otherwise changed with malicious intent is reflected in its CDI, so that the old storage key cannot be restored.
+Whether an fTPM is updated, downgraded, or otherwise changed with malicious intent is reflected in its CDI so that the old storage key cannot be restored.
 
 \paragraph{\ref{sg:5}: Privacy of remote attestation process}
 We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
-For this purpose, we introduce a proxy, the so-called privacy CA, between the verifier and the prover.
-In this process, the prover sends its certificate chain to the privacy CA, which must verify that the prover is benign, and then packages the information in a way that preserves privacy by leaving behind information that reveals the prover's identity to the verifier.
-For example, the privacy CA must verify that the verifier's DICE implementation is authentic with its DeviceID certificate and that the fTPM is actually running within the TEE\@.
-This requires information about the prover's hardware, which must not be disclosed to the verifier if data protection is a concern for the prover.
-If privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
+For this purpose, we introduce a proxy between the verifier and the prover---the privacy CA\@.
+The prover sends its certificate chain to the privacy CA, which then verifies that the prover's DICE implementation is authentic based on its DeviceID certificate.
+It then bundles the chain's information into a new certificate that preserves the prover's privacy by leaving information that reveals its identity.
+If the privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
 
 \subsection{Attestation process requirements}
 
 % Definitions
 
-\Ac{TCG} defines as part of their Trusted Attestation Protocol~\cite{tap} the requirements for an attestation process to provide assurance to a verifier that it is (i) accurate, (ii) interpretable, and (iii) attributable.
+\Ac{TCG} defines as part of their Trusted Attestation Protocol~\cite{tap} the requirements for an attestation process to assure a verifier that it is (i) accurate, (ii) interpretable, and (iii) attributable.
 
 \paragraph{Accurate}
 Accurate attestation data represents the actual identity of the device's firmware.
-This includes freshness, i.e., the data is not replayed and does not represent an old, outdated state of the device.
+This includes freshness, i.e., the data is not replayed and does not represent an outdated state of the device.
 While our system ensures freshness not alone, it is established by the subsequent protocol, e.g., retrieving a quote, as long as a verifier-supplied nonce is involved.
 
 \paragraph{Interpretable}
 Intuitively, the data must be interpretable by the verifier.
-In other words, the verifier must be able to derive a decision about the trustworthiness of the prover based on the attestation data.
+In other words, the verifier must be able to decide on the prover's trustworthiness based on the attestation data.
 Our system ensures that by propagating the TCIs as part of the publicly specified TCB Info Evidence extension.
-Also, the TCIs constitute of a hash, and the identifier of the used hash algorithm.
-Both are well-known concepts easily understandable for a verifier.
+Also, the TCIs consist of a hash and the corresponding hash algorithm identifier.
+Both are well-known concepts that are easily understandable for a verifier.
 
 \paragraph{Attributable}
 It must be possible to assign the attestation data to a specific device, i.e., it must be verifiable that the attestation data originates from the prover.
-Just like accuracy, this is also solved by the protocol that follows the attestation of the fTPM, since such protocols usually involve signing of attestation data, usually a quote.
-The quote must be signed with EKpriv corresponding to the EKpub in the EKcert.
-And EKpriv can only be created by a device that has the \acp{TCI} represented by the previously obtained certificate chain and the according \ac{UDS}, which is secret and unique for the respective prover.
+Just like accuracy, this is also solved by the protocol that follows the attestation of the fTPM since such protocols usually involve the signing of attestation data, usually a quote.
+A \ac{TPM} signs the quote with EKpriv corresponding to the EKpub in the EKcert.
+And EKpriv can only be created by a device with the \acp{TCI} represented by the previously obtained certificate chain and the according \ac{UDS}, which is secret and unique for the respective prover.
 
 
 % \section{Compatibility of higher level protocols}
@@ -116,20 +116,20 @@ And EKpriv can only be created by a device that has the \acp{TCI} represented by
 \section{Implications of openly propagating system state}
 
 % See: https://www.rfc-editor.org/rfc/rfc9334.html#section-11
-An attacker could use the TCIs to find the exact version of the running software and match this to known vulnerabilities~\cite{rfc9334}.
+An attacker could use the TCIs to find the exact running software versions and match this to known vulnerabilities~\cite{rfc9334}.
 
 To counteract this, the certificate chain can be transferred from the prover to the verifier via TCP/TLS, which guarantees the confidentiality of the TCI part of the certificates from eavesdroppers.
-However, a malicious verifier could initiate the entire attestation process, which is then the TLS endpoint that receives the certificates.
+However, a malicious verifier could initiate the entire attestation process, which is then the TLS endpoint receiving the certificates.
 This can be circumvented by authenticating the verifier.
-However, this means that the prover only shares its attestation data with certain verifiers.
-This is a trade-off that must be weighed up by the implementers of our solution.
+However, this implies the prover only shares its attestation data with certain verifiers.
+This is a trade-off that the implementers of our solution must weigh up.
 
 
 \section{Build pool of trusted TCIs}
 
 In our proposed solution, the verifiers must know the TCIs they trust.
 However, these reference values must be obtained from somewhere.
-This is a general problem of TPM~(PCRs) and DICE~(TCIs) attestation and not specific to our system.
+This is a general problem of TPM~(PCRs) and DICE~(TCIs) attestation and is not specific to our system.
 % If the prover's vendor uses off-the-shelf binaries 
 In an ideal scenario, the software developers of boot components publish the TCIs and the corresponding security attributes.
 The developers would also need to keep these listings up to date, e.g., if a vulnerability was discovered in a particular version to declare it insecure.
@@ -146,16 +146,16 @@ This is the case, for example, if the verifier provisions the devices that will 
 \subsection{Closed source vs.\ Open source}
 
 It is counter-intuitive for the acquisition of TCIs that it is irrelevant whether the software is closed or open source.
-In fact, it can be more difficult with open source software.
-This is because the calculation of TCIs is based on the binary code and not the source code, since the binary code is eventually loaded in the memory of a device and executed.
-While closed-source software must always be provided as a binary file, open-source software may only be distributed in the form of its source code.
+In fact, it can be more difficult with open-source software.
+This is because the calculation of TCIs is based on the binary code and not the source code since the binary code is eventually loaded in the memory of a device and executed.
+While closed-source software must always be provided as a binary file, open-source software may only be distributed as its source code.
 The binary file must then be generated by the device provisioner itself.
-If its build environment does not support reproducible builds~\cite{Lamb2022}, there may be many binaries and conversely many TCIs that differ only in irrelevant details, e.g., embedded timestamps.
-This is unlikely to appear with closed source software, as there is only a single distributor.
+If its build environment does not support reproducible builds~\cite{Lamb2022}, there may be many binaries and, conversely, many TCIs that differ only in irrelevant details, e.g., embedded timestamps.
+This problem is unlikely to appear with closed-source software, as only a single distributor exists.
 
-However, closed source software restricts the criteria that can be used to decide whether a TCI is trustworthy or not.
-The trustworthiness of open source software can be derived independently of its source code, and also its exact change history if an older version is evaluated.
-With closed source software, you have to rely on the developer of the closed-source software to communicate openly if security problems occur.
+However, closed-source software restricts the criteria that can be used to decide whether a TCI is trustworthy.
+The trustworthiness of open-source software can be derived independently of its source code and exact change history if an older version is evaluated.
+With closed-source software, you must rely on its developers to communicate openly if security problems occur.
 
 
 % We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
@@ -185,15 +185,15 @@ With closed source software, you have to rely on the developer of the closed-sou
 % \section{Hardware requirements: DICE + fTPM vs.\ dTPM}
 \section{Hardware requirements}
 
-A major advantage of \acp{fTPM} over \acp{dTPM} besides the better performance is that they involve less hardware components for the final system.
-The question at hand is whether the hardware requirements of an fTPM with the addition of the hardware requirements of our solution undermine this advantage.
+Besides the better performance, a significant advantage of \acp{fTPM} over \acp{dTPM} is that they involve fewer hardware components for the final system.
+The question at hand is whether the hardware requirements of an fTPM, with the addition of the hardware requirements of our solution, undermine this advantage.
 
 At the introduction of \acp{fTPM} by Raj et al.\ from Microsoft~\cite{Raj2015}, they require a TEE, storage hardware supporting a Replay Protected Memory Block~(RPMB) partition, a secure world hardware fuse, and a secure entropy source for the integration of a secure \ac{fTPM}\@.
-Thereof, a hardware fuse, a secure entropy source, and a TEE are commonly part of the processor without the need for additional hardware.
-An RPMB partition is required to protect the fTPM's storage from access outside the TEE, and prevent rollback attacks.
-Rollback attacks of the fTPM's data or the fTPM itself are not prevented by our introduction of the storage key.
-So, we also recommend using a trusted OS implementing secure storage on a RPMB partition, which involves the additional hardware requirement of an RPMB which is not necessary for \acp{dTPM}.
-However, storage has to be present anyway, and a RPMB partition is supported  by storage technologies commonly used in embedded devices, e.g., eMMC~\cite{eMMC} and UFS~\cite{UFS}.
+Thereof, a hardware fuse, a secure entropy source, and a TEE are commonly part of the processor without additional hardware.
+An RPMB partition is required to protect the fTPM's storage from access outside the TEE and prevent rollback attacks.
+Our introduction of the storage key does not prevent rollback attacks on the fTPM's data or the fTPM itself.
+So, we also recommend using a trusted OS that implements secure storage on an RPMB partition, which involves the additional hardware requirement of an RPMB, which is unnecessary for \acp{dTPM}.
+However, storage has to be present anyway, and commonly used storage technologies in embedded devices support RPMB partitions, e.g., eMMC~\cite{eMMC} and UFS~\cite{UFS}.
 
 % With DICE hardware RoT we establish a binding of the fTPM's data to the fTPM's identity, without needing to trust all remaining components in the TEE\@.
 % This is also not accomplished with RPMB\@.
@@ -206,11 +206,11 @@ However, storage has to be present anyway, and a RPMB partition is supported  by
 
 Our solution also involves the hardware requirements of DICE\@.
 The purpose of its hardware requirements is to protect the \ac{UDS}\@.
-According to Lorych and Jäger~\cite{Lorych2022}, this is usually implemented in latches which block access to a specific memory area after a bit has been set; such latches are commonly part of processors.
+According to Lorych and Jäger~\cite{Lorych2022}, this is usually implemented in latches that block access to a specific memory area after a bit has been set; such latches are commonly part of processors.
 They name the STM32G0 based on the Arm Cortex-M0+ or the STM32L4 based on the Arm Cortex-M4 as examples.
-For a system to be DICE-compatible, it is therefore usually sufficient for the processor to support it without the need for additional external hardware.
+For a system to be DICE-compatible, it is therefore sufficient for the processor to support it without needing additional external hardware.
 
-So, we are not cancelling out the advantage of less additional hardware components over a \ac{dTPM}, and instead we add restriction in the choice of processors and storage type.
+So, we are not canceling out the advantage of fewer additional hardware components over a \ac{dTPM}; instead, we restrict the choice of processors and storage type.
 
 % \section{Personal opinion about developed system}
 
@@ -223,19 +223,19 @@ So, we are not cancelling out the advantage of less additional hardware componen
 
 \section{Proving the fTPM runs in the TEE}
 
-It is important for the verifier to know that the fTPM runs within the TEE and not the REE\@.
+The verifier must know that the fTPM runs within the TEE, not the REE\@.
 Otherwise, the fTPM would not be isolated from the components within the REE, which usually offer a large attack surface because they communicate with the Internet, for example.
 The remote attestation process we propose enables this by passing the processor's name of the prover within the DeviceID certificate to the verifier.
 The verifier can then understand, e.g., from the hardware's manual, that the hardware starts in the TEE and can derive from the TCIs part of the certificate chain when the system switches to the REE during the boot process.
 It can therefore understand that the fTPM was launched and is running in the TEE\@.
 
 For our proposed architecture with privacy in mind, this check has to be conducted by the privacy CA\@.
-That is due to that the verifier must not know details of the prover's hardware, since this might reveal its identity.
+The verifier must not know the prover's hardware details since this might reveal its identity.
 
 \section{Caveats of attesting the fTPM's identity}
 
 The identity of a software component does not contain its current state.
-While the identity of a software can be derived from its binary file assuming it is statically linked, its state is derived from a snapshot of its memory during runtime.
+While the identity of software can be derived from its binary file, assuming it is statically linked, its state is derived from a snapshot of its memory during runtime.
 
-We attest the identity of the fTPM and not its state.
-This means that we do not detect attacks that occur after the startup process, i.e., during its runtime.
+We attest to the identity of the fTPM and not its state.
+This means we do not detect attacks that occur after the startup process, i.e., during its runtime.
