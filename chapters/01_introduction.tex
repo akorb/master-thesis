@@ -123,21 +123,21 @@ In this section, we want to formally describe the security goals of our solution
 
 \begin{enumerate}[label=\textbf{SG-\arabic*}]
   \item{\textbf{Compromised fTPM cannot fake its identity}\\
-  A compromised fTPM must not be able to lie to the verifier about its identity.
-  It is sufficient for a lie to be recognized, and the verifier can consequently classify the verifier's fTPM as untrustworthy.}\label{sg:1}
+  It is sufficient for a fake identity to be recognized by the verifier, who can consequently classify the prover's fTPM as untrustworthy.}\label{sg:1}
   % Does not have access to OP-TEE's private key; code in user mode does not have access to data in kernel mode
 
   \item{\textbf{Small root of trust}\\
-  A root of trust of small size, e.g., in code size, hardware size, and complexity, yields a small attack surface~\cite{Singaravelu2006}.
-  A small component yields fewer potential implementation errors, and its approaches to guarantee specific security properties are more manageable.}\label{sg:2}
+  A small root of trust, e.g., in code size, hardware size, and complexity, bears less risk in implementation errors, directly affecting security~\cite{Singaravelu2006}.
+  % and complexity, and its approaches to guarantee specific security properties are more manageable.
+  }\label{sg:2}
   % DICE, its design, not concrete HW, its protection of the \ac{UDS}
   
   \item{\textbf{Isolation of fTPM storage}\\
-  Data must only be accessible or modifiable within the boundaries of the TPM access controls, i.e., the TPM commands defined by its specification~\cite{tpm20}.
+  Data must only be accessible or modifiable within the boundaries of the fTPM's access controls, i.e., the TPM commands defined by its specification~\cite{tpm20}.
   This includes protecting against other trusted applications running in the same \ac{TEE}\@.}\label{sg:3}
   
   \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
-  The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}\label{sg:4}
+  Data of the fTPM should be sealed to its identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}\label{sg:4}
 
   % \item{\textbf{Privacy of remote attestation process}\\
   % The verifier should be able to establish trust in an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}\label{sg:5}
@@ -147,5 +147,5 @@ In this section, we want to formally describe the security goals of our solution
 
 In the \nameref{chapter:background}, we provide the knowledge necessary for a better understanding of the subsequent parts of this thesis.
 Afterward, we discuss \nameref{chapter:related_work}, i.e., attacks on TPMs to further motivate this work, approaches to hardening TPMs, and work that enables remote attestation similar to ours.
-Under \nameref{chapter:methodology}, we explain the concept of our solution and subsequently present our proof-of-concept \hyperref[chapter:implementation]{implementation}.
-Finally, we \hyperref[chapter:discussion]{discuss} our design and implementation, rounded off by \nameref{chapter:future_work_and_conclusion}.
+Under \nameref{chapter:methodology}, we explain the concept of our solution and subsequently present our proof-of-concept \nameref{chapter:implementation}.
+Finally, we \hyperref[chapter:discussion]{discuss} our design and implementation, rounded off by the \nameref{chapter:future_work_and_conclusion}.
