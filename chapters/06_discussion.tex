@@ -6,15 +6,15 @@
 In this chapter, we discuss our findings, limitations, and recommendations.
 Furthermore, we answer previously stated requirements and questions.
 
-\section{Assessment of the fulfillment of requirements}
+\section{Evaluation}
 
-Here, we revisit and evaluate the research questions, security goals, and requirements for an attestation process.
+Here, we revisit and assess the research questions, security goals, and requirements for an attestation process.
 
 \subsection{Research questions}
 
 % In the \nameref{chapter:introduction} we listed our research questions.
 
-\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM}}\label{par:identity}
+\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM} (\autoref{sec:ftpm-identity})}\label{par:identity}
 The first question asked is what constitutes the identity of an fTPM\@.
 We found that it is essential for its identity to include its entire underlying software stack because each predecessor directly affects the security of an \ac{fTPM}.
 Despite that, it is still not unique.
@@ -22,7 +22,7 @@ Therefore, it must also depend on a unique value, which we integrate by involvin
 Only by that, its identity can represent uniquely an \ac{fTPM}.
 The \ac{DICE}'s component-specific \ac{CDI} represents this definition of identity.
 
-\paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM}}
+\paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM} (\autoref{sec:combine-tpm-dice})}
 Next, we provide a design to combine the infrastructures of \ac{DICE} and \ac{TPM}.
 Here, the crucial point is where both infrastructures meet.
 While \ac{DICE} measures and derives thereon dependent secrets from the start of the device, the \ac{fTPM} is launched later in the boot chain.
@@ -30,7 +30,7 @@ When it is eventually executed, it retrieves its \ac{CDI} from \ac{DICE}, which 
 Based on that, the \ac{fTPM} derives its \ac{EPS}, which is the root seed for its \ac{EK}, which represents its identity from the perspective of \acp{TPM}.
 In short, the infrastructures meet and are combined at the step from the \ac{CDI} (DICE) to the \ac{EPS} (TPM).
 
-\paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely}
+\paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely (\autoref{subsec:storage-key})}
 Another important aspect to take care of is managing the fTPM's data securely.
 The underlying question is what \emph{securely} means in this context.
 On the one hand, you want to make the data from the fTPM as widely available as possible; on the other hand, the data should be linked as closely as possible to the fTPM\@.
@@ -39,7 +39,7 @@ We choose to bind the data to an fTPM's identity, which only changes when the se
 As described in~\hyperref[par:identity]{\ref*{rq:1-tpm-identity}}, the fTPM's \ac{CDI} represents this identity.
 Hence, we derive a storage key from it to protect the confidentiality and integrity of the fTPM's data.
 
-\paragraph{\ref{rq:4-privacy}: Privacy}
+\paragraph{\ref{rq:4-privacy}: Privacy (\autoref{sec:privacy})}
 Remote attestation without involving privacy has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
 Despite that, privacy can still be a higher prioritized criterion, such that we also explain an approach to integrate it into our solution.
 The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.

@@ -43,7 +43,7 @@ Like any other \ac{DICE} component, the \ac{fTPM} receives its secret \ac{CDI} f
 Recall that the \ac{CDI} is tied to the identity of the \ac{fTPM}, including the entire underlying firmware stack and the \ac{UDS}\@.
 We derive two values from the \ac{CDI}\@.
 
-\subsection{Storage key}
+\subsection{Storage key}\label{subsec:storage-key}
 
 % Storage Key generation
 
@@ -129,9 +129,9 @@ The \ac{EK} is a restricted encryption key by default.
 It is not used for signing by default because the resulting signatures may reveal the TPM's identity.
 We deviate from that by creating the \ac{EK} as a restricted signing key.
 While this breaks the privacy of the prover, it has the advantage of not requiring a third party \ac{CA}\@.
-More details and an extension to our system introducing privacy are provided in \autoref{sec:privacy}.
+\autoref{sec:privacy} provides more details and an extension to our system introducing privacy.
 
-\section{The identity of a firmware TPM}
+\section{The identity of a firmware TPM}\label{sec:ftpm-identity}
 
 DICE offers two identities for each component---the TCI and the CDI\@.
 As shown in \autoref{eq:dice_cdi}, the CDI of a component changes when (i) the identity of the hardware changes, i.e., the \ac{UDS}, (ii) the identity of a preceding component changes, or (iii) the component itself changes.
@@ -268,7 +268,7 @@ This ensures that the TCI also represents the template.
 
 % Also, the event log is not a hard requirement. It just makes the attestation process more flexible and comprehensible, probably not required for my Proof of concept implementation.
 
-\section{Combining TPM and DICE infrastructure}
+\section{Combining TPM and DICE infrastructure}\label{sec:combine-tpm-dice}
 
 Our DICE boot process results in a certificate chain starting with the manufacturer and DeviceID certificates and ending with the EK certificate.
 In between can be an arbitrary number of Alias certificates for ``ordinary'' firmware components (see \autoref{eq:solution_cert_chain}).
