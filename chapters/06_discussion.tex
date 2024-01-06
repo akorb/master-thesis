@@ -143,9 +143,9 @@ Alternatively, verifiers can also create their own trusted TCI pool.
 This could be a possible solution if a verifier expects a manageable number of possible firmware on the prover.
 This is the case, for example, if the verifier provisions the devices that will later be the provers themselves.
 
-\subsection{Closed source vs.\ Open source}
+\subsection{Closed-source vs.\ Open-source}
 
-It is counter-intuitive for the acquisition of TCIs that it is irrelevant whether the software is closed or open source.
+It is counter-intuitive for the acquisition of TCIs that it is irrelevant whether the software is closed- or open-source.
 In fact, it can be more difficult with open-source software.
 This is because the calculation of TCIs is based on the binary code and not the source code since the binary code is eventually loaded in the memory of a device and executed.
 While closed-source software must always be provided as a binary file, open-source software may only be distributed as its source code.
@@ -160,12 +160,12 @@ With closed-source software, you must rely on its developers to communicate open
 
 % We expect the verifier to rely on external sources to collect its pool of trustworthy TCIs.
 % The most prominent example is the observation of CVEs to see if specific versions of a software contain relevant security issues.
-% For open source software, the verifier has the possibility to derive a security policy based on the source code.
+% For open-source software, the verifier has the possibility to derive a security policy based on the source code.
 
-% Also, generally speaking, open source software receives more security audits, revealing security holes faster.
-% With closed source firmware, the verifier is restricted to reverse-engineering (not necessarily doing that itself, e.g., it could also be done by security researchers), or relying on the developer to reliably publicize CVE's about its product.
+% Also, generally speaking, open-source software receives more security audits, revealing security holes faster.
+% With closed-source firmware, the verifier is restricted to reverse-engineering (not necessarily doing that itself, e.g., it could also be done by security researchers), or relying on the developer to reliably publicize CVE's about its product.
 
-% Usually, this is easier for open source software, which is not a requirement, however.
+% Usually, this is easier for open-source software, which is not a requirement, however.
 
 % The reference values have to come from somebody. Huge burden to the verifier, see paper of Simon for potential improvement
 
