@@ -40,13 +40,27 @@ As described in~\hyperref[par:identity]{\ref*{rq:1-tpm-identity}}, the fTPM's \a
 Hence, we derive a storage key from it to protect the confidentiality and integrity of the fTPM's data.
 
 \paragraph{\ref{rq:4-privacy}: Privacy (\autoref{sec:privacy})}
-Remote attestation without involving privacy has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
+Remote attestation without ensuring the privacy of the prover has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
 Despite that, privacy can still be a higher prioritized criterion, such that we also explain an approach to integrate it into our solution.
-The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.
-To elaborate, the prover forwards its \ac{DICE} certificates containing the exact identity of the prover's \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
-It then lets the verifier know that the TPM is authentic without revealing its identity.
-Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
-Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage is the verifier must trust the privacy \ac{CA} to have correctly assessed the authenticity of the \ac{fTPM}.
+We introduce a proxy between the verifier and the prover---the privacy CA\@.
+The prover sends its certificate chain to the privacy CA, which then verifies that the \ac{fTPM} is authentic by confirming that it roots in an authentic DICE implementation.
+It then bundles the chain's information, such as measurements, into a new certificate that preserves the prover's privacy by leaving information that reveals it.
+If the privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
+Ultimately, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}, and can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements.
+
+% The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.
+% The attestation process of our \ac{fTPM} involves two steps for the verifier: ensuring the \ac{fTPM} is authentic by verifying that it roots in an authentic DICE implementation (hardware-side) and that the \ac{fTPM} itself and its entire preceding firmware are trustworthy (software-side).
+% The first one requires identifying the manufacturer of the prover's DICE implementation.
+% We therefore move the execution of this step to a privacy \ac{CA}, while the verifier can still conduct the second step itself.
+
+% To elaborate, the prover forwards its \ac{DICE} certificate chain containing the identity of its \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
+% It then lets the verifier know the DICE implementation is authentic without revealing the prover's identity.
+% Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
+% Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage is the verifier must trust the privacy \ac{CA} to have correctly assessed the authenticity of the \ac{fTPM}.
+
+% \paragraph{\ref{sg:5}: Privacy of remote attestation process}
+% We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
+
 
 \subsection{Security goals}
 
@@ -77,13 +91,6 @@ If the trusted OS or any other preceding component is modified, e.g., to leak th
 \paragraph{\ref{sg:4}: Protect fTPM data against downgrade attacks on the fTPM}
 The binding of the TPM data to the identity of the fTPM described for the storage isolation also protects against downgrade attacks.
 Whether an fTPM is updated, downgraded, or otherwise changed with malicious intent is reflected in its CDI so that the old storage key cannot be restored.
-
-\paragraph{\ref{sg:5}: Privacy of remote attestation process}
-We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
-For this purpose, we introduce a proxy between the verifier and the prover---the privacy CA\@.
-The prover sends its certificate chain to the privacy CA, which then verifies that the prover's DICE implementation is authentic based on its DeviceID certificate.
-It then bundles the chain's information into a new certificate that preserves the prover's privacy by leaving information that reveals its identity.
-If the privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
 
 \subsection{Attestation process requirements}
 

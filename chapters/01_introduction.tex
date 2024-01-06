@@ -94,7 +94,7 @@ The research questions we aim to answer are listed below.
   \item What constitutes the identity of an fTPM\@?\label{rq:1-tpm-identity} %(e.g., hash, configuration, boot chain)
   \item How to combine the DICE and TPM infrastructure?\label{rq:2-combine-infrastructure} %(e.g., AliasCert $\cup$ EKcert)
   \item How to manage an fTPM's persistent data securely?\label{rq:3-secure-data} %(e.g., flush data on update)
-  \item How to enable privacy for this attestation mechanism?\label{rq:4-privacy}
+  \item How to enable privacy in this attestation mechanism for the prover?\label{rq:4-privacy}
 \end{enumerate}
 
 % Prover and verifier can take both roles for mutual attestation
@@ -139,8 +139,8 @@ In this section, we want to formally describe the security goals of our solution
   \item{\textbf{Protect fTPM data against downgrade attacks on the fTPM}\\
   The current storage of the fTPM should be sealed to the identity of the fTPM's identity, such that when the fTPM is modified, e.g., by a downgrade attack, even the fTPM cannot access its old data anymore.}\label{sg:4}
 
-  \item{\textbf{Privacy of remote attestation process}\\
-  The verifier should be able to establish trust in an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}\label{sg:5}
+  % \item{\textbf{Privacy of remote attestation process}\\
+  % The verifier should be able to establish trust in an fTPM without having to know the identity of the fTPM, i.e., its EK\@.}\label{sg:5}
 \end{enumerate}
 
 \section{Outline}

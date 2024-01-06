@@ -346,7 +346,7 @@ As it is explicitly measured, it can be replaced at will without changing the ma
 
 \section{Privacy}\label{sec:privacy}
 
-First, we elaborate on what reveals the device's identity when conducting a remote attestation and then suggest a modification to our architecture to integrate privacy.
+First, we elaborate on what reveals the prover's identity when conducting a remote attestation and then suggest a modification to our architecture to integrate its privacy.
 
 The verifier retrieves the certificate chain and a TPM quote in an ordinary remote attestation process with our system as described in \autoref{sec:attestation_process}.
 After the root certificate, the certificate chain is continued with the DeviceID certificate, whose subject key provides the long-term identity of the device.
