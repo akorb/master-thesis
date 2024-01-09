@@ -398,8 +398,8 @@ The certificate chain is built up progressively during the boot process, with th
   Manufacturer\ Cert \rightarrow DeviceID\ Cert \rightarrow Alias\ Cert\ [\rightarrow Alias\ Cert]^*
 \end{equation}
 
-The chain's root is the certificate of the DICE manufacturer.
-It is either provided by the device or can be retrieved from the manufacturer itself, e.g., via its website, and is typically self-signed.
+The chain's self-signed root is the certificate of the DICE manufacturer.
+It is either stored on the device or retrieved from the manufacturer, e.g., via its website.
 
 \input{elements/figure_dice_layers.tex}
 
