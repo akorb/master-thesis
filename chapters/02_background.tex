@@ -391,7 +391,7 @@ where \(a \circ b = OWF(a,\,b)\), \(\circ\) denotes a left-associated operator, 
 % Certificate chain
 
 The result of a boot process using \ac{DICE} is a certificate chain, which can be seen in \autoref{fig:dice-layers} and \autoref{eq:cert_chain}.
-Here, each certificate represents a layer by embedding the \ac{TCI} of the layer.
+Each certificate represents a layer by embedding its \ac{TCI}\@.
 The certificate chain is built up progressively during the boot process, with the first two certificates---the manufacturer and DeviceID certificate---being static and stored on the device and the remaining alias certificates being generated during boot time.
 \begin{equation}
   \label{eq:cert_chain}
@@ -405,9 +405,8 @@ It is either stored on the device or retrieved from the manufacturer, e.g., via 
 
 % DeviceID certificate
 
-The following certificate is the DeviceID certificate.
-It is generated during device provisioning by the manufacturer and signed using the manufacturer's private key.
-This links the \ac{DICE} implementation to a manufacturer, which is essential to retrieve the guarantees the manufacturer conducts for its \ac{DICE} implementation to protect its \ac{UDS} value, which is the hardware root of trust.
+The following is the DeviceID certificate, generated and signed by the manufacturer during provisioning.
+It links the \ac{DICE} implementation to its manufacturer, which is essential to retrieve the guarantees it conducts to protect its \ac{UDS} value, which is the hardware root of trust.
 % The DeviceID certificate also contains the TCI of layer~0.
 % Hence, during provisioning, the manufacturer must ensure to only sign a DeviceID certificate containing a TCI matching the actual TCI of layer 0.
 This certificate also represents the long-term identity of the device.
@@ -426,8 +425,7 @@ They contain the measured \ac{TCI} of layer~\( n \) and are signed with the priv
 
 % The graph
 
-The generation of the \ac{CDI} values and certificates is shown in \autoref{fig:dice-layers}.
-There, the \acp{CDI} and certificates are associated with their ultimate usage or the entities they represent rather than the layer of their creation.
+In \autoref{fig:dice-layers}, the \acp{CDI} and certificates are associated with their ultimate usage or the entities they represent rather than the layer of their creation.
 E.g., CDI\textsubscript{\(n\)} and AliasCert\textsubscript{\(n\)} are both created by layer~\( n-1 \), but passed to and used by layer~\( n \).
 
 % How attestation works
