@@ -8,63 +8,12 @@ Furthermore, we answer previously stated requirements and questions.
 
 \section{Evaluation}
 
-Here, we revisit and assess the research questions, security goals, and requirements for an attestation process.
-
-\subsection{Research questions}
-
-% In the \nameref{chapter:introduction} we listed our research questions.
-
-\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM} (\autoref{sec:ftpm-identity})}\label{par:identity}
-The first question asked is what constitutes the identity of an fTPM\@.
-We found that it is essential for its identity to include its entire underlying software stack because each predecessor directly affects the security of an \ac{fTPM}.
-Despite that, it is still not unique.
-Therefore, it must also depend on a unique value, which we integrate by involving the \ac{UDS}.
-Only by that, its identity can represent uniquely an \ac{fTPM}.
-The \ac{DICE}'s component-specific \ac{CDI} represents this definition of identity.
-
-\paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM} (\autoref{sec:combine-tpm-dice})}
-Next, we provide a design to combine the infrastructures of \ac{DICE} and \ac{TPM}.
-Here, the crucial point is where both infrastructures meet.
-While \ac{DICE} measures and derives thereon dependent secrets from the start of the device, the \ac{fTPM} is launched later in the boot chain.
-When it is eventually executed, it retrieves its \ac{CDI} from \ac{DICE}, which represents the fTPM's identity as understood previously from the perspective of \ac{DICE}.
-Based on that, the \ac{fTPM} derives its \ac{EPS}, which is the root seed for its \ac{EK}, which represents its identity from the perspective of \acp{TPM}.
-In short, the infrastructures meet and are combined at the step from the \ac{CDI} (DICE) to the \ac{EPS} (TPM).
-
-\paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely (\autoref{subsec:storage-key})}
-Another important aspect to take care of is managing the fTPM's data securely.
-The underlying question is what \emph{securely} means in this context.
-On the one hand, you want to make the data from the fTPM as widely available as possible; on the other hand, the data should be linked as closely as possible to the fTPM\@.
-We choose to bind the data to an fTPM's identity, which only changes when the security properties of the fTPM change.
-%, which is constant as long as the underlying firmware does not change, directly affecting the fTPM's security.
-As described in~\hyperref[par:identity]{\ref*{rq:1-tpm-identity}}, the fTPM's \ac{CDI} represents this identity.
-Hence, we derive a storage key from it to protect the confidentiality and integrity of the fTPM's data.
-
-\paragraph{\ref{rq:4-privacy}: Privacy (\autoref{sec:privacy})}
-Remote attestation without ensuring the privacy of the prover has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
-Despite that, privacy can still be a higher prioritized criterion, such that we also explain an approach to integrate it into our solution.
-We introduce a proxy between the verifier and the prover---the privacy CA\@.
-The prover sends its certificate chain to the privacy CA, which then verifies that the \ac{fTPM} is authentic by confirming that it roots in an authentic DICE implementation.
-It then bundles the chain's information, such as measurements, into a new certificate that preserves the prover's privacy by leaving information that reveals it.
-If the privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
-Ultimately, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}, and can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements.
-
-% The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.
-% The attestation process of our \ac{fTPM} involves two steps for the verifier: ensuring the \ac{fTPM} is authentic by verifying that it roots in an authentic DICE implementation (hardware-side) and that the \ac{fTPM} itself and its entire preceding firmware are trustworthy (software-side).
-% The first one requires identifying the manufacturer of the prover's DICE implementation.
-% We therefore move the execution of this step to a privacy \ac{CA}, while the verifier can still conduct the second step itself.
-
-% To elaborate, the prover forwards its \ac{DICE} certificate chain containing the identity of its \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
-% It then lets the verifier know the DICE implementation is authentic without revealing the prover's identity.
-% Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
-% Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage is the verifier must trust the privacy \ac{CA} to have correctly assessed the authenticity of the \ac{fTPM}.
-
-% \paragraph{\ref{sg:5}: Privacy of remote attestation process}
-% We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
+Here, we revisit and assess the security goals and requirements for an attestation process.
 
 
 \subsection{Security goals}
 
-Here, we return to the security goals defined in the introduction and describe how we fulfill them.
+First, we return to the security goals defined in the introduction (\autoref{sec:sec-goals}) and describe how we fulfill them.
 
 \paragraph{\ref{sg:1}: Compromised fTPM cannot fake its identity}
 The predecessor component of the fTPM, i.e., the trusted OS, performs the measurement of the fTPM, embeds it in the alias certificate representing the fTPM, and signs it with its private alias key.
@@ -115,6 +64,59 @@ It must be possible to assign the attestation data to a specific device, i.e., i
 Just like accuracy, this is also solved by the protocol that follows the attestation of the fTPM since such protocols usually involve the signing of attestation data, usually a quote.
 A \ac{TPM} signs the quote with EKpriv corresponding to the EKpub in the EKcert.
 And EKpriv can only be created by a device with the \acp{TCI} represented by the previously obtained certificate chain and the according \ac{UDS}, which is secret and unique for the respective prover.
+
+\section{Revisiting research questions}
+
+In the following, we briefly discuss our answers to the previously posed research questions from \autoref{sec:goal}.
+
+% In the \nameref{chapter:introduction} we listed our research questions.
+
+\paragraph{\ref{rq:1-tpm-identity}: Identity of \ac{fTPM} (\autoref{sec:ftpm-identity})}\label{par:identity}
+The first question asked is what constitutes the identity of an fTPM\@.
+We found that it is essential for its identity to include its entire underlying software stack because each predecessor directly affects the security of an \ac{fTPM}.
+Despite that, it is still not unique.
+Therefore, it must also depend on a unique value, which we integrate by involving the \ac{UDS}.
+Only by that, its identity can represent uniquely an \ac{fTPM}.
+The \ac{DICE}'s component-specific \ac{CDI} represents this definition of identity.
+
+\paragraph{\ref{rq:2-combine-infrastructure}: \acs{DICE} \texttt{+} \acs{TPM} (\autoref{sec:combine-tpm-dice})}
+Next, we provide a design to combine the infrastructures of \ac{DICE} and \ac{TPM}.
+Here, the crucial point is where both infrastructures meet.
+While \ac{DICE} measures and derives thereon dependent secrets from the start of the device, the \ac{fTPM} is launched later in the boot chain.
+When it is eventually executed, it retrieves its \ac{CDI} from \ac{DICE}, which represents the fTPM's identity as understood previously from the perspective of \ac{DICE}.
+Based on that, the \ac{fTPM} derives its \ac{EPS}, which is the root seed for its \ac{EK}, which represents its identity from the perspective of \acp{TPM}.
+In short, the infrastructures meet and are combined at the step from the \ac{CDI} (DICE) to the \ac{EPS} (TPM).
+
+\paragraph{\ref{rq:3-secure-data}: Manage the fTPM's data securely (\autoref{subsec:storage-key})}
+Another important aspect to take care of is managing the fTPM's data securely.
+The underlying question is what \emph{securely} means in this context.
+On the one hand, you want to make the data from the fTPM as widely available as possible; on the other hand, the data should be linked as closely as possible to the fTPM\@.
+We choose to bind the data to an fTPM's identity, which only changes when the security properties of the fTPM change.
+%, which is constant as long as the underlying firmware does not change, directly affecting the fTPM's security.
+As described in~\hyperref[par:identity]{\ref*{rq:1-tpm-identity}}, the fTPM's \ac{CDI} represents this identity.
+Hence, we derive a storage key from it to protect the confidentiality and integrity of the fTPM's data.
+
+\paragraph{\ref{rq:4-privacy}: Privacy (\autoref{sec:privacy})}
+Remote attestation without ensuring the privacy of the prover has the benefit of being straightforward and requiring only the expected parties---verifier and prover.
+Despite that, privacy can still be a higher prioritized criterion, such that we also explain an approach to integrate it into our solution.
+We introduce a proxy between the verifier and the prover---the privacy CA\@.
+The prover sends its certificate chain to the privacy CA, which then verifies that the \ac{fTPM} is authentic by confirming that it roots in an authentic DICE implementation.
+It then bundles the chain's information, such as measurements, into a new certificate that preserves the prover's privacy by leaving information that reveals it.
+If the privacy CA honors its promise not to disclose the prover's identity and the verifier trusts the privacy CA, the prover's privacy is protected.
+Ultimately, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}, and can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements.
+
+% The short answer to this research question is that we need a third party \ac{CA} standing between the verifier and the prover.
+% The attestation process of our \ac{fTPM} involves two steps for the verifier: ensuring the \ac{fTPM} is authentic by verifying that it roots in an authentic DICE implementation (hardware-side) and that the \ac{fTPM} itself and its entire preceding firmware are trustworthy (software-side).
+% The first one requires identifying the manufacturer of the prover's DICE implementation.
+% We therefore move the execution of this step to a privacy \ac{CA}, while the verifier can still conduct the second step itself.
+
+% To elaborate, the prover forwards its \ac{DICE} certificate chain containing the identity of its \ac{fTPM} to the privacy \ac{CA}, which evaluates whether it indeed represents an authentic TPM\@.
+% It then lets the verifier know the DICE implementation is authentic without revealing the prover's identity.
+% Hence, the verifier can only derive that it communicates with \emph{an} authentic TPM, but not \emph{which}.
+% Although the verifier can still decide for itself whether it considers the \ac{fTPM} to be trustworthy based on its measurements, the disadvantage is the verifier must trust the privacy \ac{CA} to have correctly assessed the authenticity of the \ac{fTPM}.
+
+% \paragraph{\ref{sg:5}: Privacy of remote attestation process}
+% We have proposed an extension to our system to ensure the privacy of the prover during the remote attestation process.
 
 
 % \section{Compatibility of higher level protocols}

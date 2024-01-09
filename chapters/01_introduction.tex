@@ -68,7 +68,7 @@ In summary, with the current approach, the endorser, usually a CPU manufacturer,
 This enables trust in the other firmware components this manufacturer provided without knowing the firmware.
 This approach is limited, as with this mechanism, independent verifiers have to unquestioningly trust the firmware manufacturer, drastically limiting trust relationships.
 
-\section{Goal}
+\section{Goal}\label{sec:goal}
 
 We establish an independently verifiable fTPM stack, rooted in a hardware root of trust, that can be leveraged in a Zero Trust environment with few hardware requirements and without compromising security.
 This approach aims to break the requirement of the underlying firmware and the fTPM to originate from the same manufacturer by providing the exact firmware component identities to the verifier, such that it can decide whether they are trustworthy without relying on its manufacturer.
@@ -117,7 +117,7 @@ For the network, we assume the Dolev-Yao attacker model~\cite{Dolev1983}, wherei
 The attacker may also control parts or the entire network, e.g., all routers, switches, and connections.
 Last, they cannot break cryptographic primitives, e.g., encryption, signing, and hashing.
 
-\section{Security goals}
+\section{Security goals}\label{sec:sec-goals}
 
 In this section, we want to formally describe the security goals of our solution so that we can later briefly discuss whether and how we achieve the corresponding objectives.
 
